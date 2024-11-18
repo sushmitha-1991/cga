@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.dsp</groupId>
-	<artifactId>govtAssurance</artifactId>
+	<artifactId>cga</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>govtAssurance</name>
-	<description>project for GovtAssurance</description>
+	<name>cga</name>
+	<description>project for cga</description>
 	<url/>
 	<licenses>
 		<license/>
