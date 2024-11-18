@@ -41,7 +41,7 @@ public class AssuranceDTO {
 	    private String supplementaryPageNo;
 	    private Long supplementaryMemberId;
 	    private Boolean draftStatus;
-	    private String source;
+	    private Long source;
 	    private List<Long> clubbedMembers;
 	    private List<PartDetailsDTO> partDetails;
 	    private List<SupplementaryDTO> supplementary;

@@ -50,7 +50,7 @@ public class Supplementary extends Auditable{
 	@Column(name = "subject", length = 255)
 	private String subject;
 
-	@Column(name = "status_id", nullable = false)
+	@Column(name = "status_id")
 	private Long statusId;
 
 	private String extentOfAssurance;

@@ -52,8 +52,8 @@ public class Assurance extends Auditable {
 	@Column(name = "assurance_date", nullable = false)
 	private LocalDate assuranceDate;
 
-	@NotNull
-	@Column(name = "category_id", nullable = false)
+
+	@Column(name = "category_id")
 	private Long categoryId;
 
 	@Column(name = "question_no", length = 50)
@@ -84,8 +84,8 @@ public class Assurance extends Auditable {
 	@Column(name = "file_no", length = 50)
 	private String fileNo;
 
-	@NotNull
-	@Column(name = "status_id", nullable = false)
+
+	@Column(name = "status_id")
 	private Long statusId;
 
 	@Column(name = "pending_due_to")
@@ -126,7 +126,7 @@ public class Assurance extends Auditable {
 	private Boolean draftStatus = false;
 
 	@Column(name = "source", length = 255)
-	private String source;
+	private Long source;
 
 	@Column(name = "assuranceNo", length = 25)
 	private String assuranceNo;
