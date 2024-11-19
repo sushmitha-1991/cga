@@ -48,10 +48,9 @@ public class Assurance extends Auditable {
 	@Column(name = "rajya_sabha_session_no")
 	private Long rajyaSabhaSessionNo;
 
-	@NotNull
+	@NotNull(message = "AssuranceDate is mandatory and cannot be null")
 	@Column(name = "assurance_date", nullable = false)
 	private LocalDate assuranceDate;
-
 
 	@Column(name = "category_id")
 	private Long categoryId;
@@ -59,18 +58,18 @@ public class Assurance extends Auditable {
 	@Column(name = "question_no", length = 50)
 	private String questionNo;
 
-	@NotNull
+	@NotNull(message = "Type is mandatory and cannot be null")
 	@Column(name = "assurance_type_id", nullable = false)
 	private Long assuranceTypeId;
 
 	@Column(name = "subject", length = 255)
 	private String subject;
 
-	@NotNull
+	@NotNull(message = "Member is mandatory and cannot be null")
 	@Column(name = "member_id", nullable = false)
 	private Long memberId;
 
-	@NotNull
+	@NotNull(message = "Ministry is mandatory and cannot be null")
 	@Column(name = "ministry_id", nullable = false)
 	private Long ministryId;
 
@@ -84,7 +83,6 @@ public class Assurance extends Auditable {
 	@Column(name = "file_no", length = 50)
 	private String fileNo;
 
-
 	@Column(name = "status_id")
 	private Long statusId;
 
@@ -93,6 +91,9 @@ public class Assurance extends Auditable {
 
 	@Column(name = "mpa_ref_date")
 	private LocalDate mpaRefDate;
+
+	@Column(name = "mpa_ref_no")
+	private String mpaRefNo;
 
 	@Column(name = "report_no", length = 30)
 	private String reportNo;
@@ -125,8 +126,12 @@ public class Assurance extends Auditable {
 	@Column(name = "draft_status", nullable = false)
 	private Boolean draftStatus = false;
 
-	@Column(name = "source", length = 255)
-	private Long source;
+	@Column(name = "source_id")
+	private Long sourceId;
+
+	
+	@Column(name = "group_name", nullable = true, length = 50)
+	private String groupName;
 
 	@Column(name = "assuranceNo", length = 25)
 	private String assuranceNo;

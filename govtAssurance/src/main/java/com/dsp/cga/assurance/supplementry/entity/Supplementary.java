@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,7 +37,8 @@ public class Supplementary extends Auditable{
 	private Long id;
 
 	private String supp;
-
+	
+    @NotNull(message = "Member is mandatory and cannot be null")
 	@Column(name = "member_id")
 	private Long memberId;
 
@@ -45,14 +47,18 @@ public class Supplementary extends Auditable{
 	@Column(name = "clubbed_member")
 	private List<Long> clubbedMembers = new ArrayList<>();
 
+	 @NotNull(message = "Part is mandatory and cannot be null")
 	private String part;
 
+	 @NotNull(message = "Subject is mandatory and cannot be null")
 	@Column(name = "subject", length = 255)
 	private String subject;
 
+	 @NotNull(message = "Status is mandatory and cannot be null")
 	@Column(name = "status_id")
 	private Long statusId;
 
+	 @NotNull(message = "extentOfAssurance is mandatory and cannot be null")
 	private String extentOfAssurance;
 
 	@ManyToOne

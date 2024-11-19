@@ -45,6 +45,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 //	    String statusName = externalService.getStatusName(assuranceDTO.getStatusId());
 //	    String ministryName = externalService.getMinistryName(assuranceDTO.getMinistryId());
 //	    String departmentName = externalService.getDepartmentName(assuranceDTO.getDepartmentId());
+	    validateAssuranceFields(assuranceDTO);
 
 	    // Map the AssuranceDTO to Assurance entity
 	    Assurance assurance = assuranceMapper.toEntity(assuranceDTO);
@@ -68,6 +69,36 @@ public class AssuranceServiceImpl implements AssuranceService {
 //	    savedAssuranceDTO.setDepartmentname(departmentName);
 
 	    return savedAssuranceDTO;
+	}
+	public void validateAssuranceFields(AssuranceDTO dto) {
+	    // Check if Rajya Sabha Session Number is provided
+	    boolean hasRajyaSabhaSessionNo = dto.getRajyaSabhaSessionNo() != null;
+
+	    // Check if both Lok Sabha Number and Session Number are provided
+	    boolean hasLokSabhaNoAndSessionNo = dto.getLokSabhaNo() != null && dto.getLokSabhaSessionNo() != null;
+
+	    // Validate that either Rajya Sabha Session Number is provided,
+	    // or both Lok Sabha Number and Session Number are provided together.
+	    if (!(hasRajyaSabhaSessionNo || hasLokSabhaNoAndSessionNo)) {
+	        throw new IllegalArgumentException(
+	            "Invalid data: Either Rajya Sabha Session Number must be provided, "
+	            + "or both Lok Sabha Number and Session Number must be provided."
+	        );
+	    }
+
+	    // Check that if Lok Sabha Number is provided, Session Number must also be provided.
+	    if (dto.getLokSabhaNo() != null && dto.getLokSabhaSessionNo() == null) {
+	        throw new IllegalArgumentException(
+	            "Invalid data: If Lok Sabha Number is provided, Session Number must also be provided."
+	        );
+	    }
+
+	    // Check that if Session Number is provided, Lok Sabha Number must also be provided.
+	    if (dto.getLokSabhaSessionNo() != null && dto.getLokSabhaNo() == null) {
+	        throw new IllegalArgumentException(
+	            "Invalid data: If Session Number is provided, Lok Sabha Number must also be provided."
+	        );
+	    }
 	}
 
 }

@@ -56,11 +56,13 @@ public class AssuranceMapper {
                 .supplementaryPageNo(assurance.getSupplementaryPageNo())
                 .supplementaryMemberId(assurance.getSupplementaryMemberId())
                 .draftStatus(assurance.getDraftStatus())
-                .source(assurance.getSource())
+                .sourceId(assurance.getSourceId())
                 .assuranceNo(assurance.getAssuranceNo())
                 .pageNoCorrected(assurance.getPageNoCorrected())
                 .pageNoUncorrected(assurance.getPageNoUncorrected())
                 .clubbedMembers(assurance.getClubbedMembers())
+                .groupName(assurance.getGroupName())
+                .mpaRefNo(assurance.getMpaRefNo())
                 .partDetails(partDetailsDTOs)
                 .supplementary(supplementaryDTOs)  // Set the List<SupplementaryDTO>
                 .build();
@@ -102,7 +104,9 @@ public class AssuranceMapper {
                 .assuranceNo(assuranceDTO.getAssuranceNo())
                 .pageNoCorrected(assuranceDTO.getPageNoCorrected())
                 .pageNoUncorrected(assuranceDTO.getPageNoUncorrected())
-                .source(assuranceDTO.getSource())
+                .sourceId(assuranceDTO.getSourceId())
+                .groupName(assuranceDTO.getGroupName())
+                .mpaRefNo(assuranceDTO.getMpaRefNo())
                 .clubbedMembers(assuranceDTO.getClubbedMembers())
                 .build();
 
@@ -138,4 +142,6 @@ assurance.setClubbedMembers(clubbedMembers);
         return assurance;
 
 }
+   
+
     }

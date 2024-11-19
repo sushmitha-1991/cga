@@ -31,6 +31,7 @@ public class AssuranceDTO {
 	    private Long statusId;
 	    private Long pendingDueTo;
 	    private LocalDate mpaRefDate;
+	    private String mpaRefNo;
 	    private String reportNo;
 	    private String remarks;
 	    private LocalDate dueDateOfImplementation;
@@ -41,7 +42,7 @@ public class AssuranceDTO {
 	    private String supplementaryPageNo;
 	    private Long supplementaryMemberId;
 	    private Boolean draftStatus;
-	    private Long source;
+	    private Long sourceId;
 	    private List<Long> clubbedMembers;
 	    private List<PartDetailsDTO> partDetails;
 	    private List<SupplementaryDTO> supplementary;
@@ -55,5 +56,6 @@ public class AssuranceDTO {
 	    private String assuranceNo;
 	    private String pageNoCorrected;
 	    private String pageNoUncorrected;
+	    private String groupName;
   
 }
