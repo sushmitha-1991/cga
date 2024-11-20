@@ -57,5 +57,6 @@ public class AssuranceDTO {
 	    private String pageNoCorrected;
 	    private String pageNoUncorrected;
 	    private String groupName;
+	    private String otherPendingDueTo;
   
 }

@@ -48,8 +48,8 @@ public class Assurance extends Auditable {
 	@Column(name = "rajya_sabha_session_no")
 	private Long rajyaSabhaSessionNo;
 
-	@NotNull(message = "AssuranceDate is mandatory and cannot be null")
-	@Column(name = "assurance_date", nullable = false)
+	
+	@Column(name = "assurance_date")
 	private LocalDate assuranceDate;
 
 	@Column(name = "category_id")
@@ -128,6 +128,9 @@ public class Assurance extends Auditable {
 
 	@Column(name = "source_id")
 	private Long sourceId;
+	
+	@Column(name = "other_pending_due_to")
+	private String otherPendingDueTo;
 
 	
 	@Column(name = "group_name", nullable = true, length = 50)

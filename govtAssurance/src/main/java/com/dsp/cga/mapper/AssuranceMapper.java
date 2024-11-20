@@ -63,6 +63,7 @@ public class AssuranceMapper {
                 .clubbedMembers(assurance.getClubbedMembers())
                 .groupName(assurance.getGroupName())
                 .mpaRefNo(assurance.getMpaRefNo())
+                .otherPendingDueTo(assurance.getOtherPendingDueTo())
                 .partDetails(partDetailsDTOs)
                 .supplementary(supplementaryDTOs)  // Set the List<SupplementaryDTO>
                 .build();
@@ -107,6 +108,7 @@ public class AssuranceMapper {
                 .sourceId(assuranceDTO.getSourceId())
                 .groupName(assuranceDTO.getGroupName())
                 .mpaRefNo(assuranceDTO.getMpaRefNo())
+                .otherPendingDueTo(assuranceDTO.getOtherPendingDueTo())
                 .clubbedMembers(assuranceDTO.getClubbedMembers())
                 .build();
 
