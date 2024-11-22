@@ -46,17 +46,28 @@ public class AssuranceDTO {
 	    private List<Long> clubbedMembers;
 	    private List<PartDetailsDTO> partDetails;
 	    private List<SupplementaryDTO> supplementary;
-	    private String lokSabhaName;
+	    private String lokSabhaSession;
+	   
 	    private String categoryName;
 	    private String memberName;
 	    private String statusName;
 	    private String ministryName;
-	    private String departmentname;
+	    private String departmentName;
 	    private String assuranceType;
 	    private String assuranceNo;
 	    private String pageNoCorrected;
 	    private String pageNoUncorrected;
 	    private String groupName;
 	    private String otherPendingDueTo;
+	    private MemberDTO memberDTO;
+	    private MinistryDTO ministryDTO;
+	    private DepartmentsDTO departmentDTO;
+	    private StatusDTO statusDTO;
+	    private AssuranceTypeDTO assuranceTypeDTO;
+	    private RajyaSabhaSessionNoDTO RajyaSabhaSessionNoDTO;
+	    private SourceDTO sourceDTO;
+	    private PendingDueToDTO pendingDueToDTO;
+	    private LokSabhaNoDTO lokSabhaNoDTO;
+	    private LoksabhaSessionNoDTO loksabhaSessionNoDTO;
   
 }

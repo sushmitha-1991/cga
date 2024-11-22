@@ -15,8 +15,11 @@ import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 @Component
 public class AssuranceMapper {
+	
+	
+    
 	 // Map Assurance entity to AssuranceDTO
-    public static AssuranceDTO toDTO(Assurance assurance) {
+    public  AssuranceDTO toDTO(Assurance assurance) {
         if (assurance == null) {
             return null;
         }
@@ -28,6 +31,8 @@ public class AssuranceMapper {
         List<SupplementaryDTO> supplementaryDTOs = assurance.getSupplementary().stream()
             .map(SupplementaryMapper::toDTO)
             .collect(Collectors.toList());
+        
+   
 
         return AssuranceDTO.builder()
                 .id(assurance.getId())
@@ -61,6 +66,9 @@ public class AssuranceMapper {
                 .pageNoCorrected(assurance.getPageNoCorrected())
                 .pageNoUncorrected(assurance.getPageNoUncorrected())
                 .clubbedMembers(assurance.getClubbedMembers())
+               
+               .statusId(assurance.getStatusId())
+                
                 .groupName(assurance.getGroupName())
                 .mpaRefNo(assurance.getMpaRefNo())
                 .otherPendingDueTo(assurance.getOtherPendingDueTo())

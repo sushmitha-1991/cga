@@ -10,6 +10,7 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -42,7 +43,7 @@ public class Supplementary extends Auditable{
 	@Column(name = "member_id")
 	private Long memberId;
 
-	@ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "supplementary_clubbed_members", schema = "cga", joinColumns = @JoinColumn(name = "supplementary_id"))
 	@Column(name = "clubbed_member")
 	private List<Long> clubbedMembers = new ArrayList<>();

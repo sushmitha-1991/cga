@@ -1,4 +1,4 @@
-package com.dsp.cga.implementationrequest.entity;
+package com.dsp.cga.assurance.implementationrequest.entity;
 
 import java.time.LocalDate;
 

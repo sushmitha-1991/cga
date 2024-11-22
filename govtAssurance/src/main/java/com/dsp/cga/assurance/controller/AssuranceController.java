@@ -1,8 +1,11 @@
 package com.dsp.cga.assurance.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +38,17 @@ public class AssuranceController {
 	                "Assurance item created successfully", createdAssurance);
 	        return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	    }
+	 
+	 @GetMapping("/getAll")
+		@Operation(summary = "Get all Assurance")
+		@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
+				@ApiResponse(responseCode = "500", description = "Internal server error") })
+		public ResponseEntity<GenericResponse<List<AssuranceDTO>>> getAllAssurance() {
+			List<AssuranceDTO> assurance = assuranceService.getAllAssurance();
+			GenericResponse<List<AssuranceDTO>> response = new GenericResponse<>(HttpStatus.OK.value(), true,
+					"assurance fetched successfully", assurance);
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
 	}
 
 
