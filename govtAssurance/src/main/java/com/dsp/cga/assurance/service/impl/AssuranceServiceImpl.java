@@ -1,7 +1,10 @@
 package com.dsp.cga.assurance.service.impl;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -476,6 +479,40 @@ System.out.println(response);
 	    log.debug("Returning AssuranceDTO: {}", dto);
 	    return dto;
 	}
+
+	@Override
+	public List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId,
+			Long memberId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+//	@Override
+//	@Transactional
+//	public List<AssuranceDTO> getFilteredAssurances(
+//	        LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
+//	    log.debug("Entering getFilteredAssurances with filters - From: {}, To: {}, MinistryId: {}, MemberId: {}", 
+//	              fromDate, toDate, ministryId, memberId);
+//
+//	    // Fetch filtered assurances
+//	    List<Assurance> assurances = assuranceRepository.findFilteredAssurances(fromDate, toDate, ministryId, memberId);
+//	    log.debug("Fetched filtered assurances: {}", assurances);
+//
+//	    // Map assurances to DTOs and populate additional data
+//	    return assurances.stream().map(assurance -> {
+//	        AssuranceDTO dto = assuranceMapper.toDTO(assurance);
+//	        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+//	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+//	        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+//	        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+//	        dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
+//	        dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+//	        dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+//	        dto.setClubbedMembersData(fetchClubbedMembersData(assurance.getClubbedMembers()));
+//	        return dto;
+//	    }).collect(Collectors.toList());
+//	}
+
 
 
 }

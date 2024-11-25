@@ -56,8 +56,8 @@ public class RestTemplateConfig {
 
         // Configure timeout settings
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(3, TimeUnit.SECONDS) // Connection timeout (3 seconds)
-                .setResponseTimeout(3, TimeUnit.SECONDS) // Response timeout (3 seconds)
+                .setConnectTimeout(5, TimeUnit.SECONDS) // Connection timeout (3 seconds)
+                .setResponseTimeout(10, TimeUnit.SECONDS) // Response timeout (3 seconds)
                 .build();
 
         // Create the HttpClient with the request configuration
