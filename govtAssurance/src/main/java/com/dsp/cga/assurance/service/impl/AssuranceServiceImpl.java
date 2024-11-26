@@ -155,7 +155,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 	        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
 	        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
 	        dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
-	        dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+	        if (assurance.getPendingDueTo() != null) {
+	            dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+	        } 
 	        dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
 	        List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
 	        dto.setClubbedMembersData(clubbedMembersData);
@@ -469,13 +471,16 @@ System.out.println(response);
 	    dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
 	    dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
 	    dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
-	    dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+	    if (assurance.getPendingDueTo() != null) {
+            dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+        } 	   
 	    dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+	    if (assurance.getClubbedMembers() != null) {
 
 	    // Fetch and set clubbed members
 	    List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
 	    dto.setClubbedMembersData(clubbedMembersData);
-
+	    }
 	    log.debug("Returning AssuranceDTO: {}", dto);
 	    return dto;
 	}

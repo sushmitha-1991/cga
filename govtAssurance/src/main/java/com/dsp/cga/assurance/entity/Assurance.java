@@ -114,9 +114,6 @@ public class Assurance extends Auditable {
 	@Column(name = "text_of_assurance", length = 200)
 	private String textOfAssurance;
 
-//    @Column(name = "supplementary")
-//    private Boolean supplementary;
-
 	@Column(name = "supplementary_page_no", length = 10)
 	private String supplementaryPageNo;
 

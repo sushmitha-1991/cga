@@ -65,6 +65,7 @@ public class SupplementaryMapper {
 	                .build();
 	    }
 	    
+
 	    private List<MemberDTO> fetchClubbedMembersData(List<Long> clubbedMembers) {
 		    // Check if the list is not empty
 		    if (clubbedMembers == null || clubbedMembers.isEmpty()) {
