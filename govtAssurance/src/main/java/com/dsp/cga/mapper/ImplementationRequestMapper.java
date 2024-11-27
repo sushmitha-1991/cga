@@ -19,9 +19,10 @@ public class ImplementationRequestMapper {
                 .supplementaryId(entity.getSupplementaryId())
                 .partId(entity.getPartId())
                 .reason(entity.getReason())
-                .implementationReportFiles(entity.getImplementationReportFiles())
-                .partReportFiles(entity.getPartReportFiles())
-                .otherFiles(entity.getOtherFiles())
+                .draftStatus(entity.getDraftStatus())
+//                .implementationReportFiles(entity.getImplementationReportFiles())
+//                .partReportFiles(entity.getPartReportFiles())
+//                .otherFiles(entity.getOtherFiles())
                 .build();
     }
 
@@ -39,9 +40,10 @@ public class ImplementationRequestMapper {
                 .supplementaryId(dto.getSupplementaryId())
                 .partId(dto.getPartId())
                 .reason(dto.getReason())
-                .implementationReportFiles(dto.getImplementationReportFiles())
-                .partReportFiles(dto.getPartReportFiles())
-                .otherFiles(dto.getOtherFiles())
+                .draftStatus(dto.getDraftStatus())
+//                .implementationReportFiles(dto.getImplementationReportFiles())
+//                .partReportFiles(dto.getPartReportFiles())
+//                .otherFiles(dto.getOtherFiles())
                 .build();
     }
 }

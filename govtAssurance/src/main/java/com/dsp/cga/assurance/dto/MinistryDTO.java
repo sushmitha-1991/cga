@@ -9,5 +9,7 @@ public class MinistryDTO {
 	private Long id;
 	
 	private String ministryName;
+	
+	 private Integer ministryCode;
 ;
 }

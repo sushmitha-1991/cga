@@ -15,5 +15,9 @@ public interface AssuranceService {
 
 	List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId);
 
+	AssuranceDTO updateAssurance(Long id, AssuranceDTO assuranceDTO);
+
+	AssuranceDTO updateAssuranceById(Long id, AssuranceDTO assuranceDTO);
+
 	
 }

@@ -3,6 +3,8 @@ package com.dsp.cga.assurance.service.impl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -22,15 +24,19 @@ import com.dsp.cga.assurance.dto.LokSabhaNoDTO;
 import com.dsp.cga.assurance.dto.LoksabhaSessionNoDTO;
 import com.dsp.cga.assurance.dto.MemberDTO;
 import com.dsp.cga.assurance.dto.MinistryDTO;
+import com.dsp.cga.assurance.dto.PartDetailsDTO;
 import com.dsp.cga.assurance.dto.PendingDueToDTO;
 import com.dsp.cga.assurance.dto.RajyaSabhaSessionNoDTO;
 import com.dsp.cga.assurance.dto.SourceDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
+import com.dsp.cga.assurance.dto.SupplementaryDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 //import com.dsp.cga.assurance.external.service.ExternalService;
 import com.dsp.cga.assurance.partdetails.repository.PartDetailsRepository;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.service.AssuranceService;
+import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.assurance.supplementry.repository.SupplementaryRepository;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.AssuranceMapper;
@@ -485,39 +491,142 @@ System.out.println(response);
 	    return dto;
 	}
 
-	@Override
-	public List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId,
-			Long memberId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 //	@Override
-//	@Transactional
-//	public List<AssuranceDTO> getFilteredAssurances(
-//	        LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
-//	    log.debug("Entering getFilteredAssurances with filters - From: {}, To: {}, MinistryId: {}, MemberId: {}", 
-//	              fromDate, toDate, ministryId, memberId);
-//
-//	    // Fetch filtered assurances
-//	    List<Assurance> assurances = assuranceRepository.findFilteredAssurances(fromDate, toDate, ministryId, memberId);
-//	    log.debug("Fetched filtered assurances: {}", assurances);
-//
-//	    // Map assurances to DTOs and populate additional data
-//	    return assurances.stream().map(assurance -> {
-//	        AssuranceDTO dto = assuranceMapper.toDTO(assurance);
-//	        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
-//	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
-//	        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
-//	        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
-//	        dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
-//	        dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
-//	        dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
-//	        dto.setClubbedMembersData(fetchClubbedMembersData(assurance.getClubbedMembers()));
-//	        return dto;
-//	    }).collect(Collectors.toList());
+//	public List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId,
+//			Long memberId) {
+//		// TODO Auto-generated method stub
+//		return null;
 //	}
 
+	@Override
+	@Transactional
+	public List<AssuranceDTO> getFilteredAssurances(
+	        LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
+	    log.debug("Entering getFilteredAssurances with filters - From: {}, To: {}, MinistryId: {}, MemberId: {}", 
+	              fromDate, toDate, ministryId, memberId);
+
+	    // Fetch filtered assurances
+	    List<Assurance> assurances = assuranceRepository.findFilteredRajyaSabhaAssurances(fromDate, toDate, ministryId, memberId);
+	    log.debug("Fetched filtered assurances: {}", assurances);
+
+	    // Map assurances to DTOs and populate additional data
+	    return assurances.stream().map(assurance -> {
+	        AssuranceDTO dto = assuranceMapper.toDTO(assurance);
+	        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+	        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+	        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+	        dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
+	        dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+	        dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+	        dto.setClubbedMembersData(fetchClubbedMembersData(assurance.getClubbedMembers()));
+	        return dto;
+	    }).collect(Collectors.toList());
+	}
+
+	@Override
+	public AssuranceDTO updateAssurance(Long id, AssuranceDTO assuranceDTO) {
+	    // Fetch existing assurance
+	    Assurance existingAssurance = assuranceRepository.findById(id)
+	            .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with id: " + id));
+
+	    // Update Assurance fields (only if present)
+	    updateBasicFields(existingAssurance, assuranceDTO);
+
+	    // Update PartDetails
+	    updatePartDetails(existingAssurance, assuranceDTO.getPartDetails());
+
+	    // Update Supplementary
+	    updateSupplementary(existingAssurance, assuranceDTO.getSupplementary());
+
+	    // Save updated entity
+	    Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
+
+	    return assuranceMapper.toDTO(updatedAssurance);
+	}
+
+	private void updateBasicFields(Assurance assurance, AssuranceDTO dto) {
+	    // Update fields only if they are present
+	    if (dto.getLokSabhaNo() != null) assurance.setLokSabhaNo(dto.getLokSabhaNo());
+	    if (dto.getLokSabhaSessionNo() != null) assurance.setLokSabhaSessionNo(dto.getLokSabhaSessionNo());
+	    if (dto.getRajyaSabhaSessionNo() != null) assurance.setRajyaSabhaSessionNo(dto.getRajyaSabhaSessionNo());
+	    if (dto.getAssuranceDate() != null) assurance.setAssuranceDate(dto.getAssuranceDate());
+	    if (dto.getCategoryId() != null) assurance.setCategoryId(dto.getCategoryId());
+	    if (dto.getQuestionNo() != null) assurance.setQuestionNo(dto.getQuestionNo());
+	    if (dto.getAssuranceTypeId() != null) assurance.setAssuranceTypeId(dto.getAssuranceTypeId());
+	    if (dto.getSubject() != null) assurance.setSubject(dto.getSubject());
+	    if (dto.getMemberId() != null) assurance.setMemberId(dto.getMemberId());
+	    if (dto.getMinistryId() != null) assurance.setMinistryId(dto.getMinistryId());
+	    if (dto.getDepartmentId() != null) assurance.setDepartmentId(dto.getDepartmentId());
+	    if (dto.getGroupName() != null) assurance.setGroupName(dto.getGroupName());
+	    if (dto.getFileNo() != null) assurance.setFileNo(dto.getFileNo());
+	    if (dto.getAssuranceNo() != null) assurance.setAssuranceNo(dto.getAssuranceNo());
+	    if (dto.getPageNoUncorrected() != null) assurance.setPageNoUncorrected(dto.getPageNoUncorrected());
+	    if (dto.getPageNoCorrected() != null) assurance.setPageNoCorrected(dto.getPageNoCorrected());
+	    if (dto.getDraftStatus() != null) assurance.setDraftStatus(dto.getDraftStatus());
+	    if (dto.getSourceId() != null) assurance.setSourceId(dto.getSourceId());
+	    if (dto.getMpaRefDate() != null) assurance.setMpaRefDate(dto.getMpaRefDate());
+	    if (dto.getReportNo() != null) assurance.setReportNo(dto.getReportNo());
+	    if (dto.getRemarks() != null) assurance.setRemarks(dto.getRemarks());
+	}
+
+	private void updatePartDetails(Assurance assurance, List<PartDetailsDTO> partDetailsDTOs) {
+	    if (partDetailsDTOs == null) return;
+
+	    Map<Long, PartDetails> existingPartDetailsMap = assurance.getPartDetails()
+	            .stream()
+	            .collect(Collectors.toMap(PartDetails::getId, Function.identity()));
+
+	    for (PartDetailsDTO dto : partDetailsDTOs) {
+	        if (dto.getId() != null && existingPartDetailsMap.containsKey(dto.getId())) {
+	            // Update existing PartDetails
+	            PartDetails existing = existingPartDetailsMap.get(dto.getId());
+	            if (dto.getPart() != null) existing.setPart(dto.getPart());
+	            if (dto.getSubject() != null) existing.setSubject(dto.getSubject());
+	            if (dto.getStatusId() != null) existing.setStatusId(dto.getStatusId());
+	            if (dto.getExtentOfAssurance() != null) existing.setExtentOfAssurance(dto.getExtentOfAssurance());
+	        } 
+	    }
+	}
+
+	private void updateSupplementary(Assurance assurance, List<SupplementaryDTO> supplementaryDTOs) {
+	    if (supplementaryDTOs == null) return;
+
+	    Map<Long, Supplementary> existingSupplementaryMap = assurance.getSupplementary()
+	            .stream()
+	            .collect(Collectors.toMap(Supplementary::getId, Function.identity()));
+
+	    for (SupplementaryDTO dto : supplementaryDTOs) {
+	        if (dto.getId() != null && existingSupplementaryMap.containsKey(dto.getId())) {
+	            // Update existing Supplementary
+	            Supplementary existing = existingSupplementaryMap.get(dto.getId());
+	            if (dto.getSupp() != null) existing.setSupp(dto.getSupp());
+	            if (dto.getMemberId() != null) existing.setMemberId(dto.getMemberId());
+	            if (dto.getClubbedMembers() != null) existing.setClubbedMembers(dto.getClubbedMembers());
+	            if (dto.getPart() != null) existing.setPart(dto.getPart());
+	            if (dto.getSubject() != null) existing.setSubject(dto.getSubject());
+	            if (dto.getStatusId() != null) existing.setStatusId(dto.getStatusId());
+	            if (dto.getExtentOfAssurance() != null) existing.setExtentOfAssurance(dto.getExtentOfAssurance());
+	        } 
+	    }
+	}
+	 @Transactional
+	@Override
+	public AssuranceDTO updateAssuranceById(Long id, AssuranceDTO assuranceDTO) {
+		
+		        // Check if the Assurance exists
+		        Assurance existingAssurance = assuranceRepository.findById(id)
+		                .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with id: " + id));
+
+		        // Map the incoming DTO to the entity
+		        assuranceMapper.updateAssuranceFromDTO(assuranceDTO, existingAssurance);
+
+		        // Save and return the updated entity
+		        Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
+
+		        // Return the updated AssuranceDTO
+		        return assuranceMapper.toDTO(updatedAssurance);
+		    }
 
 
 }
