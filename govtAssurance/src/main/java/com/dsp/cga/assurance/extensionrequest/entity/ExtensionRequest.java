@@ -3,6 +3,7 @@ package com.dsp.cga.assurance.extensionrequest.entity;
 import java.time.LocalDate;
 
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.entity.Auditable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,17 +24,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "extension_request", schema = "cga")
-public class ExtensionRequest {
+@Table(name = "extension_requests", schema = "cga")
+public class ExtensionRequest extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "extension_req_seq")
 	@SequenceGenerator(name = "extension_req_seq", sequenceName = "cga.extension_req_seq", allocationSize = 1)
 	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "assurance_id", nullable = false)
-	private Assurance assurance;
+	@Column(name = "assurance_id", nullable = false)
+	private Long assuranceId;
+
 
 	@Column(name = "question_no", length = 10, nullable = false)
 	private String questionNo;

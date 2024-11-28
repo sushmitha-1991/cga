@@ -14,7 +14,7 @@ public class ExtensionRequestMapper {
 
 	        return ExtensionRequestDTO.builder()
 	                .id(entity.getId())
-	                //.assuranceId(entity.getAssuranceId())
+	                .assuranceId(entity.getAssuranceId())
 	                .questionNo(entity.getQuestionNo())
 	                .extensionNo(entity.getExtensionNo())
 	                .subject(entity.getSubject())
@@ -28,6 +28,20 @@ public class ExtensionRequestMapper {
 	                .build();
 	    }
 
+	 public static void updateEntityFromDTO(ExtensionRequestDTO dto, ExtensionRequest entity) {
+	        if (dto != null && entity != null) {
+	            entity.setQuestionNo(dto.getQuestionNo());
+	            entity.setExtensionNo(dto.getExtensionNo());
+	            entity.setSubject(dto.getSubject());
+	            entity.setExtRequestedTillDate(dto.getExtRequestedTillDate());
+	            entity.setExtGrantedTillDate(dto.getExtGrantedTillDate());
+	            entity.setMinistryRefNo(dto.getMinistryRefNo());
+	            entity.setMinistryRefDate(dto.getMinistryRefDate());
+	            entity.setRemarks(dto.getRemarks());
+	            entity.setExtensionFiles(dto.getExtensionFiles());
+	            entity.setDraftStatus(dto.getDraftStatus());
+	        }
+	    }
 	    public static ExtensionRequest toEntity(ExtensionRequestDTO dto) {
 	        if (dto == null) {
 	            return null;
@@ -35,7 +49,7 @@ public class ExtensionRequestMapper {
 
 	        return ExtensionRequest.builder()
 	                .id(dto.getId())
-	               // .assuranceId(dto.getAssuranceId())
+	                .assuranceId(dto.getAssuranceId())
 	                .questionNo(dto.getQuestionNo())
 	                .extensionNo(dto.getExtensionNo())
 	                .subject(dto.getSubject())

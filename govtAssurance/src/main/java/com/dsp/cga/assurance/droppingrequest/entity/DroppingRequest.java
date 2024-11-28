@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name ="dropping_request", schema = "cga")
+@Table(name ="dropping_requests", schema = "cga")
 public class DroppingRequest extends Auditable{
 	
 	@Id
@@ -31,7 +31,7 @@ public class DroppingRequest extends Auditable{
 	  @Column(name = "assurance_id", nullable = false)
 	    private Long assuranceId;
 
-	   
+	  @Column(name = "droppingType", nullable = false)
 	    private Long droppingType; // Code is a reference to the 'master' microservice
 
 	    @Column(name = "supplementary_id")
