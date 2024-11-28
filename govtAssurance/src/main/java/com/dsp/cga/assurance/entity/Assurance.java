@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
+import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.entity.Auditable;
@@ -153,6 +155,12 @@ public class Assurance extends Auditable {
 
 	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
 	private List<Supplementary> supplementary;
+	
+//	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+//	private List<ImplementationRequest> implementationRequests;
+//
+//	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+//	private List<ExtensionRequest> extensionRequest;
 
 	
 

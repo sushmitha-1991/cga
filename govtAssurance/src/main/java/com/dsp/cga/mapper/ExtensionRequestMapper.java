@@ -14,7 +14,7 @@ public class ExtensionRequestMapper {
 
 	        return ExtensionRequestDTO.builder()
 	                .id(entity.getId())
-	                .assuranceId(entity.getAssuranceId())
+	                //.assuranceId(entity.getAssuranceId())
 	                .questionNo(entity.getQuestionNo())
 	                .extensionNo(entity.getExtensionNo())
 	                .subject(entity.getSubject())
@@ -35,7 +35,7 @@ public class ExtensionRequestMapper {
 
 	        return ExtensionRequest.builder()
 	                .id(dto.getId())
-	                .assuranceId(dto.getAssuranceId())
+	               // .assuranceId(dto.getAssuranceId())
 	                .questionNo(dto.getQuestionNo())
 	                .extensionNo(dto.getExtensionNo())
 	                .subject(dto.getSubject())

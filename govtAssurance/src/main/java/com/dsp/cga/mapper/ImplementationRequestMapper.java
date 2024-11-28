@@ -46,5 +46,23 @@ public class ImplementationRequestMapper {
 //                .otherFiles(dto.getOtherFiles())
                 .build();
     }
+    
+    public static void updateEntityFromDTO(ImplementationRequestDTO dto, ImplementationRequest entity) {
+        if (dto == null || entity == null) {
+            return;
+        }
+
+        // Update fields that are modifiable
+        entity.setCommitteeDecisionId(dto.getCommitteeDecisionId());
+        entity.setLayingDate(dto.getLayingDate());
+        entity.setStatementNo(dto.getStatementNo());
+        entity.setSupplementaryId(dto.getSupplementaryId());
+        entity.setPartId(dto.getPartId());
+        entity.setReason(dto.getReason());
+        entity.setDraftStatus(dto.getDraftStatus());
+        
+        // Note: createdBy and createdDate will remain unchanged as per JPA logic
+    }
+
 }
 

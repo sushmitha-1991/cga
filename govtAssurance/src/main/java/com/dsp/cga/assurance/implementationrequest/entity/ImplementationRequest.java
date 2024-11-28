@@ -1,14 +1,10 @@
 package com.dsp.cga.assurance.implementationrequest.entity;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 
 import com.dsp.cga.entity.Auditable;
-import com.dsp.cga.util.JsonMapConverter;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "implementation_request", schema = "cga")
+@Table(name = "implementation_requests", schema = "cga")
 public class ImplementationRequest extends Auditable {
 
 	@Id
@@ -68,5 +64,9 @@ public class ImplementationRequest extends Auditable {
 
 	@Column(name = "draft_status", nullable = false)
 	private Boolean draftStatus = false;
+	
+//	@ManyToOne
+//    @JoinColumn(name = "assurance_id", nullable = false)
+//    private Assurance assurance;
 
 }

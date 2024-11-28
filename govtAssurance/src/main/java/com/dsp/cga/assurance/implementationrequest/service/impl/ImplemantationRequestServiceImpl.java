@@ -65,23 +65,30 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    ImplementationRequest savedRequest;
 
 	    if (existingRequestOpt.isPresent()) {
-	        // Record exists, update it
+	        // Fetch the existing entity
 	        ImplementationRequest existingRequest = existingRequestOpt.get();
-	        ImplementationRequest updatedRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
-	        updatedRequest.setId(existingRequest.getId()); // Ensure the same ID is retained
-	        savedRequest = implementationRequestRepository.save(updatedRequest);
+
+	        // Update fields based on DTO
+	        ImplementationRequestMapper.updateEntityFromDTO(implementationRequestDTO, existingRequest);
+
+	        // Save the updated entity (updatedBy and updatedAt will be set automatically)
+	        savedRequest = implementationRequestRepository.save(existingRequest);
+
 	    } else {
-	        // Record does not exist, create a new one
+	        // Create a new entity
 	        ImplementationRequest newRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
+
+	        // Save the new entity (createdBy and createdAt will be set automatically)
 	        savedRequest = implementationRequestRepository.save(newRequest);
 	    }
 
-	    // Convert the saved entity back to DTO
+	    // Convert the saved entity to DTO
 	    ImplementationRequestDTO savedDTO = ImplementationRequestMapper.toDTO(savedRequest);
 
 	    // Return the response wrapped in GenericResponse
 	    return new GenericResponse<>(HttpStatus.CREATED.value(), true, "Success", savedDTO);
 	}
+
 
 
 //	@Override
