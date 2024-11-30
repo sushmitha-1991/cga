@@ -53,13 +53,15 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 
 		// Populate additional data if available
 		dto.setStatusDTO(fetchStatusData(Request.getDropStatusId()));
+		System.out.println("$$$$$$$$$$$" + Request.getDropStatusId());
 		dto.setDroppingTypeDTO(fetchDroppingTypeData(Request.getDroppingType()));
 		log.debug("Returning ImplementationRequestDTO: {}", dto);
 		return dto;
 	}
 
-	private StatusDTO fetchStatusData(Long statusId) {
-		String statusServiceUrl = codeServiceUrl + statusId;
+	private StatusDTO fetchStatusData(Long dropStatusId) {
+		System.out.println("@@@@@@@@"+ dropStatusId);
+		String statusServiceUrl = codeServiceUrl + dropStatusId;
 		log.debug("Calling master service URL for Status: {}", statusServiceUrl);
 
 		ResponseEntity<GenericResponse<StatusDTO>> response = restTemplate.exchange(statusServiceUrl, HttpMethod.GET,
@@ -81,6 +83,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	}
 
 	private DroppingTypeDTO fetchDroppingTypeData(Long droppingType) {
+		System.out.println("#######" + droppingType);
 		String DroppingServiceUrl = codeServiceUrl + droppingType;
 		log.debug("Calling master service URL for Status: {}", DroppingServiceUrl);
 
