@@ -21,9 +21,9 @@ public class DroppingRequestMapper {
                 .partId(entity.getPartId())
                 .dropRequestDate(entity.getDropRequestDate())
                 .actualDropDate(entity.getActualDropDate())
-                .dropStatusId(entity.getDropStatusId())
+               // .dropStatusId(entity.getDropStatusId())
                 .remarks(entity.getRemarks())
-                .draftStatus(entity.getDraftStatus())
+              //  .draftStatus(entity.getDraftStatus())
                 .build();
     }
 	
@@ -40,9 +40,9 @@ public class DroppingRequestMapper {
                 .partId(dto.getPartId())
                 .dropRequestDate(dto.getDropRequestDate())
                 .actualDropDate(dto.getActualDropDate())
-                .dropStatusId(dto.getDropStatusId())
+                //.dropStatusId(dto.getDropStatusId())
                 .remarks(dto.getRemarks())
-                .draftStatus(dto.getDraftStatus())
+              //  .draftStatus(dto.getDraftStatus())
                 .build();
     }
 
@@ -53,9 +53,9 @@ public class DroppingRequestMapper {
             entity.setPartId(dto.getPartId());
             entity.setDropRequestDate(dto.getDropRequestDate());
             entity.setActualDropDate(dto.getActualDropDate());
-            entity.setDropStatusId(dto.getDropStatusId());
+           // entity.setDropStatusId(dto.getDropStatusId());
             entity.setRemarks(dto.getRemarks());
-            entity.setDraftStatus(dto.getDraftStatus());
+          //  entity.setDraftStatus(dto.getDraftStatus());
         }
     }
 }

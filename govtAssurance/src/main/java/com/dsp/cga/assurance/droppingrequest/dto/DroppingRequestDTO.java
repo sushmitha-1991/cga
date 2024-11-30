@@ -30,13 +30,13 @@ public class DroppingRequestDTO {
 
 	private LocalDate actualDropDate;
 
-	private Long dropStatusId;
+	//private Long dropStatusId;
 
 	private String remarks;
 
 	private Boolean draftStatus = Boolean.FALSE;
 	
-	private StatusDTO statusDTO;
+	//private StatusDTO statusDTO;
 	
 	private DroppingTypeDTO droppingTypeDTO;
 
