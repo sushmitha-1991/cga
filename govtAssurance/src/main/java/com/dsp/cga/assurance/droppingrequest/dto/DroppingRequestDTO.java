@@ -2,9 +2,11 @@ package com.dsp.cga.assurance.droppingrequest.dto;
 
 import java.time.LocalDate;
 
+import com.dsp.cga.assurance.dto.AcceptedDTO;
 import com.dsp.cga.assurance.dto.DroppingTypeDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,14 +32,24 @@ public class DroppingRequestDTO {
 
 	private LocalDate actualDropDate;
 
-	//private Long dropStatusId;
+	// private Long dropStatusId;
 
 	private String remarks;
 
 	private Boolean draftStatus = Boolean.FALSE;
-	
-	//private StatusDTO statusDTO;
-	
+
+	// private StatusDTO statusDTO;
+
 	private DroppingTypeDTO droppingTypeDTO;
+	
+	private AcceptedDTO acceptedDTO;
+
+	private String ministryRefNo;
+
+	private LocalDate ministryRefDate;
+
+	private Long acceptedId;
+
+	private String subject;
 
 }

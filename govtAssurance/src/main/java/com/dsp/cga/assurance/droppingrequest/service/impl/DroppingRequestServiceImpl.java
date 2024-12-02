@@ -17,6 +17,7 @@ import com.dsp.cga.assurance.droppingrequest.dto.DroppingRequestDTO;
 import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
 import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
 import com.dsp.cga.assurance.droppingrequest.service.DroppingRequestService;
+import com.dsp.cga.assurance.dto.AcceptedDTO;
 import com.dsp.cga.assurance.dto.DroppingTypeDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.implementationrequest.service.impl.ImplemantationRequestServiceImpl;
@@ -54,7 +55,8 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		// Populate additional data if available
 		//dto.setStatusDTO(fetchStatusData(Request.getDropStatusId()));
 		//System.out.println("$$$$$$$$$$$" + Request.getDropStatusId());
-		dto.setDroppingTypeDTO(fetchDroppingTypeData(Request.getDroppingType()));
+		//dto.setDroppingTypeDTO(fetchDroppingTypeData(Request.getDroppingType()));
+		dto.setAcceptedDTO(fetchAcceptdData(Request.getAcceptedId()));
 		log.debug("Returning ImplementationRequestDTO: {}", dto);
 		return dto;
 	}
@@ -81,28 +83,51 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		return statusDTO;
 	}
 
-	private DroppingTypeDTO fetchDroppingTypeData(Long droppingType) {
-		
-		String DroppingServiceUrl = codeServiceUrl + droppingType;
-		log.debug("Calling master service URL for Status: {}", DroppingServiceUrl);
+	
+	private AcceptedDTO fetchAcceptdData(Long acceptedId) {
+		String statusServiceUrl = codeServiceUrl + acceptedId;
+	log.debug("Calling master service URL for Status: {}", statusServiceUrl);
 
-		ResponseEntity<GenericResponse<DroppingTypeDTO>> response = restTemplate.exchange(DroppingServiceUrl,
-				HttpMethod.GET, null, new ParameterizedTypeReference<GenericResponse<DroppingTypeDTO>>() {
-				});
-		System.out.println(response);
+	ResponseEntity<GenericResponse<AcceptedDTO>> response = restTemplate.exchange(statusServiceUrl, HttpMethod.GET,
+			null, new ParameterizedTypeReference<GenericResponse<AcceptedDTO>>() {
+			});
+	System.out.println(response);
 
-		if (!response.getStatusCode().is2xxSuccessful()) {
-			log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(),
-					response.getBody());
-			throw new RuntimeException(
-					"Failed to fetch data from master service for Status. Status: " + response.getStatusCode());
-		}
-
-		DroppingTypeDTO droppingTypeDTO = response.getBody().getData();
-		log.debug("Fetched StatusDTO: {}", droppingTypeDTO);
-
-		return droppingTypeDTO;
+	if (!response.getStatusCode().is2xxSuccessful()) {
+		log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(),
+				response.getBody());
+		throw new RuntimeException(
+				"Failed to fetch data from master service for Status. Status: " + response.getStatusCode());
 	}
+
+	AcceptedDTO acceptedDTO = response.getBody().getData();
+	log.debug("Fetched StatusDTO: {}", acceptedDTO);
+
+	return acceptedDTO;
+}
+
+//	private DroppingTypeDTO fetchDroppingTypeData(Long droppingType) {
+//		
+//		String DroppingServiceUrl = codeServiceUrl + droppingType;
+//		log.debug("Calling master service URL for Status: {}", DroppingServiceUrl);
+//
+//		ResponseEntity<GenericResponse<DroppingTypeDTO>> response = restTemplate.exchange(DroppingServiceUrl,
+//				HttpMethod.GET, null, new ParameterizedTypeReference<GenericResponse<DroppingTypeDTO>>() {
+//				});
+//		System.out.println(response);
+//
+//		if (!response.getStatusCode().is2xxSuccessful()) {
+//			log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(),
+//					response.getBody());
+//			throw new RuntimeException(
+//					"Failed to fetch data from master service for Status. Status: " + response.getStatusCode());
+//		}
+//
+//		DroppingTypeDTO droppingTypeDTO = response.getBody().getData();
+//		log.debug("Fetched StatusDTO: {}", droppingTypeDTO);
+//
+//		return droppingTypeDTO;
+//	}
 
 	 @Override
 	    public GenericResponse<DroppingRequestDTO> createOrUpdateDroppingRequest(DroppingRequestDTO droppingRequestDTO) {

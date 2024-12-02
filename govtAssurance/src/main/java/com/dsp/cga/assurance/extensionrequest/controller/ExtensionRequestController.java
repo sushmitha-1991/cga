@@ -61,20 +61,28 @@ public class ExtensionRequestController {
 	    return ResponseEntity.ok(response);
 	}
 
+
+	
 	@PostMapping("/create-or-update")
-    @Operation(summary = "Create or update an Assurance")
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "ExtensionRequest created or updated successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid input data"),
-        @ApiResponse(responseCode = "500", description = "Internal server error") 
-    })
-    public ResponseEntity<GenericResponse<ExtensionRequestDTO>> createOrUpdateImplementationRequest(
-            @RequestBody ExtensionRequestDTO extensionRequestDTO) {
+	@Operation(summary = "Create or update one or more ExtensionRequests")
+	@ApiResponses(value = {
+	    @ApiResponse(responseCode = "200", description = "ExtensionRequest(s) created or updated successfully"),
+	    @ApiResponse(responseCode = "400", description = "Invalid input data"),
+	    @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<GenericResponse<List<ExtensionRequestDTO>>> createOrUpdateExtensionRequests(
+	        @RequestBody List<ExtensionRequestDTO> extensionRequestDTOList) {
 
-        // Call service method to either create or update the implementation request
-        GenericResponse<ExtensionRequestDTO> response = extensionRequestService.createOrUpdateExtensionRequest(extensionRequestDTO);
+	    if (extensionRequestDTOList == null || extensionRequestDTOList.isEmpty()) {
+	        throw new IllegalArgumentException("Invalid input: List of ExtensionRequestDTO cannot be null or empty.");
+	    }
 
-        // Return the response wrapped in ResponseEntity
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
+	    // Call service method to process each request
+	    GenericResponse<List<ExtensionRequestDTO>> response = 
+	            extensionRequestService.createOrUpdateExtensionRequests(extensionRequestDTOList);
+
+	    // Return the response wrapped in ResponseEntity
+	    return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
 }

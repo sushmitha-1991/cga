@@ -15,7 +15,7 @@ public class ExtensionRequestMapper {
 	        return ExtensionRequestDTO.builder()
 	                .id(entity.getId())
 	                .assuranceId(entity.getAssuranceId())
-	                .questionNo(entity.getQuestionNo())
+	                //.questionNo(entity.getQuestionNo())
 	                .extensionNo(entity.getExtensionNo())
 	                .subject(entity.getSubject())
 	                .extRequestedTillDate(entity.getExtRequestedTillDate())
@@ -30,7 +30,7 @@ public class ExtensionRequestMapper {
 
 	 public static void updateEntityFromDTO(ExtensionRequestDTO dto, ExtensionRequest entity) {
 	        if (dto != null && entity != null) {
-	            entity.setQuestionNo(dto.getQuestionNo());
+	          //  entity.setQuestionNo(dto.getQuestionNo());
 	            entity.setExtensionNo(dto.getExtensionNo());
 	            entity.setSubject(dto.getSubject());
 	            entity.setExtRequestedTillDate(dto.getExtRequestedTillDate());
@@ -50,7 +50,7 @@ public class ExtensionRequestMapper {
 	        return ExtensionRequest.builder()
 	                .id(dto.getId())
 	                .assuranceId(dto.getAssuranceId())
-	                .questionNo(dto.getQuestionNo())
+	              //  .questionNo(dto.getQuestionNo())
 	                .extensionNo(dto.getExtensionNo())
 	                .subject(dto.getSubject())
 	                .extRequestedTillDate(dto.getExtRequestedTillDate())

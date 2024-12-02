@@ -36,8 +36,8 @@ public class ExtensionRequest extends Auditable {
 	private Long assuranceId;
 
 
-	@Column(name = "question_no", length = 10, nullable = false)
-	private String questionNo;
+//	@Column(name = "question_no", length = 10)
+//	private String questionNo;
 
 	@Column(name = "extension_no", nullable = false)
 	private Integer extensionNo;

@@ -1,5 +1,6 @@
 package com.dsp.cga.assurance.extensionrequest.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -38,61 +39,88 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 
 	@Override
 	public List<ExtensionRequestDTO> getExtensionRequestByAssuranceId(Long id) {
-		// Fetch the list of ExtensionRequest entities by Assurance ID
-		Optional<ExtensionRequest> extensionRequests = extenionRequestRepository.findByAssuranceId(id);
+	    // Fetch the list of ExtensionRequest entities by Assurance ID
+	    List<ExtensionRequest> extensionRequests = extenionRequestRepository.findByAssuranceId(id);
 
-		// If no records are found, log the message and return an empty list
-		if (extensionRequests.isEmpty()) {
-			log.debug("No ExtensionRequest found for Assurance ID: {}", id);
-			return Collections.emptyList(); // Return an empty list
-		}
+	    // If no records are found, log the message and return an empty list
+	    if (extensionRequests.isEmpty()) {
+	        log.debug("No ExtensionRequest found for Assurance ID: {}", id);
+	        return Collections.emptyList(); // Return an empty list
+	    }
 
-		// Map the list of entities to a list of DTOs
-		List<ExtensionRequestDTO> dtos = extensionRequests.stream().map(ExtensionRequestMapper::toDTO)
-				.collect(Collectors.toList());
+	    // Map the list of entities to a list of DTOs
+	    List<ExtensionRequestDTO> dtos = extensionRequests.stream()
+	            .map(ExtensionRequestMapper::toDTO)
+	            .collect(Collectors.toList());
 
-		log.debug("Returning ExtensionRequestDTOs: {}", dtos);
-		return dtos;
+	    log.debug("Returning ExtensionRequestDTOs: {}", dtos);
+	    return dtos;
 	}
 
+
+	
+
 	@Override
-	public GenericResponse<ExtensionRequestDTO> createOrUpdateExtensionRequest(
-	        ExtensionRequestDTO extensionRequestDTO) {
+	public GenericResponse<List<ExtensionRequestDTO>> createOrUpdateExtensionRequests(
+	        List<ExtensionRequestDTO> extensionRequestDTOList) {
 
-	    if (extensionRequestDTO == null || extensionRequestDTO.getAssuranceId() == null) {
-	        throw new IllegalArgumentException("Invalid input: AssuranceId cannot be null.");
+	    List<ExtensionRequestDTO> savedDTOs = new ArrayList<>();
+
+	    for (ExtensionRequestDTO dto : extensionRequestDTOList) {
+	        if (dto == null || dto.getAssuranceId() == null || dto.getExtensionNo() == null) {
+	            throw new IllegalArgumentException("Invalid input: AssuranceId and ExtensionNo cannot be null.");
+	        }
+
+	        ExtensionRequest savedRequest;
+
+	        if (dto.getId() != null) {
+	            // If the ID is provided, try to find the existing record by ID
+	            Optional<ExtensionRequest> existingRequestOpt = extenionRequestRepository.findById(dto.getId());
+
+	            if (existingRequestOpt.isPresent()) {
+	                // Update the existing entity
+	                ExtensionRequest existingRequest = existingRequestOpt.get();
+	                ExtensionRequestMapper.updateEntityFromDTO(dto, existingRequest);
+
+	                // Save the updated entity
+	                savedRequest = extenionRequestRepository.save(existingRequest);
+	            } else {
+	                throw new IllegalArgumentException("No ExtensionRequest found with the provided ID: " + dto.getId());
+	            }
+
+	        } else {
+	            // If no ID is provided, check if an entry exists for assuranceId + extensionNo
+	            Optional<ExtensionRequest> existingRequestOpt = extenionRequestRepository
+	                    .findByAssuranceIdAndExtensionNo(dto.getAssuranceId(), dto.getExtensionNo());
+
+	            if (existingRequestOpt.isPresent()) {
+	                // Update the existing entity
+	                ExtensionRequest existingRequest = existingRequestOpt.get();
+	                ExtensionRequestMapper.updateEntityFromDTO(dto, existingRequest);
+
+	                // Save the updated entity
+	                savedRequest = extenionRequestRepository.save(existingRequest);
+	            } else {
+	                // Create a new entity
+	                ExtensionRequest newRequest = ExtensionRequestMapper.toEntity(dto);
+
+	                // Save the new entity
+	                savedRequest = extenionRequestRepository.save(newRequest);
+	            }
+	        }
+
+	        // Convert the saved entity to DTO and add to the response list
+	        ExtensionRequestDTO savedDTO = ExtensionRequestMapper.toDTO(savedRequest);
+	        savedDTOs.add(savedDTO);
 	    }
-
-	    // Check if an ExtensionRequest exists with the given assuranceId
-	    Optional<ExtensionRequest> existingRequestOpt = extenionRequestRepository
-	            .findByAssuranceId(extensionRequestDTO.getAssuranceId());
-
-	    ExtensionRequest savedRequest;
-
-	    if (existingRequestOpt.isPresent()) {
-	        // Fetch the existing entity
-	        ExtensionRequest existingRequest = existingRequestOpt.get();
-
-	        // Update fields of the existing entity based on the DTO
-	        ExtensionRequestMapper.updateEntityFromDTO(extensionRequestDTO, existingRequest);
-
-	        // Save the updated entity
-	        savedRequest = extenionRequestRepository.save(existingRequest);
-
-	    } else {
-	        // Create a new entity from the DTO
-	        ExtensionRequest newRequest = ExtensionRequestMapper.toEntity(extensionRequestDTO);
-
-	        // Save the new entity
-	        savedRequest = extenionRequestRepository.save(newRequest);
-	    }
-
-	    // Convert the saved entity to a DTO
-	    ExtensionRequestDTO savedDTO = ExtensionRequestMapper.toDTO(savedRequest);
 
 	    // Return the response wrapped in GenericResponse
-	    return new GenericResponse<>(HttpStatus.CREATED.value(), true, 
-	            "ExtensionRequest created or updated successfully", savedDTO);
+	    return new GenericResponse<>(
+	            HttpStatus.CREATED.value(),
+	            true,
+	            "ExtensionRequests created or updated successfully",
+	            savedDTOs
+	    );
 	}
 
 

@@ -45,9 +45,20 @@ public class DroppingRequest extends Auditable{
 
 	    @Column(name = "actual_drop_date")
 	    private LocalDate actualDropDate;
+	    
+	    @Column(name = "ministry_ref_no")
+	    private String ministryRefNo;
+	    
+	    @Column(name = "ministry_ref_date")
+	    private LocalDate ministryRefDate;
+	    
+	    @Column(name = "accepted_id")
+	    private Long acceptedId;
+	    
+	    @Column(name = "subject")
+	    private String subject;
 
-//	    @Column(name = "drop_status_id")
-//	    private Long dropStatusId;
+
 
 	    @Column(name = "remarks", length = 512)
 	    private String remarks;

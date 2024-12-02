@@ -11,6 +11,9 @@ public interface ExtensionRequestService {
 
 	List<ExtensionRequestDTO> getExtensionRequestByAssuranceId(Long id);
 
-	GenericResponse<ExtensionRequestDTO> createOrUpdateExtensionRequest(ExtensionRequestDTO extensionRequestDTO);
+	//GenericResponse<ExtensionRequestDTO> createOrUpdateExtensionRequest(ExtensionRequestDTO extensionRequestDTO);
+
+	GenericResponse<List<ExtensionRequestDTO>> createOrUpdateExtensionRequests(
+			List<ExtensionRequestDTO> extensionRequestDTOList);
 
 }
