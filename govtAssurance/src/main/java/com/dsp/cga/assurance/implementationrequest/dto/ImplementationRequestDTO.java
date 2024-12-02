@@ -26,6 +26,7 @@ public class ImplementationRequestDTO {
 	    private Long supplementaryId;
 	    private Long partId;
 	    private String reason;
+	    private String assuranceNo;
 	    private CommitteeDecisionDTO committeeDecisionDTO;
 	    private List<Map<String, Object>> implementationReportFiles;
 	    private List<Map<String, Object>> partReportFiles;

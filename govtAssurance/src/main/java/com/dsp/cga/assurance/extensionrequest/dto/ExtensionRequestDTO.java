@@ -26,4 +26,5 @@ public class ExtensionRequestDTO {
 	private String remarks;
 	private String extensionFiles;
 	private Boolean draftStatus;
+	private String assuranceNo;
 }

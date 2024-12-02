@@ -27,6 +27,8 @@ public class DroppingRequestDTO {
 	private Long supplementaryId;
 
 	private Long partId;
+	
+	private String assuranceNo;
 
 	private LocalDate dropRequestDate;
 

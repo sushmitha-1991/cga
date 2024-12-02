@@ -23,6 +23,7 @@ import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
+import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.service.impl.AssuranceServiceImpl;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
@@ -39,6 +40,9 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	private RestTemplate restTemplate;
 	@Autowired
 	private ImplementationRequestRepository implementationRequestRepository;
+	
+	@Autowired
+	private AssuranceRepository assuranceRepository;
 
 	@Override
 	public ImplementationRequestDTO createImplementationRequest(ImplementationRequestDTO implementationRequestDTO) {
@@ -91,22 +95,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 
 
-//	@Override
-//	public ImplementationRequestDTO getImplementationRequestByAssuranceId(Long id) {
-//	    ImplementationRequest implementationRequest = implementationRequestRepository.findByAssuranceId(id)
-//	            .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with ID: " + id));
-//
-//	    log.debug("Fetched Assurance: {}", implementationRequest);
-//
-//	    // Map Assurance entity to DTO
-//	    ImplementationRequestDTO dto = ImplementationRequestMapper.toDTO(implementationRequest);
-//
-//	    // Populate additional data if available
-//	    dto.setCommitteeDecisionDTO(fetchCommitteeDecisionData(implementationRequest.getCommitteeDecisionId()));
-//
-//	    log.debug("Returning AssuranceDTO: {}", dto);
-//	    return dto;
-//	}
 
 	@Override
 	public ImplementationRequestDTO getImplementationRequestByAssuranceId(Long id) {
@@ -121,8 +109,12 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	    // Log and map the entity to DTO if found
 	    log.debug("Fetched ImplementationRequest: {}", implementationRequest);
+	    
+	    Assurance assurance = assuranceRepository.findById(id).orElse(null);
+        String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
+        
 	    ImplementationRequestDTO dto = ImplementationRequestMapper.toDTO(implementationRequest);
-
+	    dto.setAssuranceNo(assuranceNo);
 	    // Populate additional data if available
 	    dto.setCommitteeDecisionDTO(fetchCommitteeDecisionData(implementationRequest.getCommitteeDecisionId()));
 

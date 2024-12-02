@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
 import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
 import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestRepository;
@@ -19,6 +20,7 @@ import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestReposit
 import com.dsp.cga.assurance.extensionrequest.service.ExtensionRequestService;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
+import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.mapper.ExtensionRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.response.GenericResponse;
@@ -30,6 +32,9 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 
 	@Autowired
 	private ExtensionRequestRepository extenionRequestRepository;
+	
+	@Autowired
+	private AssuranceRepository assuranceRepository;
 
 	@Override
 	public ExtensionRequestDTO createExtensionRequest(ExtensionRequestDTO extensionRequestDTO) {
@@ -48,14 +53,23 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	        return Collections.emptyList(); // Return an empty list
 	    }
 
-	    // Map the list of entities to a list of DTOs
+	    // Fetch Assurance to get the assuranceNo
+	    Assurance assurance = assuranceRepository.findById(id).orElse(null);
+	    String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
+
+	    // Map the list of entities to a list of DTOs and set the assuranceNo in each DTO
 	    List<ExtensionRequestDTO> dtos = extensionRequests.stream()
-	            .map(ExtensionRequestMapper::toDTO)
+	            .map(request -> {
+	                ExtensionRequestDTO dto = ExtensionRequestMapper.toDTO(request);
+	                dto.setAssuranceNo(assuranceNo);  // Set the assuranceNo in each DTO
+	                return dto;
+	            })
 	            .collect(Collectors.toList());
 
 	    log.debug("Returning ExtensionRequestDTOs: {}", dtos);
 	    return dtos;
 	}
+
 
 
 	

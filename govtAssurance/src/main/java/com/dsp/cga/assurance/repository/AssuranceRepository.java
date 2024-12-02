@@ -29,7 +29,8 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long> {
 		        @Param("ministryId") Long ministryId,
 		        @Param("memberId") Long memberId);
 
-
+	@Query("SELECT a.assuranceNo FROM Assurance a WHERE a.id = :assuranceId")
+    String findAssuranceNoById(@Param("assuranceId") Long assuranceId);
 	//Optional<GovtAssurance> findActiveAndNonDeletedGovtAssurance();
 
 }
