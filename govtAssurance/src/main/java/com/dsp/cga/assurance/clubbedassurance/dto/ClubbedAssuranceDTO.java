@@ -17,5 +17,8 @@ public class ClubbedAssuranceDTO {
 	// private Long sessionNo;
 	    private Long assuranceId;
 	    private List<Long> clubbedAssuranceIds;
+	    private String AssuranceNo;
+	    private List<AssuranceIdNoPairDTO> clubbedAssurances; 
+	    
 
 }

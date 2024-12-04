@@ -2,16 +2,19 @@ package com.dsp.cga.assurance.clubbedassurance.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.dsp.cga.assurance.clubbedassurance.dto.AssuranceIdNoPairDTO;
 import com.dsp.cga.assurance.clubbedassurance.dto.ClubbedAssuranceDTO;
 import com.dsp.cga.assurance.clubbedassurance.entity.ClubbedAssurance;
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
 import com.dsp.cga.assurance.clubbedassurance.service.ClubbedAssuranceService;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.mapper.ClubbedAssuranceMapper;
 import com.dsp.cga.response.GenericResponse;
 
@@ -20,6 +23,9 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	
 	@Autowired
 	private ClubbedAssuranceRepository clubbedAssuranceRepository;
+	
+	@Autowired
+	private AssuranceRepository assuranceRepository;
 
 	@Override
 	public GenericResponse<ClubbedAssuranceDTO> createOrUpdateClubbedAssurance(ClubbedAssuranceDTO clubbedAssuranceDTO) {
@@ -77,10 +83,40 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	@Override
 	public List<ClubbedAssuranceDTO> getClubbedAssurancesByAssuranceId(Long assuranceId) {
 	    List<ClubbedAssurance> clubbedAssurances = clubbedAssuranceRepository.findClubbedAssuranceByAssuranceId(assuranceId);
+
+	    // Fetch AssuranceNo for the given assuranceId
+	    String assuranceNo = fetchAssuranceNoById(assuranceId);
+
 	    return clubbedAssurances.stream()
-	            .map(ClubbedAssuranceMapper::toDTO)
-	            .toList();
+	            .map(clubbedAssurance -> {
+	                // Map the main ClubbedAssurance
+	                ClubbedAssuranceDTO dto = ClubbedAssuranceMapper.toDTO(clubbedAssurance);
+	                dto.setAssuranceId(assuranceId);
+	                dto.setAssuranceNo(assuranceNo);
+
+	                // Fetch AssuranceId and AssuranceNo pairs for clubbedAssuranceIds
+	                List<AssuranceIdNoPairDTO> clubbedPairs = clubbedAssurance.getClubbedAssuranceIds().stream()
+	                        .map(id -> {
+	                            String no = fetchAssuranceNoById(id);
+	                            return AssuranceIdNoPairDTO.builder()
+	                                    .id(id)
+	                                    .no(no)
+	                                    .build();
+	                        })
+	                        .collect(Collectors.toList());
+
+	                dto.setClubbedAssurances(clubbedPairs);
+	                return dto;
+	            })
+	            .collect(Collectors.toList());
 	}
+
+	// Fetch AssuranceNo by AssuranceId
+	private String fetchAssuranceNoById(Long assuranceId) {
+	    Optional<Assurance> assurance = assuranceRepository.findById(assuranceId);
+	    return assurance.map(Assurance::getAssuranceNo).orElse(null);
+	}
+
 
 
 
