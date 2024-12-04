@@ -1,12 +1,18 @@
 package com.dsp.cga.assurance.clubbedassurance.entity;
 
+import java.util.List;
+
 import com.dsp.cga.entity.Auditable;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -32,6 +38,9 @@ public class ClubbedAssurance extends Auditable{
 	@Column(name = "assurance_id", nullable = false)
 	private Long assuranceId;
 
-	@Column(name = "clubbed_assurance_id", nullable = false)
-	private Long clubbedAssuranceId;
+	@ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "clubbed_assurance_mapping", schema = "cga", 
+                     joinColumns = @JoinColumn(name = "clubbed_assurance_id"))
+    @Column(name = "mapped_clubbed_assurance_id")
+    private List<Long> clubbedAssuranceIds;
 }

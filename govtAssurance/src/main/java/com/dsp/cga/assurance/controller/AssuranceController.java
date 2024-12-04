@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
+import com.dsp.cga.assurance.dto.AssuranceListDTO;
 import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.response.GenericResponse;
 
@@ -137,5 +138,21 @@ public class AssuranceController {
 	    return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/getAllAssuranceList")
+	@Operation(summary = "Get all Assurance")
+	@ApiResponses(value = {
+	        @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
+	        @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<GenericResponse<List<AssuranceListDTO>>> getAllAssuranceList() {
+	    List<AssuranceListDTO> assurances = assuranceService.getAllAssurancesList();
+	    GenericResponse<List<AssuranceListDTO>> response = new GenericResponse<>(
+	            HttpStatus.OK.value(),
+	            true,
+	            "Assurance fetched successfully",
+	            assurances
+	    );
+	    return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
 }

@@ -12,7 +12,7 @@ public class ClubbedAssuranceMapper {
 	        return ClubbedAssuranceDTO.builder()
 	                .id(entity.getId())
 	                .assuranceId(entity.getAssuranceId())
-	                .clubbedAssuranceId(entity.getClubbedAssuranceId())
+	                .clubbedAssuranceIds(entity.getClubbedAssuranceIds())
 	               
 	                .build();
 	    }
@@ -23,7 +23,7 @@ public class ClubbedAssuranceMapper {
 	        return ClubbedAssurance.builder()
 	                .id(dto.getId())
 	                .assuranceId(dto.getAssuranceId())
-	                .clubbedAssuranceId(dto.getClubbedAssuranceId())
+	                .clubbedAssuranceIds(dto.getClubbedAssuranceIds())
 	                
 	                .build();
 	    }
@@ -32,8 +32,8 @@ public class ClubbedAssuranceMapper {
 	        if (dto.getAssuranceId() != null) {
 	            entity.setAssuranceId(dto.getAssuranceId());
 	        }
-	        if (dto.getClubbedAssuranceId() != null) {
-	            entity.setClubbedAssuranceId(dto.getClubbedAssuranceId());
+	        if (dto.getClubbedAssuranceIds() != null) {
+	            entity.setClubbedAssuranceIds(dto.getClubbedAssuranceIds());
 	        }
 	       
 	        // Add other fields here if needed.

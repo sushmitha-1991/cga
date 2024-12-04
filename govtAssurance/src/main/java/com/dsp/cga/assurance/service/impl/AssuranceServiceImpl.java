@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import com.dsp.cga.assurance.dto.AssuranceDTO;
+import com.dsp.cga.assurance.dto.AssuranceListDTO;
 import com.dsp.cga.assurance.dto.AssuranceTypeDTO;
 import com.dsp.cga.assurance.dto.DepartmentsDTO;
 import com.dsp.cga.assurance.dto.LokSabhaNoDTO;
@@ -39,6 +40,7 @@ import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.assurance.supplementry.repository.SupplementaryRepository;
 import com.dsp.cga.exception.ResourceNotFoundException;
+import com.dsp.cga.mapper.AssuranceListMapper;
 import com.dsp.cga.mapper.AssuranceMapper;
 import com.dsp.cga.response.GenericResponse;
 
@@ -627,6 +629,15 @@ System.out.println(response);
 		        // Return the updated AssuranceDTO
 		        return assuranceMapper.toDTO(updatedAssurance);
 		    }
+
+	 @Override
+	 public List<AssuranceListDTO> getAllAssurancesList() {
+	     List<Assurance> assurances = assuranceRepository.findAll();
+	     return assurances.stream()
+	             .map(AssuranceListMapper::toDto) // Use the mapper for conversion
+	             .toList(); // Collect as a list
+	 }
+
 
 
 }

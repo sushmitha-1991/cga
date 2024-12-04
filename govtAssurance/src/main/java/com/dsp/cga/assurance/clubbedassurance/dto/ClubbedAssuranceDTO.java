@@ -1,5 +1,7 @@
 package com.dsp.cga.assurance.clubbedassurance.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +16,6 @@ public class ClubbedAssuranceDTO {
 	 private Long id;
 	// private Long sessionNo;
 	    private Long assuranceId;
-	    private Long clubbedAssuranceId;
+	    private List<Long> clubbedAssuranceIds;
 
 }

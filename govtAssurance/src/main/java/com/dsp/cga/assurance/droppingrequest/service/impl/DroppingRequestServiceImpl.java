@@ -38,7 +38,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 
 	@Autowired
 	private RestTemplate restTemplate;
-	
+
 	@Autowired
 	private AssuranceRepository assuranceRepository;
 
@@ -54,24 +54,27 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 
 		// Log and map the entity to DTO if found
 		log.debug("Fetched ImplementationRequest: {}", Request);
-		
-		 Assurance assurance = assuranceRepository.findById(id).orElse(null);
-	        String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
+
+		Assurance assurance = assuranceRepository.findById(id).orElse(null);
+		String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
 
 		DroppingRequestDTO dto = DroppingRequestMapper.toDTO(Request);
 		dto.setAssuranceNo(assuranceNo);
 
 		// Populate additional data if available
-		//dto.setStatusDTO(fetchStatusData(Request.getDropStatusId()));
-		//System.out.println("$$$$$$$$$$$" + Request.getDropStatusId());
-		//dto.setDroppingTypeDTO(fetchDroppingTypeData(Request.getDroppingType()));
-		dto.setAcceptedDTO(fetchAcceptdData(Request.getAcceptedId()));
+		// dto.setStatusDTO(fetchStatusData(Request.getDropStatusId()));
+		// System.out.println("$$$$$$$$$$$" + Request.getDropStatusId());
+		// dto.setDroppingTypeDTO(fetchDroppingTypeData(Request.getDroppingType()));
+		if (Request.getAcceptedId() != null) {
+			dto.setAcceptedDTO(fetchAcceptdData(Request.getAcceptedId()));
+		}
+
 		log.debug("Returning ImplementationRequestDTO: {}", dto);
 		return dto;
 	}
 
 	private StatusDTO fetchStatusData(Long dropStatusId) {
-			String statusServiceUrl = codeServiceUrl + dropStatusId;
+		String statusServiceUrl = codeServiceUrl + dropStatusId;
 		log.debug("Calling master service URL for Status: {}", statusServiceUrl);
 
 		ResponseEntity<GenericResponse<StatusDTO>> response = restTemplate.exchange(statusServiceUrl, HttpMethod.GET,
@@ -92,48 +95,46 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		return statusDTO;
 	}
 
-	
 	private AcceptedDTO fetchAcceptdData(Long acceptedId) {
 		String statusServiceUrl = codeServiceUrl + acceptedId;
-	log.debug("Calling master service URL for Status: {}", statusServiceUrl);
+		log.debug("Calling master service URL for Status: {}", statusServiceUrl);
 
-	ResponseEntity<GenericResponse<AcceptedDTO>> response = restTemplate.exchange(statusServiceUrl, HttpMethod.GET,
-			null, new ParameterizedTypeReference<GenericResponse<AcceptedDTO>>() {
-			});
-	System.out.println(response);
+		ResponseEntity<GenericResponse<AcceptedDTO>> response = restTemplate.exchange(statusServiceUrl, HttpMethod.GET,
+				null, new ParameterizedTypeReference<GenericResponse<AcceptedDTO>>() {
+				});
+		System.out.println(response);
 
-	if (!response.getStatusCode().is2xxSuccessful()) {
-		log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(),
-				response.getBody());
-		throw new RuntimeException(
-				"Failed to fetch data from master service for Status. Status: " + response.getStatusCode());
+		if (!response.getStatusCode().is2xxSuccessful()) {
+			log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(),
+					response.getBody());
+			throw new RuntimeException(
+					"Failed to fetch data from master service for Status. Status: " + response.getStatusCode());
+		}
+
+		AcceptedDTO acceptedDTO = response.getBody().getData();
+		log.debug("Fetched StatusDTO: {}", acceptedDTO);
+
+		return acceptedDTO;
 	}
 
-	AcceptedDTO acceptedDTO = response.getBody().getData();
-	log.debug("Fetched StatusDTO: {}", acceptedDTO);
+	@Override
+	public GenericResponse<DroppingRequestDTO> createOrUpdateDroppingRequest(DroppingRequestDTO droppingRequestDTO) {
+		Optional<DroppingRequest> existingRequestOpt = droppingRequestRepository
+				.findByAssuranceId(droppingRequestDTO.getAssuranceId());
 
-	return acceptedDTO;
-}
+		DroppingRequest savedRequest;
 
+		if (existingRequestOpt.isPresent()) {
+			DroppingRequest existingRequest = existingRequestOpt.get();
+			DroppingRequestMapper.updateEntityFromDTO(droppingRequestDTO, existingRequest);
+			savedRequest = droppingRequestRepository.save(existingRequest);
+		} else {
+			DroppingRequest newRequest = DroppingRequestMapper.toEntity(droppingRequestDTO);
+			savedRequest = droppingRequestRepository.save(newRequest);
+		}
 
-
-	 @Override
-	    public GenericResponse<DroppingRequestDTO> createOrUpdateDroppingRequest(DroppingRequestDTO droppingRequestDTO) {
-	        Optional<DroppingRequest> existingRequestOpt = droppingRequestRepository
-	                .findByAssuranceId(droppingRequestDTO.getAssuranceId());
-
-	        DroppingRequest savedRequest;
-
-	        if (existingRequestOpt.isPresent()) {
-	            DroppingRequest existingRequest = existingRequestOpt.get();
-	            DroppingRequestMapper.updateEntityFromDTO(droppingRequestDTO, existingRequest);
-	            savedRequest = droppingRequestRepository.save(existingRequest);
-	        } else {
-	            DroppingRequest newRequest = DroppingRequestMapper.toEntity(droppingRequestDTO);
-	            savedRequest = droppingRequestRepository.save(newRequest);
-	        }
-
-	        DroppingRequestDTO savedDTO = DroppingRequestMapper.toDTO(savedRequest);
-	        return new GenericResponse<>(HttpStatus.CREATED.value(), true, "DroppingRequest created or updated successfully", savedDTO);
-	    }
+		DroppingRequestDTO savedDTO = DroppingRequestMapper.toDTO(savedRequest);
+		return new GenericResponse<>(HttpStatus.CREATED.value(), true,
+				"DroppingRequest created or updated successfully", savedDTO);
+	}
 }

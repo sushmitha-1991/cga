@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
+import com.dsp.cga.assurance.dto.AssuranceListDTO;
 
 public interface AssuranceService {
 
@@ -18,6 +19,8 @@ public interface AssuranceService {
 	AssuranceDTO updateAssurance(Long id, AssuranceDTO assuranceDTO);
 
 	AssuranceDTO updateAssuranceById(Long id, AssuranceDTO assuranceDTO);
+
+	List<AssuranceListDTO> getAllAssurancesList();
 
 	
 }
