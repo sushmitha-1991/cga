@@ -1,5 +1,6 @@
 package com.dsp.cga.assurance.repository;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -16,21 +17,35 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long> {
 	@Query("SELECT a FROM Assurance a WHERE a.rajyaSabhaSessionNo IS NOT NULL AND a.lokSabhaSessionNo IS NULL")
 	List<Assurance> findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull();
 
-	@Query("SELECT a FROM Assurance a " +
-		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL " +
-		       "AND a.lokSabhaSessionNo IS NULL " +
-		       "AND (:fromDate IS NULL OR a.assuranceDate >= :fromDate) " +
-		       "AND (:toDate IS NULL OR a.assuranceDate <= :toDate) " +
-		       "AND (:ministryId IS NULL OR a.ministryId = :ministryId) " +
-		       "AND (:memberId IS NULL OR a.memberId = :memberId)")
-		List<Assurance> findFilteredRajyaSabhaAssurances(
-		        @Param("fromDate") LocalDate fromDate,
-		        @Param("toDate") LocalDate toDate,
-		        @Param("ministryId") Long ministryId,
-		        @Param("memberId") Long memberId);
+//	@Query("SELECT a FROM Assurance a " +
+//		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL " +
+//		       "AND a.lokSabhaSessionNo IS NULL " +
+//		       "AND (:fromDate IS NULL OR a.assuranceDate >= :fromDate) " +
+//		       "AND (:toDate IS NULL OR a.assuranceDate <= :toDate) " +
+//		       "AND (:ministryId IS NULL OR a.ministryId = :ministryId) " +
+//		       "AND (:memberId IS NULL OR a.memberId = :memberId)")
+//		List<Assurance> findFilteredRajyaSabhaAssurances(
+//		        @Param("fromDate") LocalDate fromDate,
+//		        @Param("toDate") LocalDate toDate,
+//		        @Param("ministryId") Long ministryId,
+//		        @Param("memberId") Long memberId);
 
 	@Query("SELECT a.assuranceNo FROM Assurance a WHERE a.id = :assuranceId")
     String findAssuranceNoById(@Param("assuranceId") Long assuranceId);
 	//Optional<GovtAssurance> findActiveAndNonDeletedGovtAssurance();
+
+	 @Query("SELECT a FROM Assurance a WHERE " +
+	           "(a.rajyaSabhaSessionNo IS NOT NULL) " +
+	           "OR (a.lokSabhaSessionNo IS NULL) " +
+	           "OR a.assuranceDate >= :fromDate " +
+	           "OR a.assuranceDate <= :toDate " +
+	           "OR a.ministryId = :ministryId " +
+	           "OR a.memberId = :memberId")
+	    List<Assurance> findFilteredAssurances(@Param("fromDate") LocalDate fromDate,
+	                                           @Param("toDate") LocalDate toDate,
+	                                           @Param("ministryId") Long ministryId,
+	                                           @Param("memberId") Long memberId);
+	
+	
 
 }

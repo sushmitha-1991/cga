@@ -59,7 +59,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 //	private String assuranceTypeServiceUrl;
 
 	@Value("${master.codeServiceUrl}")
-    private String codeServiceUrl;
+	private String codeServiceUrl;
 
 	@Value("${master.lokSabhaNoServiceUrl}")
 	private String lokSabhaNoServiceUrl;
@@ -71,7 +71,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 	private String lokSabhaSessionNoServiceUrl;
 
 	@Value("${master.rajyaSabhaServiceUrl}")
-    private String rajyaSabhaServiceUrl;
+	private String rajyaSabhaServiceUrl;
 
 	@Autowired
 	private AssuranceRepository assuranceRepository;
@@ -146,39 +146,41 @@ public class AssuranceServiceImpl implements AssuranceService {
 	@Override
 	@Transactional
 	public List<AssuranceDTO> getAllAssurance() {
-	    log.debug("Entering getAllAssurance");
+		log.debug("Entering getAllAssurance");
 
-	    // Fetch only assurances where rajyaSabhaSessionNo is not null
-	    List<Assurance> assurances = assuranceRepository.findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull();
-	    log.debug("Fetched Assurances with non-null rajyaSabhaSessionNo: {}", assurances);
+		// Fetch only assurances where rajyaSabhaSessionNo is not null
+		List<Assurance> assurances = assuranceRepository
+				.findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull();
+		log.debug("Fetched Assurances with non-null rajyaSabhaSessionNo: {}", assurances);
 
-	    List<AssuranceDTO> assuranceDTOs = new ArrayList<>();
-	    for (Assurance assurance : assurances) {
-	        log.debug("Processing Assurance: {}", assurance);
-	        AssuranceDTO dto = assuranceMapper.toDTO(assurance);
+		List<AssuranceDTO> assuranceDTOs = new ArrayList<>();
+		for (Assurance assurance : assurances) {
+			log.debug("Processing Assurance: {}", assurance);
+			AssuranceDTO dto = assuranceMapper.toDTO(assurance);
 
-	        // Populate additional data
-	        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
-	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
-	        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
-	        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
-	        dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
-	        if (assurance.getPendingDueTo() != null) {
-	            dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
-	        } 
-	        dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
-	        List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
-	        dto.setClubbedMembersData(clubbedMembersData);
-	        assuranceDTOs.add(dto);
-	    }
+			// Populate additional data
+			dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+			dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+			dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+			dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+			dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
+			if (assurance.getPendingDueTo() != null) {
+				dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+			}
+			if (assurance.getPendingDueTo() != null) {
+				dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+			}
+			List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+			dto.setClubbedMembersData(clubbedMembersData);
+			assuranceDTOs.add(dto);
+		}
 
-	    log.debug("Returning list of AssuranceDTOs: {}", assuranceDTOs);
-	    return assuranceDTOs;
+		log.debug("Returning list of AssuranceDTOs: {}", assuranceDTOs);
+		return assuranceDTOs;
 	}
 
-
 	private MemberDTO fetchMemberData(Long memberId) {
-		String url = memberServiceUrl  + memberId;
+		String url = memberServiceUrl + memberId;
 		log.debug("Fetching Member by memberId from URL: {}", url);
 
 		try {
@@ -205,26 +207,25 @@ public class AssuranceServiceImpl implements AssuranceService {
 	}
 
 	private List<MemberDTO> fetchClubbedMembersData(List<Long> clubbedMembers) {
-	    // Check if the list is not empty
-	    if (clubbedMembers == null || clubbedMembers.isEmpty()) {
-	        return new ArrayList<>();  // Return an empty list if no members
-	    }
+		// Check if the list is not empty
+		if (clubbedMembers == null || clubbedMembers.isEmpty()) {
+			return new ArrayList<>(); // Return an empty list if no members
+		}
 
-	    List<MemberDTO> memberDTOs = new ArrayList<>();
+		List<MemberDTO> memberDTOs = new ArrayList<>();
 
-	    // Iterate over each member ID in the clubbedMembers list
-	    for (Long memberId : clubbedMembers) {
-	        // Fetch the MemberDTO for each memberId
-	        MemberDTO memberDTO = fetchMemberData(memberId);
-	        if (memberDTO != null) {
-	            memberDTOs.add(memberDTO);  // Add the memberDTO to the list
-	        }
-	    }
+		// Iterate over each member ID in the clubbedMembers list
+		for (Long memberId : clubbedMembers) {
+			// Fetch the MemberDTO for each memberId
+			MemberDTO memberDTO = fetchMemberData(memberId);
+			if (memberDTO != null) {
+				memberDTOs.add(memberDTO); // Add the memberDTO to the list
+			}
+		}
 
-	    return memberDTOs;  // Return the list of MemberDTOs
+		return memberDTOs; // Return the list of MemberDTOs
 	}
 
-	
 	private MinistryDTO fetchMinistryData(Long ministryId) {
 		String url = ministryServiceUrl + "/getMinistry/" + ministryId;
 		log.debug("Fetching Ministry by ministryId from URL: {}", url);
@@ -280,101 +281,91 @@ public class AssuranceServiceImpl implements AssuranceService {
 	}
 
 	private StatusDTO fetchStatusData(Long statusId) {
-	    String statusServiceUrl = codeServiceUrl + statusId;
-	    log.debug("Calling master service URL for Status: {}", statusServiceUrl);
+		String statusServiceUrl = codeServiceUrl + statusId;
+		log.debug("Calling master service URL for Status: {}", statusServiceUrl);
 
-	    ResponseEntity<GenericResponse<StatusDTO>> response = restTemplate.exchange(
-	        statusServiceUrl,
-	        HttpMethod.GET,
-	        null,
-	        new ParameterizedTypeReference<GenericResponse<StatusDTO>>() {}
-	    );
-	    System.out.println(response);
+		ResponseEntity<GenericResponse<StatusDTO>> response = restTemplate.exchange(statusServiceUrl, HttpMethod.GET,
+				null, new ParameterizedTypeReference<GenericResponse<StatusDTO>>() {
+				});
+		System.out.println(response);
 
-	    if (!response.getStatusCode().is2xxSuccessful()) {
-	        log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(), response.getBody());
-	        throw new RuntimeException("Failed to fetch data from master service for Status. Status: " + response.getStatusCode());
-	    }
+		if (!response.getStatusCode().is2xxSuccessful()) {
+			log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(),
+					response.getBody());
+			throw new RuntimeException(
+					"Failed to fetch data from master service for Status. Status: " + response.getStatusCode());
+		}
 
-	    StatusDTO statusDTO = response.getBody().getData();
-	    log.debug("Fetched StatusDTO: {}", statusDTO);
+		StatusDTO statusDTO = response.getBody().getData();
+		log.debug("Fetched StatusDTO: {}", statusDTO);
 
-	    return statusDTO;
+		return statusDTO;
 	}
 
-
-	
-
-	
 	private SourceDTO fetchSourceData(Long sourceId) {
-	    String sourceServiceUrl = codeServiceUrl + sourceId;
+		System.out.println("@@@@@@@" + sourceId);
+		String sourceServiceUrl = codeServiceUrl + sourceId;
 //		String url = sourceServiceUrl + sourceId;
-	    log.debug("Calling master service URL: {}", sourceServiceUrl);
+		log.debug("Calling master service URL: {}", sourceServiceUrl);
 
-	    ResponseEntity<GenericResponse<SourceDTO>> response = restTemplate.exchange(
-	        sourceServiceUrl,
-	        HttpMethod.GET,
-	        null,
-	        new ParameterizedTypeReference<GenericResponse<SourceDTO>>() {}
-	    );
-System.out.println(response);
-	    if (!response.getStatusCode().is2xxSuccessful()) {
-	        log.error("Failed to fetch data from master service: {} - {}", response.getStatusCode(), response.getBody());
-	        throw new RuntimeException("Failed to fetch data from master service. Status: " + response.getStatusCode());
-	    }
+		ResponseEntity<GenericResponse<SourceDTO>> response = restTemplate.exchange(sourceServiceUrl, HttpMethod.GET,
+				null, new ParameterizedTypeReference<GenericResponse<SourceDTO>>() {
+				});
+		System.out.println(response);
+		if (!response.getStatusCode().is2xxSuccessful()) {
+			log.error("Failed to fetch data from master service: {} - {}", response.getStatusCode(),
+					response.getBody());
+			throw new RuntimeException("Failed to fetch data from master service. Status: " + response.getStatusCode());
+		}
 
-	    SourceDTO sourceDTO = response.getBody().getData();
-	    log.debug("Fetched SourceDTO: {}", sourceDTO);
+		SourceDTO sourceDTO = response.getBody().getData();
+		log.debug("Fetched SourceDTO: {}", sourceDTO);
 
-	    return sourceDTO;
+		return sourceDTO;
 	}
-
 
 	private AssuranceTypeDTO fetchAssuranceTypeData(Long assuranceTypeId) {
-	    String assuranceTypeServiceUrl = codeServiceUrl + assuranceTypeId;
-	    log.debug("Calling master service URL for Assurance Type: {}", assuranceTypeServiceUrl);
+		String assuranceTypeServiceUrl = codeServiceUrl + assuranceTypeId;
+		log.debug("Calling master service URL for Assurance Type: {}", assuranceTypeServiceUrl);
 
-	    ResponseEntity<GenericResponse<AssuranceTypeDTO>> response = restTemplate.exchange(
-	        assuranceTypeServiceUrl,
-	        HttpMethod.GET,
-	        null,
-	        new ParameterizedTypeReference<GenericResponse<AssuranceTypeDTO>>() {}
-	    );
-	    System.out.println(response);
+		ResponseEntity<GenericResponse<AssuranceTypeDTO>> response = restTemplate.exchange(assuranceTypeServiceUrl,
+				HttpMethod.GET, null, new ParameterizedTypeReference<GenericResponse<AssuranceTypeDTO>>() {
+				});
+		System.out.println(response);
 
-	    if (!response.getStatusCode().is2xxSuccessful()) {
-	        log.error("Failed to fetch data from master service for Assurance Type: {} - {}", response.getStatusCode(), response.getBody());
-	        throw new RuntimeException("Failed to fetch data from master service for Assurance Type. Status: " + response.getStatusCode());
-	    }
+		if (!response.getStatusCode().is2xxSuccessful()) {
+			log.error("Failed to fetch data from master service for Assurance Type: {} - {}", response.getStatusCode(),
+					response.getBody());
+			throw new RuntimeException(
+					"Failed to fetch data from master service for Assurance Type. Status: " + response.getStatusCode());
+		}
 
-	    AssuranceTypeDTO assuranceTypeDTO = response.getBody().getData();
-	    log.debug("Fetched AssuranceTypeDTO: {}", assuranceTypeDTO);
+		AssuranceTypeDTO assuranceTypeDTO = response.getBody().getData();
+		log.debug("Fetched AssuranceTypeDTO: {}", assuranceTypeDTO);
 
-	    return assuranceTypeDTO;
+		return assuranceTypeDTO;
 	}
 
 	private PendingDueToDTO fetchPendingDueToData(Long pendingDueToId) {
-	    String pendingDueToServiceUrl = codeServiceUrl + pendingDueToId;
-	    log.debug("Calling master service URL for Pending Due To: {}", pendingDueToServiceUrl);
+		String pendingDueToServiceUrl = codeServiceUrl + pendingDueToId;
+		log.debug("Calling master service URL for Pending Due To: {}", pendingDueToServiceUrl);
 
-	    ResponseEntity<GenericResponse<PendingDueToDTO>> response = restTemplate.exchange(
-	        pendingDueToServiceUrl,
-	        HttpMethod.GET,
-	        null,
-	        new ParameterizedTypeReference<GenericResponse<PendingDueToDTO>>() {}
-	    );
-	   
-	    if (!response.getStatusCode().is2xxSuccessful()) {
-	        log.error("Failed to fetch data from master service for Pending Due To: {} - {}", response.getStatusCode(), response.getBody());
-	        throw new RuntimeException("Failed to fetch data from master service for Pending Due To. Status: " + response.getStatusCode());
-	    }
+		ResponseEntity<GenericResponse<PendingDueToDTO>> response = restTemplate.exchange(pendingDueToServiceUrl,
+				HttpMethod.GET, null, new ParameterizedTypeReference<GenericResponse<PendingDueToDTO>>() {
+				});
 
-	    PendingDueToDTO pendingDueToDTO = response.getBody().getData();
-	    log.debug("Fetched PendingDueToDTO: {}", pendingDueToDTO);
+		if (!response.getStatusCode().is2xxSuccessful()) {
+			log.error("Failed to fetch data from master service for Pending Due To: {} - {}", response.getStatusCode(),
+					response.getBody());
+			throw new RuntimeException(
+					"Failed to fetch data from master service for Pending Due To. Status: " + response.getStatusCode());
+		}
 
-	    return pendingDueToDTO;
+		PendingDueToDTO pendingDueToDTO = response.getBody().getData();
+		log.debug("Fetched PendingDueToDTO: {}", pendingDueToDTO);
+
+		return pendingDueToDTO;
 	}
-
 
 	private LoksabhaSessionNoDTO fetchLokSabhaSessionData(Long sessionNo) {
 		String url = lokSabhaSessionNoServiceUrl + "/session/" + sessionNo;
@@ -431,213 +422,101 @@ System.out.println(response);
 	}
 
 	private RajyaSabhaSessionNoDTO fetchRajyaSabhaSessionData(Long rajyaSabhaSessionNo) {
-	    String url = rajyaSabhaServiceUrl + "getById/" + rajyaSabhaSessionNo;
-	    log.debug("Fetching RajyaSabhaSession by sessionNo from URL: {}", url);
+		String url = rajyaSabhaServiceUrl + "getById/" + rajyaSabhaSessionNo;
+		log.debug("Fetching RajyaSabhaSession by sessionNo from URL: {}", url);
 
-	    try {
-	        ResponseEntity<GenericResponse<RajyaSabhaSessionNoDTO>> response = restTemplate.exchange(
-	            url,
-	            HttpMethod.GET,
-	            null,
-	            new ParameterizedTypeReference<GenericResponse<RajyaSabhaSessionNoDTO>>() {}
-	        );
+		try {
+			ResponseEntity<GenericResponse<RajyaSabhaSessionNoDTO>> response = restTemplate.exchange(url,
+					HttpMethod.GET, null, new ParameterizedTypeReference<GenericResponse<RajyaSabhaSessionNoDTO>>() {
+					});
 
-	        if (response == null || response.getBody() == null || response.getBody().getData() == null) {
-	            log.error("Response or body is null when fetching RajyaSabhaSession for sessionNo: {}", rajyaSabhaSessionNo);
-	            throw new RuntimeException("Failed to fetch RajyaSabhaSession, response is null");
-	        }
+			if (response == null || response.getBody() == null || response.getBody().getData() == null) {
+				log.error("Response or body is null when fetching RajyaSabhaSession for sessionNo: {}",
+						rajyaSabhaSessionNo);
+				throw new RuntimeException("Failed to fetch RajyaSabhaSession, response is null");
+			}
 
-	        RajyaSabhaSessionNoDTO rajyaSabhaSessionDTO = response.getBody().getData();
-	        log.debug("Fetched RajyaSabhaSessionDTO: {}", rajyaSabhaSessionDTO);
-	        return rajyaSabhaSessionDTO;
+			RajyaSabhaSessionNoDTO rajyaSabhaSessionDTO = response.getBody().getData();
+			log.debug("Fetched RajyaSabhaSessionDTO: {}", rajyaSabhaSessionDTO);
+			return rajyaSabhaSessionDTO;
 
-	    } catch (ResourceNotFoundException e) {
-	        log.error("Resource not found for sessionNo: {}", rajyaSabhaSessionNo);
-	        throw e;
-	    } catch (Exception e) {
-	        log.error("Error fetching RajyaSabhaSession for sessionNo: {}", rajyaSabhaSessionNo, e);
-	        throw new RuntimeException("Failed to fetch RajyaSabhaSession data", e);
-	    }
+		} catch (ResourceNotFoundException e) {
+			log.error("Resource not found for sessionNo: {}", rajyaSabhaSessionNo);
+			throw e;
+		} catch (Exception e) {
+			log.error("Error fetching RajyaSabhaSession for sessionNo: {}", rajyaSabhaSessionNo, e);
+			throw new RuntimeException("Failed to fetch RajyaSabhaSession data", e);
+		}
 	}
 
 	@Override
 	@Transactional
 	public AssuranceDTO getAssuranceById(Long id) {
-	    log.debug("Entering getAssuranceById with ID: {}", id);
+		log.debug("Entering getAssuranceById with ID: {}", id);
 
-	    // Fetch assurance by ID
-	    Assurance assurance = assuranceRepository.findById(id)
-	            .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with ID: " + id));
-	    log.debug("Fetched Assurance: {}", assurance);
+		// Fetch assurance by ID
+		Assurance assurance = assuranceRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Assurance not found with ID: " + id));
+		log.debug("Fetched Assurance: {}", assurance);
 
-	    // Map Assurance entity to DTO
-	    AssuranceDTO dto = assuranceMapper.toDTO(assurance);
+		// Map Assurance entity to DTO
+		AssuranceDTO dto = assuranceMapper.toDTO(assurance);
 
-	    // Populate additional data
-	    dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
-	    dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
-	    dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
-	    dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
-	    dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
-	    if (assurance.getPendingDueTo() != null) {
-            dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
-        } 	   
-	    dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
-	    if (assurance.getClubbedMembers() != null) {
+		// Populate additional data
+		dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+		dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+		dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+		dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+		dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
+		if (assurance.getPendingDueTo() != null) {
+			dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+		}
+		dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+		if (assurance.getClubbedMembers() != null) {
 
-	    // Fetch and set clubbed members
-	    List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
-	    dto.setClubbedMembersData(clubbedMembersData);
-	    }
-	    log.debug("Returning AssuranceDTO: {}", dto);
-	    return dto;
+			// Fetch and set clubbed members
+			List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+			dto.setClubbedMembersData(clubbedMembersData);
+		}
+		log.debug("Returning AssuranceDTO: {}", dto);
+		return dto;
 	}
 
-//	@Override
-//	public List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId,
-//			Long memberId) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-
-	@Override
 	@Transactional
-	public List<AssuranceDTO> getFilteredAssurances(
-	        LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
-	    log.debug("Entering getFilteredAssurances with filters - From: {}, To: {}, MinistryId: {}, MemberId: {}", 
-	              fromDate, toDate, ministryId, memberId);
-
-	    // Fetch filtered assurances
-	    List<Assurance> assurances = assuranceRepository.findFilteredRajyaSabhaAssurances(fromDate, toDate, ministryId, memberId);
-	    log.debug("Fetched filtered assurances: {}", assurances);
-
-	    // Map assurances to DTOs and populate additional data
-	    return assurances.stream().map(assurance -> {
-	        AssuranceDTO dto = assuranceMapper.toDTO(assurance);
-	        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
-	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
-	        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
-	        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
-	        dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
-	        dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
-	        dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
-	        dto.setClubbedMembersData(fetchClubbedMembersData(assurance.getClubbedMembers()));
-	        return dto;
-	    }).collect(Collectors.toList());
-	}
-
-	@Override
-	public AssuranceDTO updateAssurance(Long id, AssuranceDTO assuranceDTO) {
-	    // Fetch existing assurance
-	    Assurance existingAssurance = assuranceRepository.findById(id)
-	            .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with id: " + id));
-
-	    // Update Assurance fields (only if present)
-	    updateBasicFields(existingAssurance, assuranceDTO);
-
-	    // Update PartDetails
-	    updatePartDetails(existingAssurance, assuranceDTO.getPartDetails());
-
-	    // Update Supplementary
-	    updateSupplementary(existingAssurance, assuranceDTO.getSupplementary());
-
-	    // Save updated entity
-	    Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
-
-	    return assuranceMapper.toDTO(updatedAssurance);
-	}
-
-	private void updateBasicFields(Assurance assurance, AssuranceDTO dto) {
-	    // Update fields only if they are present
-	    if (dto.getLokSabhaNo() != null) assurance.setLokSabhaNo(dto.getLokSabhaNo());
-	    if (dto.getLokSabhaSessionNo() != null) assurance.setLokSabhaSessionNo(dto.getLokSabhaSessionNo());
-	    if (dto.getRajyaSabhaSessionNo() != null) assurance.setRajyaSabhaSessionNo(dto.getRajyaSabhaSessionNo());
-	    if (dto.getAssuranceDate() != null) assurance.setAssuranceDate(dto.getAssuranceDate());
-	    if (dto.getCategoryId() != null) assurance.setCategoryId(dto.getCategoryId());
-	    if (dto.getQuestionNo() != null) assurance.setQuestionNo(dto.getQuestionNo());
-	    if (dto.getAssuranceTypeId() != null) assurance.setAssuranceTypeId(dto.getAssuranceTypeId());
-	    if (dto.getSubject() != null) assurance.setSubject(dto.getSubject());
-	    if (dto.getMemberId() != null) assurance.setMemberId(dto.getMemberId());
-	    if (dto.getMinistryId() != null) assurance.setMinistryId(dto.getMinistryId());
-	    if (dto.getDepartmentId() != null) assurance.setDepartmentId(dto.getDepartmentId());
-	    if (dto.getGroupName() != null) assurance.setGroupName(dto.getGroupName());
-	    if (dto.getFileNo() != null) assurance.setFileNo(dto.getFileNo());
-	    if (dto.getAssuranceNo() != null) assurance.setAssuranceNo(dto.getAssuranceNo());
-	    if (dto.getPageNoUncorrected() != null) assurance.setPageNoUncorrected(dto.getPageNoUncorrected());
-	    if (dto.getPageNoCorrected() != null) assurance.setPageNoCorrected(dto.getPageNoCorrected());
-	    if (dto.getDraftStatus() != null) assurance.setDraftStatus(dto.getDraftStatus());
-	    if (dto.getSourceId() != null) assurance.setSourceId(dto.getSourceId());
-	    if (dto.getMpaRefDate() != null) assurance.setMpaRefDate(dto.getMpaRefDate());
-	    if (dto.getReportNo() != null) assurance.setReportNo(dto.getReportNo());
-	    if (dto.getRemarks() != null) assurance.setRemarks(dto.getRemarks());
-	}
-
-	private void updatePartDetails(Assurance assurance, List<PartDetailsDTO> partDetailsDTOs) {
-	    if (partDetailsDTOs == null) return;
-
-	    Map<Long, PartDetails> existingPartDetailsMap = assurance.getPartDetails()
-	            .stream()
-	            .collect(Collectors.toMap(PartDetails::getId, Function.identity()));
-
-	    for (PartDetailsDTO dto : partDetailsDTOs) {
-	        if (dto.getId() != null && existingPartDetailsMap.containsKey(dto.getId())) {
-	            // Update existing PartDetails
-	            PartDetails existing = existingPartDetailsMap.get(dto.getId());
-	            if (dto.getPart() != null) existing.setPart(dto.getPart());
-	            if (dto.getSubject() != null) existing.setSubject(dto.getSubject());
-	            if (dto.getStatusId() != null) existing.setStatusId(dto.getStatusId());
-	            if (dto.getExtentOfAssurance() != null) existing.setExtentOfAssurance(dto.getExtentOfAssurance());
-	        } 
-	    }
-	}
-
-	private void updateSupplementary(Assurance assurance, List<SupplementaryDTO> supplementaryDTOs) {
-	    if (supplementaryDTOs == null) return;
-
-	    Map<Long, Supplementary> existingSupplementaryMap = assurance.getSupplementary()
-	            .stream()
-	            .collect(Collectors.toMap(Supplementary::getId, Function.identity()));
-
-	    for (SupplementaryDTO dto : supplementaryDTOs) {
-	        if (dto.getId() != null && existingSupplementaryMap.containsKey(dto.getId())) {
-	            // Update existing Supplementary
-	            Supplementary existing = existingSupplementaryMap.get(dto.getId());
-	            if (dto.getSupp() != null) existing.setSupp(dto.getSupp());
-	            if (dto.getMemberId() != null) existing.setMemberId(dto.getMemberId());
-	            if (dto.getClubbedMembers() != null) existing.setClubbedMembers(dto.getClubbedMembers());
-	            if (dto.getPart() != null) existing.setPart(dto.getPart());
-	            if (dto.getSubject() != null) existing.setSubject(dto.getSubject());
-	            if (dto.getStatusId() != null) existing.setStatusId(dto.getStatusId());
-	            if (dto.getExtentOfAssurance() != null) existing.setExtentOfAssurance(dto.getExtentOfAssurance());
-	        } 
-	    }
-	}
-	 @Transactional
 	@Override
 	public AssuranceDTO updateAssuranceById(Long id, AssuranceDTO assuranceDTO) {
+
+		// Check if the Assurance exists
+		Assurance existingAssurance = assuranceRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Assurance not found with id: " + id));
+
+		// Map the incoming DTO to the entity
+		assuranceMapper.updateAssuranceFromDTO(assuranceDTO, existingAssurance);
+
+		// Save and return the updated entity
+		Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
+
+		// Return the updated AssuranceDTO
+		return assuranceMapper.toDTO(updatedAssurance);
+	}
+
+	@Override
+	public List<AssuranceListDTO> getAllAssurancesList() {
+		List<Assurance> assurances = assuranceRepository.findAll();
+		return assurances.stream().map(AssuranceListMapper::toDto) // Use the mapper for conversion
+				.toList(); // Collect as a list
+	}
+
+	@Override
+	 public List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
+	     // Fetch the filtered assurances from the repository
 		
-		        // Check if the Assurance exists
-		        Assurance existingAssurance = assuranceRepository.findById(id)
-		                .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with id: " + id));
-
-		        // Map the incoming DTO to the entity
-		        assuranceMapper.updateAssuranceFromDTO(assuranceDTO, existingAssurance);
-
-		        // Save and return the updated entity
-		        Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
-
-		        // Return the updated AssuranceDTO
-		        return assuranceMapper.toDTO(updatedAssurance);
-		    }
-
-	 @Override
-	 public List<AssuranceListDTO> getAllAssurancesList() {
-	     List<Assurance> assurances = assuranceRepository.findAll();
+	     List<Assurance> assurances = assuranceRepository.findFilteredAssurances(fromDate, toDate, ministryId, memberId);
+	     
+	     // Map entities to DTOs
 	     return assurances.stream()
-	             .map(AssuranceListMapper::toDto) // Use the mapper for conversion
-	             .toList(); // Collect as a list
+	             .map(assuranceMapper::toDTO) // Use method reference for simplicity
+	             .collect(Collectors.toList());
 	 }
-
-
 
 }

@@ -85,37 +85,7 @@ public class AssuranceController {
 		}
 	}
 	
-	@GetMapping("/filter")
-    @Operation(summary = "Filter Assurances")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Filtered assurances fetched successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid filter parameters"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public ResponseEntity<GenericResponse<List<AssuranceDTO>>> getFilteredAssurances(
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate,
-            @RequestParam(required = false) Long ministryId,
-            @RequestParam(required = false) Long memberId) {
 
-        try {
-            // Call service to fetch filtered data
-            List<AssuranceDTO> filteredAssurances = assuranceService.getFilteredAssurances(fromDate, toDate, ministryId, memberId);
-
-            // Build and return success response
-            GenericResponse<List<AssuranceDTO>> response = new GenericResponse<>(
-                    HttpStatus.OK.value(), true, "Filtered assurances fetched successfully", filteredAssurances);
-            return ResponseEntity.ok(response);
-
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new GenericResponse<>(HttpStatus.BAD_REQUEST.value(), false, "Invalid filter parameters", null));
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new GenericResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Error filtering assurances", null));
-        }
-    }
 
 	@PutMapping("/update/{id}")
 	@Operation(summary = "Update an existing Assurance by ID")
@@ -154,5 +124,17 @@ public class AssuranceController {
 	    );
 	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	@GetMapping("/filters")
+    public ResponseEntity<List<AssuranceDTO>> getFilteredAssurances(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) Long ministryId,
+            @RequestParam(required = false) Long memberId) {
+
+        List<AssuranceDTO> assurances = assuranceService.getFilteredAssurances(fromDate, toDate, ministryId, memberId);
+        return ResponseEntity.ok(assurances);
+    }
+
 
 }

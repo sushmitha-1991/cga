@@ -14,13 +14,15 @@ public interface AssuranceService {
 
 	AssuranceDTO getAssuranceById(Long id);
 
-	List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId);
+	//List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId);
 
-	AssuranceDTO updateAssurance(Long id, AssuranceDTO assuranceDTO);
+//	AssuranceDTO updateAssurance(Long id, AssuranceDTO assuranceDTO);
 
 	AssuranceDTO updateAssuranceById(Long id, AssuranceDTO assuranceDTO);
 
 	List<AssuranceListDTO> getAllAssurancesList();
+
+	List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId);
 
 	
 }
