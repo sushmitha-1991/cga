@@ -59,6 +59,17 @@ public class AssuranceController {
 				"assurance fetched successfully", assurance);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	@GetMapping("/getAllLokSabha")
+	@Operation(summary = "Get all Assurance")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
+			@ApiResponse(responseCode = "500", description = "Internal server error") })
+	public ResponseEntity<GenericResponse<List<AssuranceDTO>>> getAllLokSabhaAssurance() {
+		List<AssuranceDTO> assurance = assuranceService.getAllLokSabhaAssurance();
+		GenericResponse<List<AssuranceDTO>> response = new GenericResponse<>(HttpStatus.OK.value(), true,
+				"assurance fetched successfully", assurance);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
 	@GetMapping("/{id}")
 	@Operation(summary = "Get Assurance by ID")

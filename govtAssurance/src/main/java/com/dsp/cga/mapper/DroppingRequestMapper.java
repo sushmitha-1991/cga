@@ -26,6 +26,8 @@ public class DroppingRequestMapper {
 	                .acceptedId(dto.getAcceptedId())
 	                .subject(dto.getSubject())
 	                .remarks(dto.getRemarks())
+	                .meetingDate(dto.getMeetingDate())
+	                .meetingNo(dto.getMeetingNo())
 	                .draftStatus(dto.getDraftStatus())
 	                .build();
 	    }
@@ -49,6 +51,8 @@ public class DroppingRequestMapper {
 	                .acceptedId(entity.getAcceptedId())
 	                .subject(entity.getSubject())
 	                .remarks(entity.getRemarks())
+	                .meetingDate(entity.getMeetingDate())
+	                .meetingNo(entity.getMeetingNo())
 	                .draftStatus(entity.getDraftStatus())
 	                .build();
 	    }
@@ -64,6 +68,8 @@ public class DroppingRequestMapper {
 	            entity.setMinistryRefDate(dto.getMinistryRefDate());
 	            entity.setMinistryRefNo(dto.getMinistryRefNo());
 	            entity.setSubject(dto.getSubject());
+	            entity.setMeetingNo(dto.getMeetingNo());
+	            entity.setMeetingDate(dto.getMeetingDate());
 	            entity.setRemarks(dto.getRemarks());
 	        }
 	    }

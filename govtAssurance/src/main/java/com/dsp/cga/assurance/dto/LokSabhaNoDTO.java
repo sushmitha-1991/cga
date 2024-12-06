@@ -6,7 +6,7 @@ import lombok.Data;
 public class LokSabhaNoDTO {
 	
 	private Long id;
-	private String loksabhaNo;
-	private String loksabhaSessionNo;
+	
+	    private String lokSabhaNumber;
 
 }

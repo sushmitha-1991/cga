@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.dsp.cga.assurance.entity.Assurance;
+
 @Repository
 
 public interface AssuranceRepository extends JpaRepository<Assurance, Long> {
@@ -31,21 +32,16 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long> {
 //		        @Param("memberId") Long memberId);
 
 	@Query("SELECT a.assuranceNo FROM Assurance a WHERE a.id = :assuranceId")
-    String findAssuranceNoById(@Param("assuranceId") Long assuranceId);
-	//Optional<GovtAssurance> findActiveAndNonDeletedGovtAssurance();
+	String findAssuranceNoById(@Param("assuranceId") Long assuranceId);
+	// Optional<GovtAssurance> findActiveAndNonDeletedGovtAssurance();
 
-	 @Query("SELECT a FROM Assurance a WHERE " +
-	           "(a.rajyaSabhaSessionNo IS NOT NULL) " +
-	           "OR (a.lokSabhaSessionNo IS NULL) " +
-	           "OR a.assuranceDate >= :fromDate " +
-	           "OR a.assuranceDate <= :toDate " +
-	           "OR a.ministryId = :ministryId " +
-	           "OR a.memberId = :memberId")
-	    List<Assurance> findFilteredAssurances(@Param("fromDate") LocalDate fromDate,
-	                                           @Param("toDate") LocalDate toDate,
-	                                           @Param("ministryId") Long ministryId,
-	                                           @Param("memberId") Long memberId);
-	
-	
+	@Query("SELECT a FROM Assurance a WHERE " + "(a.rajyaSabhaSessionNo IS NOT NULL) "
+			+ "OR (a.lokSabhaSessionNo IS NULL) " + "OR a.assuranceDate >= :fromDate "
+			+ "OR a.assuranceDate <= :toDate " + "OR a.ministryId = :ministryId " + "OR a.memberId = :memberId")
+	List<Assurance> findFilteredAssurances(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
+			@Param("ministryId") Long ministryId, @Param("memberId") Long memberId);
+
+	@Query("SELECT a FROM Assurance a WHERE a.rajyaSabhaSessionNo IS NULL AND a.lokSabhaSessionNo IS NOT NULL")
+	List<Assurance> findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNull();
 
 }

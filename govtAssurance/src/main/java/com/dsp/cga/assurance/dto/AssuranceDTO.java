@@ -69,11 +69,12 @@ public class AssuranceDTO {
 	    private StatusDTO statusDTO;
 	    private AssuranceTypeDTO assuranceTypeDTO;
 	    private RajyaSabhaSessionNoDTO RajyaSabhaSessionNoDTO;
+	    private LoksabhaSessionNoDTO lokSabhaSessionNoDTO;
 	    private SourceDTO sourceDTO;
 	   
 	    private PendingDueToDTO pendingDueToDTO;
 	    private LokSabhaNoDTO lokSabhaNoDTO;
-	    private LoksabhaSessionNoDTO loksabhaSessionNoDTO;
+	   // private LoksabhaSessionNoDTO loksabhaSessionNoDTO;
 	    private List<MemberDTO> clubbedMembersData = new ArrayList<>();
   
 }

@@ -32,7 +32,7 @@ public class DroppingRequest extends Auditable {
 	@Column(name = "assurance_id", nullable = false)
 	private Long assuranceId;
 
-	@Column(name = "droppingType", nullable = false)
+	@Column(name = "droppingType")
 	private Long droppingType; // Code is a reference to the 'master' microservice
 
 	@Column(name = "supplementary_id")
@@ -61,6 +61,10 @@ public class DroppingRequest extends Auditable {
 
 	@Column(name = "remarks", length = 512)
 	private String remarks;
+	@Column(name = "meeting_no")
+	private String meetingNo;
+	@Column(name = "meeting_date")
+	private LocalDate meetingDate;
 
 	@Column(name = "draft_status", nullable = false)
 	private Boolean draftStatus = Boolean.FALSE;

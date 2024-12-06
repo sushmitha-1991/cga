@@ -54,6 +54,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	@Value("${master.departmentServiceUrl}")
 	private String departmentServiceUrl;
+	
+	@Value("${loksabha.session.url}")
+    private String loksabhaSessionUrl;
 
 //	@Value("${master.assuranceTypeServiceUrl}")
 //	private String assuranceTypeServiceUrl;
@@ -67,8 +70,8 @@ public class AssuranceServiceImpl implements AssuranceService {
 	@Value("${master.ministryServiceUrl}")
 	private String ministryServiceUrl;
 
-	@Value("${master.lokSabhaSessionNoServiceUrl}")
-	private String lokSabhaSessionNoServiceUrl;
+//	@Value("${master.lokSabhaSessionNoServiceUrl}")
+//	private String lokSabhaSessionNoServiceUrl;
 
 	@Value("${master.rajyaSabhaServiceUrl}")
 	private String rajyaSabhaServiceUrl;
@@ -367,32 +370,60 @@ public class AssuranceServiceImpl implements AssuranceService {
 		return pendingDueToDTO;
 	}
 
-	private LoksabhaSessionNoDTO fetchLokSabhaSessionData(Long sessionNo) {
-		String url = lokSabhaSessionNoServiceUrl + "/session/" + sessionNo;
-		log.debug("Fetching LokSabhaSession by sessionNo from URL: {}", url);
+	
+	
+	private LoksabhaSessionNoDTO fetchLoksabhaSessionData(Long lokSabhaSessionNo) {
+		
+		System.out.println("@@@@@@@@@@@@ +"  + lokSabhaSessionNo);
+	    String loksabhaSessionServiceUrl = loksabhaSessionUrl + lokSabhaSessionNo;
+	    log.debug("Calling master service URL for Loksabha Session: {}", loksabhaSessionServiceUrl);
 
-		try {
-			ResponseEntity<GenericResponse<LoksabhaSessionNoDTO>> response = restTemplate.exchange(url, HttpMethod.GET,
-					null, new ParameterizedTypeReference<GenericResponse<LoksabhaSessionNoDTO>>() {
-					});
+	    ResponseEntity<GenericResponse<LoksabhaSessionNoDTO>> response = restTemplate.exchange(
+	            loksabhaSessionServiceUrl,
+	            HttpMethod.GET, 
+	            null, 
+	            new ParameterizedTypeReference<GenericResponse<LoksabhaSessionNoDTO>>() {}
+	    );
 
-			if (response == null || response.getBody() == null || response.getBody().getData() == null) {
-				log.error("Response or body is null when fetching LokSabhaSession for sessionNo: {}", sessionNo);
-				throw new RuntimeException("Failed to fetch LokSabhaSession, response is null");
-			}
+	    if (!response.getStatusCode().is2xxSuccessful()) {
+	        log.error("Failed to fetch data from master service for Loksabha Session: {} - {}", 
+	                  response.getStatusCode(), response.getBody());
+	        throw new RuntimeException(
+	                "Failed to fetch data from master service for Loksabha Session. Status: " + response.getStatusCode());
+	    }
 
-			LoksabhaSessionNoDTO lokSabhaSessionDTO = response.getBody().getData();
-			log.debug("Fetched LokSabhaSessionDTO: {}", lokSabhaSessionDTO);
-			return lokSabhaSessionDTO;
+	    LoksabhaSessionNoDTO loksabhaSessionNoDTO = response.getBody().getData();
+	    log.debug("Fetched LoksabhaSessionNoDTO: {}", loksabhaSessionNoDTO);
 
-		} catch (ResourceNotFoundException e) {
-			log.error("Resource not found for sessionNo: {}", sessionNo);
-			throw e;
-		} catch (Exception e) {
-			log.error("Error fetching LokSabhaSession for sessionNo: {}", sessionNo, e);
-			throw new RuntimeException("Failed to fetch LokSabhaSession data", e);
-		}
+	    return loksabhaSessionNoDTO;
 	}
+
+//	private LoksabhaSessionNoDTO fetchLokSabhaSessionData(Long lokSabhaSessionNo) {
+//		String url = loksabhaSessionUrl  + lokSabhaSessionNo;
+//		log.debug("Fetching LokSabhaSession by sessionNo from URL: {}", url);
+//
+//		try {
+//			ResponseEntity<GenericResponse<LoksabhaSessionNoDTO>> response = restTemplate.exchange(url, HttpMethod.GET,
+//					null, new ParameterizedTypeReference<GenericResponse<LoksabhaSessionNoDTO>>() {
+//					});
+//
+//			if (response == null || response.getBody() == null || response.getBody().getData() == null) {
+//				log.error("Response or body is null when fetching LokSabhaSession for sessionNo: {}", lokSabhaSessionNo);
+//				throw new RuntimeException("Failed to fetch LokSabhaSession, response is null");
+//			}
+//
+//			LoksabhaSessionNoDTO lokSabhaSessionDTO = response.getBody().getData();
+//			log.debug("Fetched LokSabhaSessionDTO: {}", lokSabhaSessionDTO);
+//			return lokSabhaSessionDTO;
+//
+//		} catch (ResourceNotFoundException e) {
+//			log.error("Resource not found for sessionNo: {}", lokSabhaSessionNo);
+//			throw e;
+//		} catch (Exception e) {
+//			log.error("Error fetching LokSabhaSession for sessionNo: {}", lokSabhaSessionNo, e);
+//			throw new RuntimeException("Failed to fetch LokSabhaSession data", e);
+//		}
+//	}
 
 	private LokSabhaNoDTO fetchLokSabhaData(Long lokSabhaNo) {
 		String url = lokSabhaNoServiceUrl + "/" + lokSabhaNo;
@@ -508,15 +539,53 @@ public class AssuranceServiceImpl implements AssuranceService {
 	}
 
 	@Override
-	 public List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
-	     // Fetch the filtered assurances from the repository
-		
-	     List<Assurance> assurances = assuranceRepository.findFilteredAssurances(fromDate, toDate, ministryId, memberId);
-	     
-	     // Map entities to DTOs
-	     return assurances.stream()
-	             .map(assuranceMapper::toDTO) // Use method reference for simplicity
-	             .collect(Collectors.toList());
-	 }
+	public List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId,
+			Long memberId) {
+		// Fetch the filtered assurances from the repository
 
+		List<Assurance> assurances = assuranceRepository.findFilteredAssurances(fromDate, toDate, ministryId, memberId);
+
+		// Map entities to DTOs
+		return assurances.stream().map(assuranceMapper::toDTO) // Use method reference for simplicity
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<AssuranceDTO> getAllLokSabhaAssurance() {
+		log.debug("Entering getAllAssurance");
+
+		// Fetch only assurances where rajyaSabhaSessionNo is not null
+		List<Assurance> assurances = assuranceRepository
+				.findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNull();
+		log.debug("Fetched Assurances with non-null rajyaSabhaSessionNo: {}", assurances);
+
+		List<AssuranceDTO> assuranceDTOs = new ArrayList<>();
+		for (Assurance assurance : assurances) {
+			log.debug("Processing Assurance: {}", assurance);
+			AssuranceDTO dto = assuranceMapper.toDTO(assurance);
+
+			// Populate additional data
+			dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+			dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+			dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+			dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+			if (assurance.getLokSabhaSessionNo() != null) {
+			dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
+			System.out.println("########### +"+ assurance.getLokSabhaSessionNo());
+			}
+			dto.setLokSabhaNoDTO(fetchLokSabhaData(assurance.getLokSabhaNo()));
+			if (assurance.getPendingDueTo() != null) {
+				dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+			}
+			if (assurance.getPendingDueTo() != null) {
+				dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+			}
+			List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+			dto.setClubbedMembersData(clubbedMembersData);
+			assuranceDTOs.add(dto);
+		}
+
+		log.debug("Returning list of AssuranceDTOs: {}", assuranceDTOs);
+		return assuranceDTOs;
+	}
 }

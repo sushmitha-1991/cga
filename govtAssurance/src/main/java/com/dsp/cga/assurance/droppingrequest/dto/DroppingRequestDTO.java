@@ -27,7 +27,7 @@ public class DroppingRequestDTO {
 	private Long supplementaryId;
 
 	private Long partId;
-	
+
 	private String assuranceNo;
 
 	private LocalDate dropRequestDate;
@@ -43,7 +43,7 @@ public class DroppingRequestDTO {
 	// private StatusDTO statusDTO;
 
 	private DroppingTypeDTO droppingTypeDTO;
-	
+
 	private AcceptedDTO acceptedDTO;
 
 	private String ministryRefNo;
@@ -53,5 +53,9 @@ public class DroppingRequestDTO {
 	private Long acceptedId;
 
 	private String subject;
+
+	private String meetingNo;
+
+	private LocalDate meetingDate;
 
 }

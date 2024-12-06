@@ -18,6 +18,7 @@ import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
 import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
 import com.dsp.cga.assurance.droppingrequest.service.DroppingRequestService;
 import com.dsp.cga.assurance.dto.AcceptedDTO;
+import com.dsp.cga.assurance.dto.DroppingTypeDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.implementationrequest.service.impl.ImplemantationRequestServiceImpl;
@@ -57,6 +58,8 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 
 		Assurance assurance = assuranceRepository.findById(id).orElse(null);
 		String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
+		Long lokshabaNo = (assurance != null) ? assurance.getLokSabhaNo() : null;
+		
 
 		DroppingRequestDTO dto = DroppingRequestMapper.toDTO(Request);
 		dto.setAssuranceNo(assuranceNo);
@@ -64,7 +67,10 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		// Populate additional data if available
 		// dto.setStatusDTO(fetchStatusData(Request.getDropStatusId()));
 		// System.out.println("$$$$$$$$$$$" + Request.getDropStatusId());
-		// dto.setDroppingTypeDTO(fetchDroppingTypeData(Request.getDroppingType()));
+		if (Request.getDroppingType() != null) {
+		    dto.setDroppingTypeDTO(fetchDroppingTypeData(Request.getDroppingType()));
+		}
+
 		if (Request.getAcceptedId() != null) {
 			dto.setAcceptedDTO(fetchAcceptdData(Request.getAcceptedId()));
 		}
@@ -93,6 +99,30 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		log.debug("Fetched StatusDTO: {}", statusDTO);
 
 		return statusDTO;
+	}
+
+	private DroppingTypeDTO fetchDroppingTypeData(Long droppingType) {
+	    String droppingTypeServiceUrl = codeServiceUrl + droppingType;
+	    log.debug("Calling master service URL for Dropping Type: {}", droppingTypeServiceUrl);
+
+	    ResponseEntity<GenericResponse<DroppingTypeDTO>> response = restTemplate.exchange(
+	            droppingTypeServiceUrl, 
+	            HttpMethod.GET,
+	            null, 
+	            new ParameterizedTypeReference<GenericResponse<DroppingTypeDTO>>() {}
+	    );
+
+	    if (!response.getStatusCode().is2xxSuccessful()) {
+	        log.error("Failed to fetch data from master service for Dropping Type: {} - {}", 
+	                  response.getStatusCode(), response.getBody());
+	        throw new RuntimeException(
+	                "Failed to fetch data from master service for Dropping Type. Status: " + response.getStatusCode());
+	    }
+
+	    DroppingTypeDTO droppingTypeDTO = response.getBody().getData();
+	    log.debug("Fetched DroppingTypeDTO: {}", droppingTypeDTO);
+
+	    return droppingTypeDTO;
 	}
 
 	private AcceptedDTO fetchAcceptdData(Long acceptedId) {
