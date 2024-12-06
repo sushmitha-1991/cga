@@ -497,11 +497,23 @@ public class AssuranceServiceImpl implements AssuranceService {
 		dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
 		dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
 		dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+		if (assurance.getAssuranceTypeId() != null) {
 		dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+		}
+		if (assurance.getRajyaSabhaSessionNo() != null) {
 		dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
+		}
 		if (assurance.getPendingDueTo() != null) {
 			dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
 		}
+		if (assurance.getLokSabhaSessionNo() != null) {
+			dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
+			System.out.println("########### +"+ assurance.getLokSabhaSessionNo());
+			}
+			dto.setLokSabhaNoDTO(fetchLokSabhaData(assurance.getLokSabhaNo()));
+			if (assurance.getPendingDueTo() != null) {
+				dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+			}
 		dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
 		if (assurance.getClubbedMembers() != null) {
 
