@@ -24,9 +24,9 @@ public class DroppingRequestDTO {
 
 	private Long droppingType; // Code is a reference to the 'master' microservice
 
-	private Long supplementaryId;
+	private String supplementaryId;
 
-	private Long partId;
+	private String partId;
 
 	private String assuranceNo;
 

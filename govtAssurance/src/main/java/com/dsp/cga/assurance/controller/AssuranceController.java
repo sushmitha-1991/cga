@@ -137,15 +137,29 @@ public class AssuranceController {
 	}
 	
 	@GetMapping("/filters")
-    public ResponseEntity<List<AssuranceDTO>> getFilteredAssurances(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-            @RequestParam(required = false) Long ministryId,
-            @RequestParam(required = false) Long memberId) {
+	@Operation(summary = "Get filtered Assurances")
+	@ApiResponses(value = {
+	        @ApiResponse(responseCode = "200", description = "Filtered assurances fetched successfully"),
+	        @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<GenericResponse<List<AssuranceDTO>>> getFilteredAssurances(
+	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+	        @RequestParam(required = false) Long ministryId,
+	        @RequestParam(required = false) Long memberId) {
 
-        List<AssuranceDTO> assurances = assuranceService.getFilteredAssurances(fromDate, toDate, ministryId, memberId);
-        return ResponseEntity.ok(assurances);
-    }
+	    List<AssuranceDTO> assurances = assuranceService.getFilteredAssurances(fromDate, toDate, ministryId, memberId);
+	    GenericResponse<List<AssuranceDTO>> response = new GenericResponse<>(
+	            HttpStatus.OK.value(),
+	            true,
+	            "Filtered assurances fetched successfully",
+	            assurances
+	    );
+	    return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	
+
 
 
 }

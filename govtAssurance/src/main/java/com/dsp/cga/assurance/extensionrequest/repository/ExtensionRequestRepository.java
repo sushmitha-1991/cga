@@ -16,6 +16,6 @@ public interface ExtensionRequestRepository extends JpaRepository<ExtensionReque
 	@Query("SELECT e FROM ExtensionRequest e WHERE e.assuranceId = :assuranceId")
 	List<ExtensionRequest> findByAssuranceId(@Param("assuranceId") Long assuranceId);
 
-	Optional<ExtensionRequest> findByAssuranceIdAndExtensionNo(Long assuranceId, Integer extensionNo);
+	Optional<ExtensionRequest> findByAssuranceIdAndExtensionNo(Long assuranceId, String extensionNo);
 
 }

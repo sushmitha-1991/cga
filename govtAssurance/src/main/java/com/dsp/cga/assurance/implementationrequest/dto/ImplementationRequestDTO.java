@@ -23,8 +23,8 @@ public class ImplementationRequestDTO {
 	    private Long committeeDecisionId;
 	    private LocalDate layingDate;
 	    private String statementNo;
-	    private Long supplementaryId;
-	    private Long partId;
+	    private String supplementaryId;
+	    private String partId;
 	    private String reason;
 	    private String assuranceNo;
 	    private CommitteeDecisionDTO committeeDecisionDTO;

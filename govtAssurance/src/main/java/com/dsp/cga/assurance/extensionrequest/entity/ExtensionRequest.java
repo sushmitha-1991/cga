@@ -40,7 +40,7 @@ public class ExtensionRequest extends Auditable {
 //	private String questionNo;
 
 	@Column(name = "extension_no", nullable = false)
-	private Integer extensionNo;
+	private String extensionNo;
 
 	@Column(name = "subject", nullable = false)
 	private String subject;

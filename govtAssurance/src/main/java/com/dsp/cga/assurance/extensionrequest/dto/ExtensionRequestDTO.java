@@ -17,7 +17,7 @@ public class ExtensionRequestDTO {
 	private Long id;
 	private Long assuranceId;
 	private String questionNo;
-	private Integer extensionNo;
+	private String extensionNo;
 	private String subject;
 	private LocalDate extRequestedTillDate;
 	private LocalDate extGrantedTillDate;

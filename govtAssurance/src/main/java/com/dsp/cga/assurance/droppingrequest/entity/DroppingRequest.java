@@ -36,10 +36,10 @@ public class DroppingRequest extends Auditable {
 	private Long droppingType; // Code is a reference to the 'master' microservice
 
 	@Column(name = "supplementary_id")
-	private Long supplementaryId;
+	private String supplementaryId;
 
 	@Column(name = "part_id")
-	private Long partId;
+	private String partId;
 
 	@Column(name = "drop_request_date", nullable = false)
 	private LocalDate dropRequestDate;

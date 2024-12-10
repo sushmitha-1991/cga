@@ -42,10 +42,10 @@ public class ImplementationRequest extends Auditable {
 	private String statementNo;
 
 	@Column(name = "supplementary_id")
-	private Long supplementaryId;
+	private String supplementaryId;
 
 	@Column(name = "part_id")
-	private Long partId;
+	private String partId;
 
 	@Column(name = "reason", length = 512)
 	private String reason;
