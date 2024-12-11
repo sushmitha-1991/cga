@@ -1,6 +1,8 @@
 package com.dsp.cga.assurance.extensionrequest.dto;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +26,9 @@ public class ExtensionRequestDTO {
 	private String ministryRefNo;
 	private LocalDate ministryRefDate;
 	private String remarks;
-	private String extensionFiles;
+	//private String extensionFiles;
 	private Boolean draftStatus;
 	private String assuranceNo;
+    private List<Map<String, Object>> extensionFiles;
+
 }

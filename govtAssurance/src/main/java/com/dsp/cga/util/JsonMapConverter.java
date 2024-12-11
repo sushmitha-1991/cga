@@ -18,6 +18,9 @@ public class JsonMapConverter implements AttributeConverter<List<Map<String, Obj
 
     @Override
     public String convertToDatabaseColumn(List<Map<String, Object>> attribute) {
+        if (attribute == null) {
+            return "[]"; // Default empty JSON array
+        }
         try {
             return objectMapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
@@ -27,10 +30,14 @@ public class JsonMapConverter implements AttributeConverter<List<Map<String, Obj
 
     @Override
     public List<Map<String, Object>> convertToEntityAttribute(String dbData) {
+        if (dbData == null || dbData.isEmpty()) {
+            return List.of(); // Default empty list
+        }
         try {
             return objectMapper.readValue(dbData, new TypeReference<List<Map<String, Object>>>() {});
         } catch (IOException e) {
             throw new IllegalArgumentException("Error while converting JSON to List<Map<String, Object>>", e);
         }
     }
+
 }

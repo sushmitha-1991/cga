@@ -1,10 +1,14 @@
 package com.dsp.cga.assurance.droppingrequest.entity;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import com.dsp.cga.entity.Auditable;
+import com.dsp.cga.util.JsonMapConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -65,6 +69,10 @@ public class DroppingRequest extends Auditable {
 	private String meetingNo;
 	@Column(name = "meeting_date")
 	private LocalDate meetingDate;
+	
+	@Column(name = "dropping_files", columnDefinition = "jsonb")
+	@Convert(converter = JsonMapConverter.class)
+	private List<Map<String, Object>> droppingFiles;
 
 	@Column(name = "draft_status", nullable = false)
 	private Boolean draftStatus = Boolean.FALSE;

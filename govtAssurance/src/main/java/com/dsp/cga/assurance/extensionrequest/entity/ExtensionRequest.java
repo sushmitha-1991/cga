@@ -1,11 +1,15 @@
 package com.dsp.cga.assurance.extensionrequest.entity;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.entity.Auditable;
+import com.dsp.cga.util.JsonMapConverter;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -60,8 +64,13 @@ public class ExtensionRequest extends Auditable {
 	@Column(name = "remarks", length = 512)
 	private String remarks;
 
+//	@Column(name = "extension_files", columnDefinition = "jsonb")
+//	private String extensionFiles;
+	
+
 	@Column(name = "extension_files", columnDefinition = "jsonb")
-	private String extensionFiles;
+	@Convert(converter = JsonMapConverter.class)
+	private List<Map<String, Object>> extensionFiles;
 
 	@Column(name = "draft_status", nullable = false)
 	private Boolean draftStatus = false;

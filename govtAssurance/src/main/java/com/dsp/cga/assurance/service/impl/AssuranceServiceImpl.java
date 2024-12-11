@@ -306,7 +306,6 @@ public class AssuranceServiceImpl implements AssuranceService {
 	}
 
 	private SourceDTO fetchSourceData(Long sourceId) {
-		System.out.println("@@@@@@@" + sourceId);
 		String sourceServiceUrl = codeServiceUrl + sourceId;
 //		String url = sourceServiceUrl + sourceId;
 		log.debug("Calling master service URL: {}", sourceServiceUrl);
@@ -374,7 +373,6 @@ public class AssuranceServiceImpl implements AssuranceService {
 	
 	private LoksabhaSessionNoDTO fetchLoksabhaSessionData(Long lokSabhaSessionNo) {
 		
-		System.out.println("@@@@@@@@@@@@ +"  + lokSabhaSessionNo);
 	    String loksabhaSessionServiceUrl = loksabhaSessionUrl + lokSabhaSessionNo;
 	    log.debug("Calling master service URL for Loksabha Session: {}", loksabhaSessionServiceUrl);
 
@@ -583,7 +581,6 @@ public class AssuranceServiceImpl implements AssuranceService {
 			dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
 			if (assurance.getLokSabhaSessionNo() != null) {
 			dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
-			System.out.println("########### +"+ assurance.getLokSabhaSessionNo());
 			}
 			dto.setLokSabhaNoDTO(fetchLokSabhaData(assurance.getLokSabhaNo()));
 			if (assurance.getPendingDueTo() != null) {
@@ -599,5 +596,15 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 		log.debug("Returning list of AssuranceDTOs: {}", assuranceDTOs);
 		return assuranceDTOs;
+	}
+
+	@Override
+	public List<AssuranceDTO> getFilteredAssurancesLs(LocalDate fromDate, LocalDate toDate, Long ministryId,
+			Long memberId) {
+		List<Assurance> assurances = assuranceRepository.findFilteredAssurancesLs(fromDate, toDate, ministryId, memberId);
+
+		// Map entities to DTOs
+		return assurances.stream().map(assuranceMapper::toDTO) // Use method reference for simplicity
+				.collect(Collectors.toList());
 	}
 }

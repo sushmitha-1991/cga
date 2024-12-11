@@ -28,6 +28,7 @@ public class DroppingRequestMapper {
 	                .remarks(dto.getRemarks())
 	                .meetingDate(dto.getMeetingDate())
 	                .meetingNo(dto.getMeetingNo())
+	                .droppingFiles(dto.getDroppingFiles())
 	                .draftStatus(dto.getDraftStatus())
 	                .build();
 	    }
@@ -53,6 +54,7 @@ public class DroppingRequestMapper {
 	                .remarks(entity.getRemarks())
 	                .meetingDate(entity.getMeetingDate())
 	                .meetingNo(entity.getMeetingNo())
+	                .droppingFiles(entity.getDroppingFiles())
 	                .draftStatus(entity.getDraftStatus())
 	                .build();
 	    }
@@ -70,6 +72,7 @@ public class DroppingRequestMapper {
 	            entity.setSubject(dto.getSubject());
 	            entity.setMeetingNo(dto.getMeetingNo());
 	            entity.setMeetingDate(dto.getMeetingDate());
+	            entity.setDroppingFiles(dto.getDroppingFiles());
 	            entity.setRemarks(dto.getRemarks());
 	        }
 	    }

@@ -26,5 +26,7 @@ public interface AssuranceService {
 
 	List<AssuranceDTO> getAllLokSabhaAssurance();
 
+	List<AssuranceDTO> getFilteredAssurancesLs(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId);
+
 	
 }

@@ -20,9 +20,9 @@ public class ImplementationRequestMapper {
                 .partId(entity.getPartId())
                 .reason(entity.getReason())
                 .draftStatus(entity.getDraftStatus())
-//                .implementationReportFiles(entity.getImplementationReportFiles())
-//                .partReportFiles(entity.getPartReportFiles())
-//                .otherFiles(entity.getOtherFiles())
+               .implementationReportFiles(entity.getImplementationReportFiles())
+                .partReportFiles(entity.getPartReportFiles())
+               .otherFiles(entity.getOtherFiles())
                 .build();
     }
 
@@ -41,9 +41,9 @@ public class ImplementationRequestMapper {
                 .partId(dto.getPartId())
                 .reason(dto.getReason())
                 .draftStatus(dto.getDraftStatus())
-//                .implementationReportFiles(dto.getImplementationReportFiles())
-//                .partReportFiles(dto.getPartReportFiles())
-//                .otherFiles(dto.getOtherFiles())
+                .implementationReportFiles(dto.getImplementationReportFiles())
+                .partReportFiles(dto.getPartReportFiles())
+                .otherFiles(dto.getOtherFiles())
                 .build();
     }
     
@@ -60,6 +60,9 @@ public class ImplementationRequestMapper {
         entity.setPartId(dto.getPartId());
         entity.setReason(dto.getReason());
         entity.setDraftStatus(dto.getDraftStatus());
+        entity.setImplementationReportFiles(dto.getImplementationReportFiles());
+        entity.setPartReportFiles(dto.getPartReportFiles());
+        entity.setOtherFiles(dto.getOtherFiles());
         
         // Note: createdBy and createdDate will remain unchanged as per JPA logic
     }

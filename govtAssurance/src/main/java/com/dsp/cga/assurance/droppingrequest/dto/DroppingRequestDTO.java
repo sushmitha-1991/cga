@@ -1,6 +1,8 @@
 package com.dsp.cga.assurance.droppingrequest.dto;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import com.dsp.cga.assurance.dto.AcceptedDTO;
 import com.dsp.cga.assurance.dto.DroppingTypeDTO;
@@ -57,5 +59,7 @@ public class DroppingRequestDTO {
 	private String meetingNo;
 
 	private LocalDate meetingDate;
+	
+	private List<Map<String, Object>> droppingFiles;
 
 }

@@ -35,13 +35,34 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long> {
 	String findAssuranceNoById(@Param("assuranceId") Long assuranceId);
 	// Optional<GovtAssurance> findActiveAndNonDeletedGovtAssurance();
 
-	@Query("SELECT a FROM Assurance a WHERE " + "(a.rajyaSabhaSessionNo IS NOT NULL) "
-			+ "OR (a.lokSabhaSessionNo IS NULL) " + "OR a.assuranceDate >= :fromDate "
-			+ "OR a.assuranceDate <= :toDate " + "OR a.ministryId = :ministryId " + "OR a.memberId = :memberId")
+	@Query("SELECT a FROM Assurance a WHERE a.rajyaSabhaSessionNo IS NOT NULL "
+			+ "AND (a.lokSabhaSessionNo IS NULL) " + "AND (a.assuranceDate >= :fromDate or :fromDate is null)"
+			+ "AND (a.assuranceDate <= :toDate or :toDate is null)" + "AND (a.ministryId = :ministryId or :ministryId is null) " + "AND (a.memberId = :memberId or :memberId is null)")
 	List<Assurance> findFilteredAssurances(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
 			@Param("ministryId") Long ministryId, @Param("memberId") Long memberId);
 
 	@Query("SELECT a FROM Assurance a WHERE a.rajyaSabhaSessionNo IS NULL AND a.lokSabhaSessionNo IS NOT NULL")
 	List<Assurance> findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNull();
 
+	@Query("SELECT a FROM Assurance a WHERE a.rajyaSabhaSessionNo IS NULL "
+			+ "AND (a.lokSabhaSessionNo IS NOT NULL) " + "AND (a.assuranceDate >= :fromDate or :fromDate is null)"
+			+ "AND (a.assuranceDate <= :toDate or :toDate is null)" + "AND (a.ministryId = :ministryId or :ministryId is null) " + "AND (a.memberId = :memberId or :memberId is null)")
+	List<Assurance> findFilteredAssurancesLs(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
+			@Param("ministryId") Long ministryId, @Param("memberId") Long memberId);  
+	
+//	@Query("SELECT a FROM Assurance a WHERE a.lokSabhaSessionNo IS NOT NULL AND a.rajyaSabhaSessionNo IS NULL "
+//		     + "OR (a.assuranceDate >= :fromDate OR :fromDate IS NULL) "
+//		     + " (a.assuranceDate <= :toDate OR :toDate IS NULL) "
+//		     + "AND (a.ministryId = :ministryId OR :ministryId IS NULL) "
+//		     + "AND (a.memberId = :memberId OR :memberId IS NULL)")
+//		List<Assurance> findFilteredAssurancesLs(@Param("fromDate") LocalDate fromDate, 
+//		                                         @Param("toDate") LocalDate toDate,
+//		                                         @Param("ministryId") Long ministryId, 
+//		                                         @Param("memberId") Long memberId);
+	
+	
+	
+	
+
 }
+
