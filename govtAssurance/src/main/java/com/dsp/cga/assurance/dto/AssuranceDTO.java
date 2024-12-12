@@ -3,6 +3,7 @@ package com.dsp.cga.assurance.dto;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -71,7 +72,8 @@ public class AssuranceDTO {
 	    private RajyaSabhaSessionNoDTO RajyaSabhaSessionNoDTO;
 	    private LoksabhaSessionNoDTO lokSabhaSessionNoDTO;
 	    private SourceDTO sourceDTO;
-	   
+		private List<Map<String, Object>> assuranceFiles;
+
 	    private PendingDueToDTO pendingDueToDTO;
 	    private LokSabhaNoDTO lokSabhaNoDTO;
 	   // private LoksabhaSessionNoDTO loksabhaSessionNoDTO;

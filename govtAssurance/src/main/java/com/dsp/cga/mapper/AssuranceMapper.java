@@ -50,7 +50,7 @@ public class AssuranceMapper {
 				.sourceId(assurance.getSourceId()).assuranceNo(assurance.getAssuranceNo())
 				.pageNoCorrected(assurance.getPageNoCorrected()).pageNoUncorrected(assurance.getPageNoUncorrected())
 				.clubbedMembers(assurance.getClubbedMembers())
-
+				.assuranceFiles(assurance.getAssuranceFiles())
 				.statusId(assurance.getStatusId())
 
 				.groupName(assurance.getGroupName()).mpaRefNo(assurance.getMpaRefNo())
@@ -83,6 +83,7 @@ public class AssuranceMapper {
 				.supplementaryMemberId(assuranceDTO.getSupplementaryMemberId())
 				.draftStatus(assuranceDTO.getDraftStatus()).assuranceNo(assuranceDTO.getAssuranceNo())
 				.pageNoCorrected(assuranceDTO.getPageNoCorrected())
+				.assuranceFiles(assuranceDTO.getAssuranceFiles())
 				.pageNoUncorrected(assuranceDTO.getPageNoUncorrected()).sourceId(assuranceDTO.getSourceId())
 				.groupName(assuranceDTO.getGroupName()).mpaRefNo(assuranceDTO.getMpaRefNo())
 				.otherPendingDueTo(assuranceDTO.getOtherPendingDueTo()).clubbedMembers(assuranceDTO.getClubbedMembers())

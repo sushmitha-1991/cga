@@ -3,16 +3,19 @@ package com.dsp.cga.assurance.entity;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.entity.Auditable;
+import com.dsp.cga.util.JsonMapConverter;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -155,6 +158,12 @@ public class Assurance extends Auditable {
 
 	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
 	private List<Supplementary> supplementary;
+	
+	@Column(name = "assurance_files", columnDefinition = "jsonb")
+	@Convert(converter = JsonMapConverter.class)
+	private List<Map<String, Object>> assuranceFiles;
+	
+	
 	
 //	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
 //	private List<ImplementationRequest> implementationRequests;
