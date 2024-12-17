@@ -508,7 +508,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 			dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
 			System.out.println("########### +"+ assurance.getLokSabhaSessionNo());
 			}
+		if (assurance.getLokSabhaNo() != null) {
 			dto.setLokSabhaNoDTO(fetchLokSabhaData(assurance.getLokSabhaNo()));
+		}
 			if (assurance.getPendingDueTo() != null) {
 				dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
 			}
@@ -549,16 +551,41 @@ public class AssuranceServiceImpl implements AssuranceService {
 	}
 
 	@Override
-	public List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId,
-			Long memberId) {
-		// Fetch the filtered assurances from the repository
+	public List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
+	    // Fetch the filtered assurances from the repository
+	    List<Assurance> assurances = assuranceRepository.findFilteredAssurances(fromDate, toDate, ministryId, memberId);
 
-		List<Assurance> assurances = assuranceRepository.findFilteredAssurances(fromDate, toDate, ministryId, memberId);
+	    // Map entities to DTOs with additional data populated
+	    List<AssuranceDTO> assuranceDTOs = assurances.stream().map(assurance -> {
+	        log.debug("Processing Assurance: {}", assurance);
 
-		// Map entities to DTOs
-		return assurances.stream().map(assuranceMapper::toDTO) // Use method reference for simplicity
-				.collect(Collectors.toList());
+	        // Convert Assurance to AssuranceDTO
+	        AssuranceDTO dto = assuranceMapper.toDTO(assurance);
+
+	        // Populate additional data
+	        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+	        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+	        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+	        dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
+
+	        if (assurance.getPendingDueTo() != null) {
+	            dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+	        }
+
+	        if (assurance.getSourceId() != null) { // Corrected to use the proper condition for sourceId
+	            dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+	        }
+
+	        dto.setClubbedMembersData(fetchClubbedMembersData(assurance.getClubbedMembers()));
+
+	        return dto;
+	    }).collect(Collectors.toList());
+
+	    log.debug("Returning list of AssuranceDTOs: {}", assuranceDTOs);
+	    return assuranceDTOs;
 	}
+
 
 	@Override
 	public List<AssuranceDTO> getAllLokSabhaAssurance() {
@@ -602,9 +629,43 @@ public class AssuranceServiceImpl implements AssuranceService {
 	public List<AssuranceDTO> getFilteredAssurancesLs(LocalDate fromDate, LocalDate toDate, Long ministryId,
 			Long memberId) {
 		List<Assurance> assurances = assuranceRepository.findFilteredAssurancesLs(fromDate, toDate, ministryId, memberId);
+		  List<AssuranceDTO> assuranceDTOs = assurances.stream().map(assurance -> {
+		        log.debug("Processing Assurance: {}", assurance);
 
-		// Map entities to DTOs
-		return assurances.stream().map(assuranceMapper::toDTO) // Use method reference for simplicity
-				.collect(Collectors.toList());
-	}
+		        // Convert Assurance to AssuranceDTO
+		        AssuranceDTO dto = assuranceMapper.toDTO(assurance);
+
+		        // Populate additional data
+		        if (assurance.getMemberId() != null) {
+		        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+		        }
+		        
+		        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+		        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+		        if (assurance.getAssuranceTypeId() != null) {
+
+		        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+		        }
+		        if (assurance.getLokSabhaSessionNo() != null) {
+					dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
+					}
+				if (assurance.getLokSabhaNo() != null) {
+					dto.setLokSabhaNoDTO(fetchLokSabhaData(assurance.getLokSabhaNo()));
+				}
+		        if (assurance.getPendingDueTo() != null) {
+		            dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+		        }
+
+		        if (assurance.getSourceId() != null) { // Corrected to use the proper condition for sourceId
+		            dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+		        }
+
+		        dto.setClubbedMembersData(fetchClubbedMembersData(assurance.getClubbedMembers()));
+
+		        return dto;
+		    }).collect(Collectors.toList());
+
+		    log.debug("Returning list of AssuranceDTOs: {}", assuranceDTOs);
+		    return assuranceDTOs;
+		}
 }

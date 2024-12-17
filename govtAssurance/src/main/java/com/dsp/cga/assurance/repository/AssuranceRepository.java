@@ -50,17 +50,18 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long> {
 	List<Assurance> findFilteredAssurancesLs(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
 			@Param("ministryId") Long ministryId, @Param("memberId") Long memberId);  
 	
-//	@Query("SELECT a FROM Assurance a WHERE a.lokSabhaSessionNo IS NOT NULL AND a.rajyaSabhaSessionNo IS NULL "
-//		     + "OR (a.assuranceDate >= :fromDate OR :fromDate IS NULL) "
-//		     + " (a.assuranceDate <= :toDate OR :toDate IS NULL) "
-//		     + "AND (a.ministryId = :ministryId OR :ministryId IS NULL) "
-//		     + "AND (a.memberId = :memberId OR :memberId IS NULL)")
-//		List<Assurance> findFilteredAssurancesLs(@Param("fromDate") LocalDate fromDate, 
-//		                                         @Param("toDate") LocalDate toDate,
-//		                                         @Param("ministryId") Long ministryId, 
-//		                                         @Param("memberId") Long memberId);
 	
-	
+//	 @Query ("SELECT a FROM Assurance a WHERE a.rajyaSabhaSessionNo is not NULL"
+//	 		+ " AND a.lokSabhaSessionNo IS null"
+//	 		+ " AND (a.assuranceDate >= :fromDate OR :fromDate is null)"
+//	 		+ " AND (a.assuranceDate <= :toDate OR :toDate is null)" 
+//            + " AND (:ministryId IS NULL OR a.ministryId = :ministryId) " 
+//            + " AND (:memberId IS NULL OR a.memberId = :memberId)")
+//    
+//	 List<Assurance> findFilteredAssurancesLs(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
+//				@Param("ministryId") Long ministryId, @Param("memberId") Long memberId); 
+
+
 	
 	
 

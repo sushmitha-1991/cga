@@ -30,6 +30,10 @@ public class DroppingRequestMapper {
 	                .meetingNo(dto.getMeetingNo())
 	                .droppingFiles(dto.getDroppingFiles())
 	                .draftStatus(dto.getDraftStatus())
+	                .type(dto.getType())
+	                .issueLetterMinistry(dto.getIssueLetterMinistry())
+	                .communicationDate(dto.getCommunicationDate())
+	                .session(dto.getSession())
 	                .build();
 	    }
 
@@ -56,6 +60,10 @@ public class DroppingRequestMapper {
 	                .meetingNo(entity.getMeetingNo())
 	                .droppingFiles(entity.getDroppingFiles())
 	                .draftStatus(entity.getDraftStatus())
+	                .communicationDate(entity.getCommunicationDate())
+	                .issueLetterMinistry(entity.getIssueLetterMinistry())
+	                .type(entity.getType())
+	                .session(entity.getSession())
 	                .build();
 	    }
 
@@ -73,6 +81,9 @@ public class DroppingRequestMapper {
 	            entity.setMeetingNo(dto.getMeetingNo());
 	            entity.setMeetingDate(dto.getMeetingDate());
 	            entity.setDroppingFiles(dto.getDroppingFiles());
+	            entity.setIssueLetterMinistry(dto.getIssueLetterMinistry());
+	            entity.setCommunicationDate(dto.getCommunicationDate());
+	            entity.setSession(dto.getSession());
 	            entity.setRemarks(dto.getRemarks());
 	        }
 	    }

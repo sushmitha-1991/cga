@@ -143,11 +143,15 @@ public class AssuranceController {
 	        @ApiResponse(responseCode = "500", description = "Internal server error")
 	})
 	public ResponseEntity<GenericResponse<List<AssuranceDTO>>> getFilteredAssurances(
-	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
 	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
 	        @RequestParam(required = false) Long ministryId,
 	        @RequestParam(required = false) Long memberId) {
-
+		
+		 log.info("fromDate: {}", fromDate);
+		    log.info("toDate: {}", toDate);
+		    log.info("ministryId: {}", ministryId);
+		    log.info("memberId: {}", memberId);
 	    List<AssuranceDTO> assurances = assuranceService.getFilteredAssurances(fromDate, toDate, ministryId, memberId);
 	    GenericResponse<List<AssuranceDTO>> response = new GenericResponse<>(
 	            HttpStatus.OK.value(),

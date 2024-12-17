@@ -45,7 +45,7 @@ public class DroppingRequest extends Auditable {
 	@Column(name = "part_id")
 	private String partId;
 
-	@Column(name = "drop_request_date", nullable = false)
+	@Column(name = "drop_request_date")
 	private LocalDate dropRequestDate;
 
 	@Column(name = "actual_drop_date")
@@ -59,9 +59,22 @@ public class DroppingRequest extends Auditable {
 
 	@Column(name = "accepted_id")
 	private Long acceptedId;
+	
+	@Column(name = "type")
+	private Long type;
+	
+	@Column(name = "communicationDate")
+	private LocalDate communicationDate;
 
 	@Column(name = "subject")
 	private String subject;
+	
+	@Column(name = "issue_letter_ministry", nullable = false)
+	private Boolean issueLetterMinistry = Boolean.FALSE;
+	
+	
+	@Column(name = "session")
+	private Long session;
 
 	@Column(name = "remarks", length = 512)
 	private String remarks;

@@ -35,6 +35,12 @@ public class DroppingRequestDTO {
 	private LocalDate dropRequestDate;
 
 	private LocalDate actualDropDate;
+	
+	private Long type;
+	
+	private Boolean issueLetterMinistry; 
+	
+	private LocalDate communicationDate;
 
 	// private Long dropStatusId;
 
@@ -57,6 +63,8 @@ public class DroppingRequestDTO {
 	private String subject;
 
 	private String meetingNo;
+	
+	private Long session;
 
 	private LocalDate meetingDate;
 	

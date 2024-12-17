@@ -53,6 +53,9 @@ public class ImplementationRequest extends Auditable {
 
 	@Column(name = "reason", length = 512)
 	private String reason;
+	
+	@Column(name = "implementation_type_id")
+	private Long implementationTypeId;
 
 	@Column(name = "implementation_report_files", columnDefinition = "jsonb")
 	@Convert(converter = JsonMapConverter.class)
@@ -68,6 +71,9 @@ public class ImplementationRequest extends Auditable {
 
 	@Column(name = "draft_status", nullable = false)
 	private Boolean draftStatus = false;
+	
+	@Column(name = "session")
+	private Long session;
 	
 //	@ManyToOne
 //    @JoinColumn(name = "assurance_id", nullable = false)

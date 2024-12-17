@@ -30,18 +30,18 @@ public class PartDetails {
     @SequenceGenerator(name = "part_seq", sequenceName = "cga.part_seq", allocationSize = 1)
     private Long id;
 
-    @NotNull
+   
     private String part;
 
-    @NotNull
+  
     @Column(name = "subject", length = 255)
     private String subject;
 
-    @NotNull
+  
     @Column(name = "status_id")
     private Long statusId;
 
-    @NotNull
+ 
     private String extentOfAssurance;
 
     @ManyToOne
