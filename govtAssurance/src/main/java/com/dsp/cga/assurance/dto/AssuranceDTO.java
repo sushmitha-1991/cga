@@ -52,7 +52,8 @@ public class AssuranceDTO {
 	    private List<PartDetailsDTO> partDetails;
 	    private List<SupplementaryDTO> supplementary;
 	    private String lokSabhaSession;
-	   
+	    private Long supplement;
+
 	    private String categoryName;
 	    private String memberName;
 	    private String statusName;
@@ -72,7 +73,8 @@ public class AssuranceDTO {
 	    private RajyaSabhaSessionNoDTO RajyaSabhaSessionNoDTO;
 	    private LoksabhaSessionNoDTO lokSabhaSessionNoDTO;
 	    private SourceDTO sourceDTO;
-		//private List<Map<String, Object>> assuranceFiles;
+	    private SupplementDTO supplemantDTO;
+		private List<Map<String, Object>> assuranceFiles;
 
 	    private PendingDueToDTO pendingDueToDTO;
 	    private LokSabhaNoDTO lokSabhaNoDTO;

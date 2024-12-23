@@ -48,9 +48,10 @@ public class AssuranceMapper {
 				.textOfAssurance(assurance.getTextOfAssurance()).supplementaryPageNo(assurance.getSupplementaryPageNo())
 				.supplementaryMemberId(assurance.getSupplementaryMemberId()).draftStatus(assurance.getDraftStatus())
 				.sourceId(assurance.getSourceId()).assuranceNo(assurance.getAssuranceNo())
+				.supplement(assurance.getSupplement())
 				.pageNoCorrected(assurance.getPageNoCorrected()).pageNoUncorrected(assurance.getPageNoUncorrected())
 				.clubbedMembers(assurance.getClubbedMembers())
-				//.assuranceFiles(assurance.getAssuranceFiles())
+				.assuranceFiles(assurance.getAssuranceFiles())
 				.statusId(assurance.getStatusId())
 
 				.groupName(assurance.getGroupName()).mpaRefNo(assurance.getMpaRefNo())
@@ -81,9 +82,10 @@ public class AssuranceMapper {
 				.textOfAssurance(assuranceDTO.getTextOfAssurance())
 				.supplementaryPageNo(assuranceDTO.getSupplementaryPageNo())
 				.supplementaryMemberId(assuranceDTO.getSupplementaryMemberId())
+				.supplement(assuranceDTO.getSupplement())
 				.draftStatus(assuranceDTO.getDraftStatus()).assuranceNo(assuranceDTO.getAssuranceNo())
 				.pageNoCorrected(assuranceDTO.getPageNoCorrected())
-			//	.assuranceFiles(assuranceDTO.getAssuranceFiles())
+				.assuranceFiles(assuranceDTO.getAssuranceFiles())
 				.pageNoUncorrected(assuranceDTO.getPageNoUncorrected()).sourceId(assuranceDTO.getSourceId())
 				.groupName(assuranceDTO.getGroupName()).mpaRefNo(assuranceDTO.getMpaRefNo())
 				.otherPendingDueTo(assuranceDTO.getOtherPendingDueTo()).clubbedMembers(assuranceDTO.getClubbedMembers())
@@ -177,6 +179,10 @@ public class AssuranceMapper {
 	        }
 	        if (assuranceDTO.getDueDateOfImplementation() != null) {
 	            assurance.setDueDateOfImplementation(assuranceDTO.getDueDateOfImplementation());
+	        }
+	        
+	        if (assuranceDTO.getSupplement() != null) {
+	            assurance.setSupplement(assuranceDTO.getSupplement());
 	        }
 	        if (assuranceDTO.getDateOfImplementation() != null) {
 	            assurance.setDateOfImplementation(assuranceDTO.getDateOfImplementation());

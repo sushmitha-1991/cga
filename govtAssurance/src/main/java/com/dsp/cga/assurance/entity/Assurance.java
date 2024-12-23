@@ -128,6 +128,9 @@ public class Assurance extends Auditable {
 	@NotNull
 	@Column(name = "draft_status", nullable = false)
 	private Boolean draftStatus = false;
+	
+	@Column(name = "supplement")
+	private Long supplement;
 
 	@Column(name = "source_id")
 	private Long sourceId;
@@ -159,10 +162,10 @@ public class Assurance extends Auditable {
 	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
 	private List<Supplementary> supplementary;
 	
-//	@Column(name = "assurance_files", columnDefinition = "jsonb")
-//	@Convert(converter = JsonMapConverter.class)
-//	private List<Map<String, Object>> assuranceFiles;
-//	
+	@Column(name = "assurance_files", columnDefinition = "jsonb")
+	@Convert(converter = JsonMapConverter.class)
+	private List<Map<String, Object>> assuranceFiles;
+	
 	
 	
 //	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)

@@ -1,6 +1,7 @@
 package com.dsp.cga.assurance.service.impl;
 
 import java.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import com.dsp.cga.assurance.dto.PendingDueToDTO;
 import com.dsp.cga.assurance.dto.RajyaSabhaSessionNoDTO;
 import com.dsp.cga.assurance.dto.SourceDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
+import com.dsp.cga.assurance.dto.SupplementDTO;
 import com.dsp.cga.assurance.dto.SupplementaryDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
@@ -325,6 +327,27 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 		return sourceDTO;
 	}
+	
+	private SupplementDTO fetchSupplementData(Long supplement) {
+		String supplemantServiceUrl = codeServiceUrl + supplement;
+//		String url = sourceServiceUrl + sourceId;
+		log.debug("Calling master service URL: {}", supplemantServiceUrl);
+
+		ResponseEntity<GenericResponse<SupplementDTO>> response = restTemplate.exchange(supplemantServiceUrl, HttpMethod.GET,
+				null, new ParameterizedTypeReference<GenericResponse<SupplementDTO>>() {
+				});
+		System.out.println(response);
+		if (!response.getStatusCode().is2xxSuccessful()) {
+			log.error("Failed to fetch data from master service: {} - {}", response.getStatusCode(),
+					response.getBody());
+			throw new RuntimeException("Failed to fetch data from master service. Status: " + response.getStatusCode());
+		}
+
+		SupplementDTO sourceDTO = response.getBody().getData();
+		log.debug("Fetched SourceDTO: {}", sourceDTO);
+
+		return sourceDTO;
+	}
 
 	private AssuranceTypeDTO fetchAssuranceTypeData(Long assuranceTypeId) {
 		String assuranceTypeServiceUrl = codeServiceUrl + assuranceTypeId;
@@ -396,32 +419,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 	    return loksabhaSessionNoDTO;
 	}
 
-//	private LoksabhaSessionNoDTO fetchLokSabhaSessionData(Long lokSabhaSessionNo) {
-//		String url = loksabhaSessionUrl  + lokSabhaSessionNo;
-//		log.debug("Fetching LokSabhaSession by sessionNo from URL: {}", url);
-//
-//		try {
-//			ResponseEntity<GenericResponse<LoksabhaSessionNoDTO>> response = restTemplate.exchange(url, HttpMethod.GET,
-//					null, new ParameterizedTypeReference<GenericResponse<LoksabhaSessionNoDTO>>() {
-//					});
-//
-//			if (response == null || response.getBody() == null || response.getBody().getData() == null) {
-//				log.error("Response or body is null when fetching LokSabhaSession for sessionNo: {}", lokSabhaSessionNo);
-//				throw new RuntimeException("Failed to fetch LokSabhaSession, response is null");
-//			}
-//
-//			LoksabhaSessionNoDTO lokSabhaSessionDTO = response.getBody().getData();
-//			log.debug("Fetched LokSabhaSessionDTO: {}", lokSabhaSessionDTO);
-//			return lokSabhaSessionDTO;
-//
-//		} catch (ResourceNotFoundException e) {
-//			log.error("Resource not found for sessionNo: {}", lokSabhaSessionNo);
-//			throw e;
-//		} catch (Exception e) {
-//			log.error("Error fetching LokSabhaSession for sessionNo: {}", lokSabhaSessionNo, e);
-//			throw new RuntimeException("Failed to fetch LokSabhaSession data", e);
-//		}
-//	}
+
 
 	private LokSabhaNoDTO fetchLokSabhaData(Long lokSabhaNo) {
 		String url = lokSabhaNoServiceUrl + "/" + lokSabhaNo;
@@ -495,6 +493,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 		if (assurance.getMemberId() != null) {
 		dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
 		}
+		if (assurance.getSupplement() != null) {
+			dto.setSupplemantDTO(fetchSupplementData(assurance.getSupplement()));
+			}
 		if (assurance.getMinistryId() != null) {
 		dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
 		}
@@ -512,7 +513,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 		}
 		if (assurance.getLokSabhaSessionNo() != null) {
 			dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
-			System.out.println("########### +"+ assurance.getLokSabhaSessionNo());
+			
 			}
 		if (assurance.getLokSabhaNo() != null) {
 			dto.setLokSabhaNoDTO(fetchLokSabhaData(assurance.getLokSabhaNo()));
@@ -617,6 +618,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 			if (assurance.getDepartmentId() != null) {
 			dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
 			}
+			if (assurance.getSupplement() != null) {
+				dto.setSupplemantDTO(fetchSupplementData(assurance.getSupplement()));
+				}
 			if (assurance.getAssuranceTypeId() != null) {
 			dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
 			}
