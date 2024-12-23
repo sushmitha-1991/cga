@@ -492,9 +492,15 @@ public class AssuranceServiceImpl implements AssuranceService {
 		AssuranceDTO dto = assuranceMapper.toDTO(assurance);
 
 		// Populate additional data
+		if (assurance.getMemberId() != null) {
 		dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+		}
+		if (assurance.getMinistryId() != null) {
 		dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+		}
+		if (assurance.getDepartmentId() != null) {
 		dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+		}
 		if (assurance.getAssuranceTypeId() != null) {
 		dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
 		}
