@@ -162,19 +162,19 @@ public class AssuranceServiceImpl implements AssuranceService {
 			AssuranceDTO dto = assuranceMapper.toDTO(assurance);
 
 			// Populate additional data
-			dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
-			dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
-			dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
-			dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
-			dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
+			//dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+			//dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+			//dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+			//dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+			//dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
 			if (assurance.getPendingDueTo() != null) {
 				dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
 			}
 			if (assurance.getPendingDueTo() != null) {
 				dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
 			}
-			List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
-			dto.setClubbedMembersData(clubbedMembersData);
+			//List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+			//dto.setClubbedMembersData(clubbedMembersData);
 			assuranceDTOs.add(dto);
 		}
 

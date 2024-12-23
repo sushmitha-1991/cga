@@ -3,6 +3,7 @@ package com.dsp.cga.entity;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.hibernate.envers.Audited;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,6 +16,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +24,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
+@Audited
 @Table(schema = "authentication") // Updated table name to match entity
 public class BaseUser extends Auditable implements UserDetails {
 
@@ -43,8 +47,8 @@ public class BaseUser extends Auditable implements UserDetails {
 	@Column(name = "password", nullable = false)
 	private String password;
 
-	@Column(name = "role", nullable = true)
-	private String role;
+	@Column(name = "house_id", nullable = true)
+	private Long houseId;
 
 	// Merged User entity properties
 
@@ -97,20 +101,16 @@ public class BaseUser extends Auditable implements UserDetails {
 		return true;
 	}
 
-//    @Override
-//    public boolean isEnabled() {
-//        // Return true if the user is enabled
-//        return this.isActive;
-//    }
+   @Override
+   public boolean isEnabled() {
+       // Return true if the user is enabled
+    //    return this.isActive;
+	   return true;
+
+   }
 
 	// Ensuring the method exists for AuditorAware
 	public Long getUserId() {
 		return this.id;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 }

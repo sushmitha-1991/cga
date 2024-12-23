@@ -6,10 +6,13 @@
 package com.dsp.cga.assurance.dto;
 
 import java.util.Collection;
+
 import java.util.Collections;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -32,7 +35,7 @@ public class UserDetailsDTO implements UserDetails {
 
 	private String email;
 	private String password;
-	private String role;
+	private Long houseId;
 	private boolean isActive;
 
 	@Override
@@ -70,4 +73,3 @@ public class UserDetailsDTO implements UserDetails {
 		return this.id;
 	}
 }
-

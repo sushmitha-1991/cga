@@ -45,7 +45,7 @@ public class Supplementary extends Auditable{
     @ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "supplementary_clubbed_members", schema = "cga", joinColumns = @JoinColumn(name = "supplementary_id"))
 	@Column(name = "clubbed_member")
-	private List<Long> clubbedMembers = new ArrayList<>();
+	private List<ClubbedMemberInfo> clubbedMembers = new ArrayList<>();
 
 	private String part;
 

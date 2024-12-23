@@ -72,7 +72,7 @@ public class AssuranceDTO {
 	    private RajyaSabhaSessionNoDTO RajyaSabhaSessionNoDTO;
 	    private LoksabhaSessionNoDTO lokSabhaSessionNoDTO;
 	    private SourceDTO sourceDTO;
-		private List<Map<String, Object>> assuranceFiles;
+		//private List<Map<String, Object>> assuranceFiles;
 
 	    private PendingDueToDTO pendingDueToDTO;
 	    private LokSabhaNoDTO lokSabhaNoDTO;
