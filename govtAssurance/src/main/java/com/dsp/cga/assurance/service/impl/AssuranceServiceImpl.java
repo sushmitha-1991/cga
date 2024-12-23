@@ -602,10 +602,18 @@ public class AssuranceServiceImpl implements AssuranceService {
 			AssuranceDTO dto = assuranceMapper.toDTO(assurance);
 
 			// Populate additional data
+			if (assurance.getMemberId() != null) {
 			dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+			}
+			if (assurance.getMinistryId() != null) {
 			dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+			}
+			if (assurance.getDepartmentId() != null) {
 			dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+			}
+			if (assurance.getAssuranceTypeId() != null) {
 			dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+			}
 			if (assurance.getLokSabhaSessionNo() != null) {
 			dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
 			}
@@ -616,8 +624,10 @@ public class AssuranceServiceImpl implements AssuranceService {
 			if (assurance.getPendingDueTo() != null) {
 				dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
 			}
+			if (assurance.getClubbedMembers() != null) {
 			List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
 			dto.setClubbedMembersData(clubbedMembersData);
+			}
 			assuranceDTOs.add(dto);
 		}
 
