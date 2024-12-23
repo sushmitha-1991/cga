@@ -64,23 +64,23 @@ public class Assurance extends Auditable {
 	@Column(name = "question_no", length = 50)
 	private String questionNo;
 
-	@NotNull(message = "Type is mandatory and cannot be null")
-	@Column(name = "assurance_type_id", nullable = false)
+	
+	@Column(name = "assurance_type_id" )
 	private Long assuranceTypeId;
 
 	@Column(name = "subject", length = 255)
 	private String subject;
 
-	@NotNull(message = "Member is mandatory and cannot be null")
-	@Column(name = "member_id", nullable = false)
+	
+	@Column(name = "member_id" )
 	private Long memberId;
 
-	@NotNull(message = "Ministry is mandatory and cannot be null")
-	@Column(name = "ministry_id", nullable = false)
+	
+	@Column(name = "ministry_id")
 	private Long ministryId;
 
 	@NotNull
-	@Column(name = "department_id", nullable = false)
+	@Column(name = "department_id")
 	private Long departmentId;
 
 	@Column(name = "page_no", length = 20)
