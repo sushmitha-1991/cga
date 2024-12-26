@@ -25,6 +25,7 @@ public class ExtensionRequestMapper {
 	                .remarks(entity.getRemarks())
 	                .extensionFiles(entity.getExtensionFiles())
 	                .draftStatus(entity.getDraftStatus())
+	                .statusId(entity.getStatusId())
 	                .build();
 	    }
 
@@ -40,6 +41,7 @@ public class ExtensionRequestMapper {
 	            entity.setRemarks(dto.getRemarks());
 	            entity.setExtensionFiles(dto.getExtensionFiles());
 	            entity.setDraftStatus(dto.getDraftStatus());
+	            entity.setStatusId(dto.getStatusId());
 	        }
 	    }
 	    public static ExtensionRequest toEntity(ExtensionRequestDTO dto) {
@@ -60,6 +62,7 @@ public class ExtensionRequestMapper {
 	                .remarks(dto.getRemarks())
 	                .extensionFiles(dto.getExtensionFiles())
 	                .draftStatus(dto.getDraftStatus())
+	                .statusId(dto.getStatusId())
 	                .build();
 	    }
 	}

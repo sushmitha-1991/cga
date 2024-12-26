@@ -75,7 +75,8 @@ public class AssuranceDTO {
 	    private SourceDTO sourceDTO;
 	    private SupplementDTO supplemantDTO;
 		private List<Map<String, Object>> assuranceFiles;
-
+		private Long questionType;
+		private LocalDate ansDate;
 	    private PendingDueToDTO pendingDueToDTO;
 	    private LokSabhaNoDTO lokSabhaNoDTO;
 	   // private LoksabhaSessionNoDTO loksabhaSessionNoDTO;

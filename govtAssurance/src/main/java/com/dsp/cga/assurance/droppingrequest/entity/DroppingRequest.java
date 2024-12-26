@@ -44,6 +44,8 @@ public class DroppingRequest extends Auditable {
 
 	@Column(name = "part_id")
 	private String partId;
+	
+	
 
 	@Column(name = "drop_request_date")
 	private LocalDate dropRequestDate;

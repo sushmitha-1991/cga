@@ -43,6 +43,8 @@ public class AssuranceController {
 			@ApiResponse(responseCode = "400", description = "Invalid input data"),
 			@ApiResponse(responseCode = "500", description = "Internal server error") })
 	public ResponseEntity<GenericResponse<AssuranceDTO>> createAssurance(@RequestBody AssuranceDTO assuranceDTO) {
+		
+		System.out.println("@@@@@@@@@@@@@"+ assuranceDTO);
 		AssuranceDTO createdAssurance = assuranceService.createAssurance(assuranceDTO);
 		GenericResponse<AssuranceDTO> response = new GenericResponse<>(HttpStatus.CREATED.value(), true,
 				"Assurance item created successfully", createdAssurance);

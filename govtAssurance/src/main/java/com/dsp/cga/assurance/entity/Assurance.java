@@ -124,6 +124,11 @@ public class Assurance extends Auditable {
 
 	@Column(name = "supplementary_member_id")
 	private Long supplementaryMemberId;
+	
+	@Column(name ="questionType")
+	private Long questionType;
+	
+	
 
 	@NotNull
 	@Column(name = "draft_status", nullable = false)
@@ -138,6 +143,8 @@ public class Assurance extends Auditable {
 	@Column(name = "other_pending_due_to")
 	private String otherPendingDueTo;
 
+	@Column(name = "ans_date")
+	private LocalDate ansDate;
 	
 	@Column(name = "group_name", nullable = true, length = 50)
 	private String groupName;

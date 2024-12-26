@@ -49,11 +49,14 @@ public class AssuranceMapper {
 				.supplementaryMemberId(assurance.getSupplementaryMemberId()).draftStatus(assurance.getDraftStatus())
 				.sourceId(assurance.getSourceId()).assuranceNo(assurance.getAssuranceNo())
 				.supplement(assurance.getSupplement())
+				.ansDate(assurance.getAnsDate())
+				.questionType(assurance.getQuestionType())
 				.pageNoCorrected(assurance.getPageNoCorrected()).pageNoUncorrected(assurance.getPageNoUncorrected())
 				.clubbedMembers(assurance.getClubbedMembers())
 				.assuranceFiles(assurance.getAssuranceFiles())
 				.statusId(assurance.getStatusId())
-
+.ansDate(assurance.getAnsDate())
+.questionType(assurance.getQuestionType())
 				.groupName(assurance.getGroupName()).mpaRefNo(assurance.getMpaRefNo())
 				.otherPendingDueTo(assurance.getOtherPendingDueTo()).partDetails(partDetailsDTOs)
 				.supplementary(supplementaryDTOs) // Set the List<SupplementaryDTO>
@@ -85,6 +88,8 @@ public class AssuranceMapper {
 				.supplement(assuranceDTO.getSupplement())
 				.draftStatus(assuranceDTO.getDraftStatus()).assuranceNo(assuranceDTO.getAssuranceNo())
 				.pageNoCorrected(assuranceDTO.getPageNoCorrected())
+				.ansDate(assuranceDTO.getAnsDate())
+				.questionType(assuranceDTO.getQuestionType())
 				.assuranceFiles(assuranceDTO.getAssuranceFiles())
 				.pageNoUncorrected(assuranceDTO.getPageNoUncorrected()).sourceId(assuranceDTO.getSourceId())
 				.groupName(assuranceDTO.getGroupName()).mpaRefNo(assuranceDTO.getMpaRefNo())
@@ -204,6 +209,13 @@ public class AssuranceMapper {
 	        }
 	        if (assuranceDTO.getSourceId() != null) {
 	            assurance.setSourceId(assuranceDTO.getSourceId());
+	        }
+	        
+	        if (assuranceDTO.getAnsDate() != null) {
+	            assurance.setAnsDate(assuranceDTO.getAnsDate());
+	        }
+	        if (assuranceDTO.getQuestionType() != null) {
+	            assurance.setQuestionType(assuranceDTO.getQuestionType());
 	        }
 	        if (assuranceDTO.getOtherPendingDueTo() != null) {
 	            assurance.setOtherPendingDueTo(assuranceDTO.getOtherPendingDueTo());

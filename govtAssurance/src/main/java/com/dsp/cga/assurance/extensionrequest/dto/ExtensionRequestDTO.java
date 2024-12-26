@@ -26,6 +26,7 @@ public class ExtensionRequestDTO {
 	private String ministryRefNo;
 	private LocalDate ministryRefDate;
 	private String remarks;
+	private Long statusId;
 	//private String extensionFiles;
 	private Boolean draftStatus;
 	private String assuranceNo;

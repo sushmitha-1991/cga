@@ -63,10 +63,9 @@ public class ExtensionRequest extends Auditable {
 
 	@Column(name = "remarks", length = 512)
 	private String remarks;
-
-//	@Column(name = "extension_files", columnDefinition = "jsonb")
-//	private String extensionFiles;
 	
+	@Column(name = "statusId")
+	private Long statusId;
 
 	@Column(name = "extension_files", columnDefinition = "jsonb")
 	@Convert(converter = JsonMapConverter.class)
