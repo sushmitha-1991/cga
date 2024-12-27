@@ -79,7 +79,7 @@ public class Assurance extends Auditable {
 	@Column(name = "ministry_id")
 	private Long ministryId;
 
-	@NotNull
+	
 	@Column(name = "department_id")
 	private Long departmentId;
 
@@ -125,11 +125,9 @@ public class Assurance extends Auditable {
 	@Column(name = "supplementary_member_id")
 	private Long supplementaryMemberId;
 	
-	@Column(name ="questionType")
+	@Column(name ="question_type")
 	private Long questionType;
 	
-	
-
 	@NotNull
 	@Column(name = "draft_status", nullable = false)
 	private Boolean draftStatus = false;
