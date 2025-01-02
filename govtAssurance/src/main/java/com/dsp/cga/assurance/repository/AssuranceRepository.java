@@ -15,8 +15,11 @@ import com.dsp.cga.assurance.entity.Assurance;
 
 public interface AssuranceRepository extends JpaRepository<Assurance, Long> {
 
-	@Query("SELECT a FROM Assurance a WHERE a.rajyaSabhaSessionNo IS NOT NULL AND a.lokSabhaSessionNo IS NULL")
-	List<Assurance> findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull();
+	@Query("SELECT a FROM Assurance a " +
+		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL AND a.lokSabhaSessionNo IS NULL " +
+		       "ORDER BY a.createdAt DESC")
+		List<Assurance> findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull();
+
 
 //	@Query("SELECT a FROM Assurance a " +
 //		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL " +
@@ -41,8 +44,11 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long> {
 	List<Assurance> findFilteredAssurances(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
 			@Param("ministryId") Long ministryId, @Param("memberId") Long memberId);
 
-	@Query("SELECT a FROM Assurance a WHERE a.rajyaSabhaSessionNo IS NULL AND a.lokSabhaSessionNo IS NOT NULL")
-	List<Assurance> findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNull();
+	@Query("SELECT a FROM Assurance a " +
+		       "WHERE a.rajyaSabhaSessionNo IS NULL AND a.lokSabhaSessionNo IS NOT NULL " +
+		       "ORDER BY a.createdAt DESC")
+		List<Assurance> findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNull();
+
 
 	@Query("SELECT a FROM Assurance a WHERE a.rajyaSabhaSessionNo IS NULL "
 			+ "AND (a.lokSabhaSessionNo IS NOT NULL) " + "AND (a.assuranceDate >= :fromDate or :fromDate is null)"

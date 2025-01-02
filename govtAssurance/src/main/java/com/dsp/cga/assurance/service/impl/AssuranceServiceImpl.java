@@ -493,6 +493,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 		if (assurance.getMemberId() != null) {
 		dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
 		}
+		if (assurance.getSourceId() != null) {
+			dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+			}
 		if (assurance.getSupplement() != null) {
 			dto.setSupplemantDTO(fetchSupplementData(assurance.getSupplement()));
 			}
@@ -631,9 +634,11 @@ public class AssuranceServiceImpl implements AssuranceService {
 			if (assurance.getPendingDueTo() != null) {
 				dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
 			}
-			if (assurance.getPendingDueTo() != null) {
+			if (assurance.getSourceId() != null) {
 				dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
 			}
+			
+			
 			if (assurance.getClubbedMembers() != null) {
 			List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
 			dto.setClubbedMembersData(clubbedMembersData);
@@ -659,8 +664,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 		        if (assurance.getMemberId() != null) {
 		        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
 		        }
-		        
+		        if (assurance.getMinistryId() != null) {
 		        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+		        }
 		        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
 		        if (assurance.getAssuranceTypeId() != null) {
 
