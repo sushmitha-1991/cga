@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.CommitteeDecisionDTO;
+import com.dsp.cga.assurance.dto.ImplementationTypeDTO;
 import com.dsp.cga.assurance.dto.MemberDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.entity.Assurance;
@@ -115,9 +116,13 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
         
 	    ImplementationRequestDTO dto = ImplementationRequestMapper.toDTO(implementationRequest);
 	    dto.setAssuranceNo(assuranceNo);
+	    if (implementationRequest.getImplementationTypeId() != null) {
+	    dto.setImplementationTypeDTO(fetchImplementationTypeData(implementationRequest.getImplementationTypeId()));
+	    }
 	    // Populate additional data if available
+	    if (implementationRequest.getCommitteeDecisionId() != null) {
 	    dto.setCommitteeDecisionDTO(fetchCommitteeDecisionData(implementationRequest.getCommitteeDecisionId()));
-
+	    }
 	    log.debug("Returning ImplementationRequestDTO: {}", dto);
 	    return dto;
 	}
@@ -148,6 +153,32 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        return committeeDecisionDTO;
 	    } catch (Exception e) {
 	        log.error("Error occurred while fetching data from master service for Committee Decision ID: {}", committeeDecisionId, e);
+	        return null;
+	    }
+	}
+	
+	private ImplementationTypeDTO fetchImplementationTypeData(Long implementationTypeId) {
+	    String statusServiceUrl = codeServiceUrl + implementationTypeId;
+	    log.debug("Calling master service URL for Committee Decision: {}", statusServiceUrl);
+
+	    try {
+	        ResponseEntity<GenericResponse<ImplementationTypeDTO>> response = restTemplate.exchange(
+	                statusServiceUrl, HttpMethod.GET, null, 
+	                new ParameterizedTypeReference<GenericResponse<ImplementationTypeDTO>>() {}
+	        );
+
+	        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+	            log.warn("Failed to fetch data from master service for Committee Decision. Status: {} - {}",
+	                    response.getStatusCode(), response.getBody());
+	            return null;
+	        }
+
+	        ImplementationTypeDTO implementationTypeDTO = response.getBody().getData();
+	        log.debug("Fetched CommitteeDecisionDTO: {}", implementationTypeDTO);
+
+	        return implementationTypeDTO;
+	    } catch (Exception e) {
+	        log.error("Error occurred while fetching data from master service for Committee Decision ID: {}", implementationTypeId, e);
 	        return null;
 	    }
 	}

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.dsp.cga.assurance.dto.AssuranceTypeDTO;
 import com.dsp.cga.assurance.dto.CommitteeDecisionDTO;
+import com.dsp.cga.assurance.dto.ImplementationTypeDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,7 @@ public class ImplementationRequestDTO {
 	    private Long implemetationTypeId;
 	    private Long session;
 	    private CommitteeDecisionDTO committeeDecisionDTO;
+	    private ImplementationTypeDTO implementationTypeDTO;
 	    private List<Map<String, Object>> implementationReportFiles;
 	    private List<Map<String, Object>> partReportFiles;
 	    private List<Map<String, Object>> otherFiles;
