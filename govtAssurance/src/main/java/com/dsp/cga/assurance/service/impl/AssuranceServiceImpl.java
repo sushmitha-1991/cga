@@ -164,11 +164,24 @@ public class AssuranceServiceImpl implements AssuranceService {
 			AssuranceDTO dto = assuranceMapper.toDTO(assurance);
 
 			// Populate additional data
-			//dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
-			//dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
-			//dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
-			//dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
-			//dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
+			if (assurance.getMemberId() != null) {
+			dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+			}
+			if (assurance.getSourceId() != null) {
+				dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+				}
+			if (assurance.getMinistryId() != null) {
+			dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+			}
+			if (assurance.getDepartmentId() != null) {
+			dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+			}
+			if (assurance.getAssuranceTypeId() != null) {
+			dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+			}
+			if (assurance.getRajyaSabhaSessionNo() != null) {
+			dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
+			}
 			if (assurance.getPendingDueTo() != null) {
 				dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
 			}

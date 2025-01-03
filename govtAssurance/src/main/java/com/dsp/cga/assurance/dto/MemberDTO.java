@@ -7,7 +7,11 @@ public class MemberDTO {
 	
 	private Long id;
 	private String fullName;
-	private Integer pageNumber;
+
+	private String firstName;
+
+	private String LastName;
+
 	//private String lastNameHindi;
 	
 
