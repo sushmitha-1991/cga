@@ -165,11 +165,11 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 			// Populate additional data
 			if (assurance.getMemberId() != null) {
-			dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
-			}
-			if (assurance.getSourceId() != null) {
-				dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+				dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
 				}
+				if (assurance.getSourceId() != null) {
+					dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+					}
 			if (assurance.getMinistryId() != null) {
 			dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
 			}
