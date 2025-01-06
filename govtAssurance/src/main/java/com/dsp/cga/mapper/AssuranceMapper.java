@@ -1,6 +1,7 @@
 package com.dsp.cga.mapper;
 
 import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,9 @@ public class AssuranceMapper {
 
 	@Autowired
 	private SupplementaryMapper supplementaryMapper;
+	
+	@Autowired
+	private PartDetailsMapper partDetailsMapper;
 
 	// Map Assurance entity to AssuranceDTO
 	public AssuranceDTO toDTO(Assurance assurance) {
@@ -28,7 +32,7 @@ public class AssuranceMapper {
 			return null;
 		}
 
-		List<PartDetailsDTO> partDetailsDTOs = assurance.getPartDetails().stream().map(PartDetailsMapper::toDTO)
+		List<PartDetailsDTO> partDetailsDTOs = assurance.getPartDetails().stream().map(partDetailsMapper::toDTO)
 				.collect(Collectors.toList());
 
 		List<SupplementaryDTO> supplementaryDTOs = assurance.getSupplementary().stream().map(supplementaryMapper::toDTO)
@@ -56,8 +60,8 @@ public class AssuranceMapper {
 				.clubbedMembers(assurance.getClubbedMembers())
 				.assuranceFiles(assurance.getAssuranceFiles())
 				.statusId(assurance.getStatusId())
-.ansDate(assurance.getAnsDate())
-.questionType(assurance.getQuestionType())
+                .ansDate(assurance.getAnsDate())
+                .questionType(assurance.getQuestionType())
 				.groupName(assurance.getGroupName()).mpaRefNo(assurance.getMpaRefNo())
 				.otherPendingDueTo(assurance.getOtherPendingDueTo()).partDetails(partDetailsDTOs)
 				.supplementary(supplementaryDTOs) // Set the List<SupplementaryDTO>
@@ -65,7 +69,7 @@ public class AssuranceMapper {
 	}
 
 	// Map AssuranceDTO to Assurance entity
-	public static Assurance toEntity(AssuranceDTO assuranceDTO) {
+	public Assurance toEntity(AssuranceDTO assuranceDTO) {
 		if (assuranceDTO == null) {
 			return null;
 		}

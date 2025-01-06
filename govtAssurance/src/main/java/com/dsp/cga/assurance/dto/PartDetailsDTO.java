@@ -16,6 +16,6 @@ public class PartDetailsDTO {
 	    private String subject;
 	    private Long statusId;
 	    private String extentOfAssurance;
-	   
+	    private StatusDTO statusDTO;
 
 }
