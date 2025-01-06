@@ -220,6 +220,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 			}
 
 			MemberDTO memberDTO = response.getBody().getData();
+			memberDTO.generateMemberName();
 			log.debug("Fetched MemberDTO: {}", memberDTO);
 			return memberDTO;
 
@@ -245,6 +246,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 			// Fetch the MemberDTO for each memberId
 			MemberDTO memberDTO = fetchMemberData(memberId);
 			if (memberDTO != null) {
+				 memberDTO.generateMemberName();
 				memberDTOs.add(memberDTO); // Add the memberDTO to the list
 			}
 		}

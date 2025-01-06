@@ -135,6 +135,7 @@ public class SupplementaryMapper {
 			}
 
 			MemberDTO memberDTO = response.getBody().getData();
+			 memberDTO.generateMemberName();
 			log.debug("Fetched MemberDTO: {}", memberDTO);
 			return memberDTO;
 
@@ -170,8 +171,11 @@ public class SupplementaryMapper {
                 log.error("Response or body is null when fetching Member for memberId: {}", memberId);
                 throw new ResourceNotFoundException("Member not found for ID: " + memberId);
             }
+            MemberDTO memberDTO = response.getBody().getData();
+            memberDTO.generateMemberName();  // Call generateMemberName to populate memberName
+            return memberDTO;
 
-            return response.getBody().getData();
+          //  return response.getBody().getData();
         } catch (ResourceNotFoundException e) {
             log.error("Resource not found for memberId: {}", memberId);
             throw e;
