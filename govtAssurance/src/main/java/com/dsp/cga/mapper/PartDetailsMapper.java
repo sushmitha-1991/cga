@@ -1,5 +1,7 @@
 package com.dsp.cga.mapper;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import com.dsp.cga.assurance.dto.PartDetailsDTO;
@@ -26,5 +28,24 @@ public class PartDetailsMapper {
                 .extentOfAssurance(dto.getExtentOfAssurance())
                 .build();
     }
+
+	
+
+	public void updatePartDetailsFromDTO(PartDetailsDTO partDetailsDTO, PartDetails partDetails) {
+		 if (partDetailsDTO.getExtentOfAssurance() != null) {
+		        partDetails.setExtentOfAssurance(partDetailsDTO.getExtentOfAssurance());
+		    }
+		    if (partDetailsDTO.getPart() != null) {
+		        partDetails.setPart(partDetailsDTO.getPart());
+		    }
+		    if (partDetailsDTO.getSubject() != null) {
+		        partDetails.setSubject(partDetailsDTO.getSubject());
+		    }
+		    if (partDetailsDTO.getStatusId() != null) {
+		        partDetails.setStatusId(partDetailsDTO.getStatusId());
+		    }
+		
+		
+	}
 }
 

@@ -22,5 +22,7 @@ public class SupplementaryDTO {
 	    private String subject;
 	    private Long statusId;
 	    private String extentOfAssurance;
+	    private MemberDTO memberDTO;
+	    private StatusDTO statusDTO;
 	    private List<MemberDTO> clubbedMembersData = new ArrayList<>();
 }

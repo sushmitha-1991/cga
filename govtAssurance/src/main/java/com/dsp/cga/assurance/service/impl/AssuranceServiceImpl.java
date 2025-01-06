@@ -44,6 +44,8 @@ import com.dsp.cga.assurance.supplementry.repository.SupplementaryRepository;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.AssuranceListMapper;
 import com.dsp.cga.mapper.AssuranceMapper;
+import com.dsp.cga.mapper.PartDetailsMapper;
+import com.dsp.cga.mapper.SupplementaryMapper;
 import com.dsp.cga.response.GenericResponse;
 
 @Service
@@ -89,6 +91,12 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	@Autowired
 	private AssuranceMapper assuranceMapper;
+	
+	@Autowired
+	private SupplementaryMapper supplementaryMapper;
+	
+	@Autowired
+	private PartDetailsMapper PartDetailsMapper;
 
 //	@Autowired
 //    private ExternalService externalService;
@@ -165,11 +173,11 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 			// Populate additional data
 			if (assurance.getMemberId() != null) {
-				dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+			dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+			}
+			if (assurance.getSourceId() != null) {
+				dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
 				}
-				if (assurance.getSourceId() != null) {
-					dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
-					}
 			if (assurance.getMinistryId() != null) {
 			dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
 			}
@@ -188,8 +196,8 @@ public class AssuranceServiceImpl implements AssuranceService {
 			if (assurance.getPendingDueTo() != null) {
 				dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
 			}
-			//List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
-			//dto.setClubbedMembersData(clubbedMembersData);
+			List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+			dto.setClubbedMembersData(clubbedMembersData);
 			assuranceDTOs.add(dto);
 		}
 
@@ -562,9 +570,38 @@ public class AssuranceServiceImpl implements AssuranceService {
 		// Save and return the updated entity
 		Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
 
+		 // Update PartDetails associated with the Assurance ID
+	    if (assuranceDTO.getPartDetails() != null) {
+	        for (PartDetailsDTO partDetailsDTO : assuranceDTO.getPartDetails()) {
+	            // Assuming that PartDetails are linked to the Assurance entity by AssuranceId
+	            PartDetails partDetails = partDetailsRepository.findByAssuranceId(id)
+	                    .orElseThrow(() -> new ResourceNotFoundException(
+	                            "PartDetails not found for Assurance ID: " + id));
+
+	            // Map the updated fields to PartDetails, keeping the Assurance ID unchanged
+	            PartDetailsMapper.updatePartDetailsFromDTO(partDetailsDTO, partDetails);
+	            partDetailsRepository.save(partDetails);
+	        }
+	    }
+
+	    // Update Supplementary associated with the Assurance ID
+	    if (assuranceDTO.getSupplementary() != null) {
+	        for (SupplementaryDTO supplementaryDTO : assuranceDTO.getSupplementary()) {
+	            // Assuming that Supplementary is linked to the Assurance entity by AssuranceId
+	            Supplementary supplementary = supplementaryRepository.findByAssuranceId(id)
+	                    .orElseThrow(() -> new ResourceNotFoundException(
+	                            "Supplementary not found for Assurance ID: " + id));
+
+	            // Map the updated fields to Supplementary, keeping the Assurance ID unchanged
+	            supplementaryMapper.updateSupplementaryFromDTO(supplementaryDTO, supplementary);
+	            supplementaryRepository.save(supplementary);
+	        }
+	    }
 		// Return the updated AssuranceDTO
 		return assuranceMapper.toDTO(updatedAssurance);
 	}
+
+
 
 	@Override
 	public List<AssuranceListDTO> getAllAssurancesList() {

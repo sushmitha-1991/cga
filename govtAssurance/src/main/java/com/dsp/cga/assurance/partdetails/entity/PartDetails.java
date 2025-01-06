@@ -1,6 +1,7 @@
 package com.dsp.cga.assurance.partdetails.entity;
 
 import com.dsp.cga.assurance.entity.Assurance;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,7 +44,7 @@ public class PartDetails {
 
  
     private String extentOfAssurance;
-
+    
     @ManyToOne
     @JoinColumn(name = "assurance_id", nullable = false)
     private Assurance assurance;

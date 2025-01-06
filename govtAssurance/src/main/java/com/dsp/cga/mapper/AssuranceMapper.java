@@ -1,5 +1,6 @@
 package com.dsp.cga.mapper;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -232,6 +233,11 @@ public class AssuranceMapper {
 	        if (assuranceDTO.getPageNoUncorrected() != null) {
 	            assurance.setPageNoUncorrected(assuranceDTO.getPageNoUncorrected());
 	        }
+	        
+	        List<Long> clubbedMembers = Optional.ofNullable(assuranceDTO.getClubbedMembers())
+					.orElse(Collections.emptyList());
+			assurance.setClubbedMembers(clubbedMembers);
+	       
 	    }
 
 }
