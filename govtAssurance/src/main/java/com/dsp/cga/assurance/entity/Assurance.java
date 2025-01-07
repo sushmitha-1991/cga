@@ -54,7 +54,6 @@ public class Assurance extends Auditable {
 	@Column(name = "rajya_sabha_session_no")
 	private Long rajyaSabhaSessionNo;
 
-	
 	@Column(name = "assurance_date")
 	private LocalDate assuranceDate;
 
@@ -64,22 +63,18 @@ public class Assurance extends Auditable {
 	@Column(name = "question_no", length = 50)
 	private String questionNo;
 
-	
-	@Column(name = "assurance_type_id" )
+	@Column(name = "assurance_type_id")
 	private Long assuranceTypeId;
 
 	@Column(name = "subject", length = 255)
 	private String subject;
 
-	
-	@Column(name = "member_id" )
+	@Column(name = "member_id")
 	private Long memberId;
 
-	
 	@Column(name = "ministry_id")
 	private Long ministryId;
 
-	
 	@Column(name = "department_id")
 	private Long departmentId;
 
@@ -124,26 +119,25 @@ public class Assurance extends Auditable {
 
 	@Column(name = "supplementary_member_id")
 	private Long supplementaryMemberId;
-	
-	@Column(name ="question_type")
+
+	@Column(name = "question_type")
 	private Long questionType;
-	
-	
+
 	@Column(name = "draft_status", nullable = false)
 	private Boolean draftStatus = false;
-	
+
 	@Column(name = "supplement")
 	private Long supplement;
 
 	@Column(name = "source_id")
 	private Long sourceId;
-	
+
 	@Column(name = "other_pending_due_to")
 	private String otherPendingDueTo;
 
 	@Column(name = "ans_date")
 	private LocalDate ansDate;
-	
+
 	@Column(name = "group_name", nullable = true, length = 50)
 	private String groupName;
 
@@ -161,24 +155,14 @@ public class Assurance extends Auditable {
 	@Column(name = "clubbed_member")
 	private List<Long> clubbedMembers = new ArrayList<>();
 
-	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<PartDetails> partDetails;
 
-	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<Supplementary> supplementary;
-	
+
 	@Column(name = "assurance_files", columnDefinition = "jsonb")
 	@Convert(converter = JsonMapConverter.class)
 	private List<Map<String, Object>> assuranceFiles;
-	
-	
-	
-//	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
-//	private List<ImplementationRequest> implementationRequests;
-//
-//	@OneToMany(mappedBy = "assurance", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
-//	private List<ExtensionRequest> extensionRequest;
-
-	
 
 }

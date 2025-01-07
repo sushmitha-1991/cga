@@ -120,6 +120,28 @@ public class AssuranceController {
 	            updatedAssurance);
 	    return ResponseEntity.ok(response);
 	}
+	
+//	@PutMapping("/update/{id}")
+//	@Operation(summary = "Update an existing Assurance by ID")
+//	@ApiResponses(value = {
+//	        @ApiResponse(responseCode = "200", description = "Assurance updated successfully"),
+//	        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+//	        @ApiResponse(responseCode = "404", description = "Assurance not found"),
+//	        @ApiResponse(responseCode = "500", description = "Internal server error")
+//	})
+//	public ResponseEntity<GenericResponse<AssuranceDTO>> updateAssuranceById(
+//	        @PathVariable Long id,
+//	        @RequestBody AssuranceDTO assuranceDTO) {
+//
+//	    AssuranceDTO updatedAssurance = assuranceService.updateAssuranceById(id, assuranceDTO);
+//	    GenericResponse<AssuranceDTO> response = new GenericResponse<>(
+//	            HttpStatus.OK.value(),
+//	            true,
+//	            "Assurance updated successfully",
+//	            updatedAssurance);
+//	    return ResponseEntity.ok(response);
+//	}
+
 
 	@GetMapping("/getAllAssuranceList")
 	@Operation(summary = "Get all Assurance")

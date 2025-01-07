@@ -572,33 +572,6 @@ public class AssuranceServiceImpl implements AssuranceService {
 		// Save and return the updated entity
 		Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
 
-		 // Update PartDetails associated with the Assurance ID
-	    if (assuranceDTO.getPartDetails() != null) {
-	        for (PartDetailsDTO partDetailsDTO : assuranceDTO.getPartDetails()) {
-	            // Assuming that PartDetails are linked to the Assurance entity by AssuranceId
-	            PartDetails partDetails = partDetailsRepository.findByAssuranceId(id)
-	                    .orElseThrow(() -> new ResourceNotFoundException(
-	                            "PartDetails not found for Assurance ID: " + id));
-
-	            // Map the updated fields to PartDetails, keeping the Assurance ID unchanged
-	            PartDetailsMapper.updatePartDetailsFromDTO(partDetailsDTO, partDetails);
-	            partDetailsRepository.save(partDetails);
-	        }
-	    }
-
-	    // Update Supplementary associated with the Assurance ID
-	    if (assuranceDTO.getSupplementary() != null) {
-	        for (SupplementaryDTO supplementaryDTO : assuranceDTO.getSupplementary()) {
-	            // Assuming that Supplementary is linked to the Assurance entity by AssuranceId
-	            Supplementary supplementary = supplementaryRepository.findByAssuranceId(id)
-	                    .orElseThrow(() -> new ResourceNotFoundException(
-	                            "Supplementary not found for Assurance ID: " + id));
-
-	            // Map the updated fields to Supplementary, keeping the Assurance ID unchanged
-	            supplementaryMapper.updateSupplementaryFromDTO(supplementaryDTO, supplementary);
-	            supplementaryRepository.save(supplementary);
-	        }
-	    }
 		// Return the updated AssuranceDTO
 		return assuranceMapper.toDTO(updatedAssurance);
 	}

@@ -60,43 +60,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		return savedImplementationRequestDTO;
 	}
 
-//	@Override
-//	public GenericResponse<ImplementationRequestDTO> createOrUpdateImplementationRequest(
-//	        ImplementationRequestDTO implementationRequestDTO) {
-//
-//	    Optional<ImplementationRequest> existingRequestOpt = implementationRequestRepository
-//	            .findByAssuranceId(implementationRequestDTO.getAssuranceId());
-//
-//	    ImplementationRequest savedRequest;
-//
-//	    if (existingRequestOpt.isPresent()) {
-//	        // Fetch the existing entity
-//	        ImplementationRequest existingRequest = existingRequestOpt.get();
-//
-//	        // Update fields based on DTO
-//	        ImplementationRequestMapper.updateEntityFromDTO(implementationRequestDTO, existingRequest);
-//
-//	        // Save the updated entity (updatedBy and updatedAt will be set automatically)
-//	        savedRequest = implementationRequestRepository.save(existingRequest);
-//
-//	    } else {
-//	        // Create a new entity
-//	        ImplementationRequest newRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
-//
-//	        // Save the new entity (createdBy and createdAt will be set automatically)
-//	        savedRequest = implementationRequestRepository.save(newRequest);
-//	    }
-//	    if (savedRequest.getImplementationTypeId() != null) {
-//	        ImplementationTypeDTO implementationTypeDTO = fetchImplementationTypeData(savedRequest.getImplementationTypeId());
-//	        implementationRequestDTO.setImplementationTypeDTO(implementationTypeDTO);
-//	    }
-//
-//	    // Convert the saved entity to DTO
-//	    ImplementationRequestDTO savedDTO = ImplementationRequestMapper.toDTO(savedRequest);
-//
-//	    // Return the response wrapped in GenericResponse
-//	    return new GenericResponse<>(HttpStatus.CREATED.value(), true, "Success", savedDTO);
-//	}
+
 	
 	@Override
 	public GenericResponse<ImplementationRequestDTO> createOrUpdateImplementationRequest(
@@ -129,7 +93,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        CommitteeDecisionDTO committeeDecisionDTO = fetchCommitteeDecisionData(
 	        		implementationRequestDTO.getCommitteeDecisionId());
 	        implementationRequestDTO.setCommitteeDecisionDTO(committeeDecisionDTO);
-	        System.out.println("88888888888888888" + committeeDecisionDTO);
+	        
 	    }
 
 	    // Convert saved entity to DTO
@@ -183,7 +147,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	
 	private CommitteeDecisionDTO fetchCommitteeDecisionData(Long committeeDecisionId) {
-		System.out.println(committeeDecisionId);
+		
 	    String serviceUrl = codeServiceUrl + committeeDecisionId;
 	    log.debug("Calling master service URL for Committee Decision: {}", serviceUrl);
 
@@ -201,7 +165,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	        CommitteeDecisionDTO committeeDecisionDTO = response.getBody().getData();
 	        log.debug("Fetched CommitteeDecisionDTO: {}", committeeDecisionDTO);
-            System.out.println(committeeDecisionDTO);
+           
 	        return committeeDecisionDTO;
 	    } catch (Exception e) {
 	        log.error("Error occurred while fetching data from master service for Committee Decision ID: {}", committeeDecisionId, e);
@@ -229,7 +193,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	    ImplementationTypeDTO implementationTypeDTO = response.getBody().getData();
 	    log.debug("Fetched ImplementationTypeDTO: {}", implementationTypeDTO);
-System.out.println(implementationTypeDTO);
 	    return implementationTypeDTO;
 	}
 

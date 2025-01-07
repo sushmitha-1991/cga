@@ -241,7 +241,33 @@ public class AssuranceMapper {
 	        List<Long> clubbedMembers = Optional.ofNullable(assuranceDTO.getClubbedMembers())
 					.orElse(Collections.emptyList());
 			assurance.setClubbedMembers(clubbedMembers);
+			
+//			  if (assuranceDTO.getPartDetails() != null && !assuranceDTO.getPartDetails().isEmpty()) {
+//			        List<PartDetails> currentPartDetails = assurance.getPartDetails();
+//			        for (PartDetailsDTO partDetailsDTO : assuranceDTO.getPartDetails()) {
+//			            boolean exists = currentPartDetails.stream()
+//			                    .anyMatch(existingPart -> existingPart.getId().equals(partDetailsDTO.getId()));
+//			            if (!exists) {
+//			                currentPartDetails.add(partDetailsMapper.toEntity(partDetailsDTO));  // Use mapper here
+//			            }
+//			        }
+//			        assurance.setPartDetails(currentPartDetails);
+//			    }
+//
+//			    // Add new supplementary without modifying existing ones
+//			    if (assuranceDTO.getSupplementary() != null && !assuranceDTO.getSupplementary().isEmpty()) {
+//			        List<Supplementary> currentSupplementary = assurance.getSupplementary();
+//			        for (SupplementaryDTO supplementaryDTO : assuranceDTO.getSupplementary()) {
+//			            boolean exists = currentSupplementary.stream()
+//			                    .anyMatch(existingSupplement -> existingSupplement.getId().equals(supplementaryDTO.getId()));
+//			            if (!exists) {
+//			                currentSupplementary.add(supplementaryMapper.toEntity(supplementaryDTO));  // Use mapper here
+//			            }
+//			        }
+//			        assurance.setSupplementary(currentSupplementary);
+//			    }
 	       
 	    }
+	 
 
 }
