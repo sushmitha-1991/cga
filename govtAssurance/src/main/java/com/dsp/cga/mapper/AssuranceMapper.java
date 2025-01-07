@@ -241,33 +241,82 @@ public class AssuranceMapper {
 	        List<Long> clubbedMembers = Optional.ofNullable(assuranceDTO.getClubbedMembers())
 					.orElse(Collections.emptyList());
 			assurance.setClubbedMembers(clubbedMembers);
-			
-//			  if (assuranceDTO.getPartDetails() != null && !assuranceDTO.getPartDetails().isEmpty()) {
-//			        List<PartDetails> currentPartDetails = assurance.getPartDetails();
-//			        for (PartDetailsDTO partDetailsDTO : assuranceDTO.getPartDetails()) {
-//			            boolean exists = currentPartDetails.stream()
-//			                    .anyMatch(existingPart -> existingPart.getId().equals(partDetailsDTO.getId()));
-//			            if (!exists) {
-//			                currentPartDetails.add(partDetailsMapper.toEntity(partDetailsDTO));  // Use mapper here
-//			            }
-//			        }
-//			        assurance.setPartDetails(currentPartDetails);
-//			    }
-//
-//			    // Add new supplementary without modifying existing ones
-//			    if (assuranceDTO.getSupplementary() != null && !assuranceDTO.getSupplementary().isEmpty()) {
-//			        List<Supplementary> currentSupplementary = assurance.getSupplementary();
-//			        for (SupplementaryDTO supplementaryDTO : assuranceDTO.getSupplementary()) {
-//			            boolean exists = currentSupplementary.stream()
-//			                    .anyMatch(existingSupplement -> existingSupplement.getId().equals(supplementaryDTO.getId()));
-//			            if (!exists) {
-//			                currentSupplementary.add(supplementaryMapper.toEntity(supplementaryDTO));  // Use mapper here
-//			            }
-//			        }
-//			        assurance.setSupplementary(currentSupplementary);
-//			    }
-	       
-	    }
-	 
 
+
+			//return assurance;
+	 }
+
+	public PartDetails mapToPartEntity(PartDetailsDTO partDTO) {
+		 return PartDetails.builder()
+	                .part(partDTO.getPart())
+	                .subject(partDTO.getSubject())
+	                .statusId(partDTO.getStatusId())
+	                .extentOfAssurance(partDTO.getExtentOfAssurance())
+	                .build();
+	    }
+
+	public Supplementary mapToSupplementaryEntity(SupplementaryDTO suppDTO) {
+		 return Supplementary.builder()
+	                .supp(suppDTO.getSupp())
+	                .memberId(suppDTO.getMemberId())
+	                .part(suppDTO.getPart())
+	                .subject(suppDTO.getSubject())
+	                .statusId(suppDTO.getStatusId())
+	                .extentOfAssurance(suppDTO.getExtentOfAssurance())
+	                .build();
+	    }
+
+	public AssuranceDTO mapToDTO(Assurance updatedAssurance) {
+		
+	 
+	        AssuranceDTO dto = new AssuranceDTO();
+	        dto.setAssuranceNo(updatedAssurance.getAssuranceNo());
+	        dto.setRajyaSabhaSessionNo(updatedAssurance.getRajyaSabhaSessionNo());
+	        dto.setAssuranceDate(updatedAssurance.getAssuranceDate());
+	        dto.setAssuranceTypeId(updatedAssurance.getAssuranceTypeId());
+	        dto.setSourceId(updatedAssurance.getSourceId());
+	        dto.setQuestionNo(updatedAssurance.getQuestionNo());
+	        dto.setMinistryId(updatedAssurance.getMinistryId());
+	        dto.setDepartmentId(updatedAssurance.getDepartmentId());
+	        dto.setMemberId(updatedAssurance.getMemberId());
+	        dto.setFileNo(updatedAssurance.getFileNo());
+	        dto.setPageNoUncorrected(updatedAssurance.getPageNoUncorrected());
+	        dto.setPageNoCorrected(updatedAssurance.getPageNoCorrected());
+	        dto.setMpaRefNo(updatedAssurance.getMpaRefNo());
+	        dto.setReportNo(updatedAssurance.getReportNo());
+	        dto.setRemarks(updatedAssurance.getRemarks());
+	        dto.setMpaRefDate(updatedAssurance.getMpaRefDate());
+	        
+	        // Set partDetails and supplementary
+	        dto.setPartDetails(updatedAssurance.getPartDetails().stream()
+	                .map(this::mapToPartDTO)
+	                .collect(Collectors.toList()));
+	        dto.setSupplementary(updatedAssurance.getSupplementary().stream()
+	                .map(this::mapToSupplementaryDTO)
+	                .collect(Collectors.toList()));
+
+	        return dto;
+	    }
+	
+	 public PartDetailsDTO mapToPartDTO(PartDetails partDetail) {
+		 PartDetailsDTO dto = new PartDetailsDTO();
+	        dto.setId(partDetail.getId());
+	        dto.setPart(partDetail.getPart());
+	        dto.setSubject(partDetail.getSubject());
+	        dto.setStatusId(partDetail.getStatusId());
+	        dto.setExtentOfAssurance(partDetail.getExtentOfAssurance());
+	        return dto;
+	    }
+
+	    // Map Supplementary entity to DTO
+	    public SupplementaryDTO mapToSupplementaryDTO(Supplementary supplementary) {
+	        SupplementaryDTO dto = new SupplementaryDTO();
+	        dto.setSupp(supplementary.getSupp());
+	        dto.setMemberId(supplementary.getMemberId());
+	        dto.setPart(supplementary.getPart());
+	        dto.setSubject(supplementary.getSubject());
+	        dto.setStatusId(supplementary.getStatusId());
+	        dto.setExtentOfAssurance(supplementary.getExtentOfAssurance());
+	        return dto;
+	    }
 }

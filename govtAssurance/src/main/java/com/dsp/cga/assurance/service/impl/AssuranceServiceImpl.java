@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -558,22 +559,113 @@ public class AssuranceServiceImpl implements AssuranceService {
 		return dto;
 	}
 
+//	@Transactional
+//	@Override
+//	public AssuranceDTO updateAssuranceById(Long id, AssuranceDTO assuranceDTO) {
+//
+//		// Check if the Assurance exists
+//		Assurance existingAssurance = assuranceRepository.findById(id)
+//				.orElseThrow(() -> new ResourceNotFoundException("Assurance not found with id: " + id));
+//
+//		// Map the incoming DTO to the entity
+//		assuranceMapper.updateAssuranceFromDTO(assuranceDTO, existingAssurance);
+//
+//		// Save and return the updated entity
+//		Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
+//
+//		// Return the updated AssuranceDTO
+//		return assuranceMapper.toDTO(updatedAssurance);
+//	}
+	
+//	@Transactional
+//	@Override
+//	public AssuranceDTO updateAssuranceById(Long id, AssuranceDTO assuranceDTO) {
+//		Assurance existingAssurance = assuranceRepository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with ID: " + id));
+//
+//        // Map the fields from DTO to entity
+//		assuranceMapper.updateAssuranceFromDTO(assuranceDTO, existingAssurance);
+//
+//        // Update part details
+//        if (assuranceDTO.getPartDetails() != null) {
+//        	existingAssurance.getPartDetails().clear();
+//            for (PartDetailsDTO partDTO : assuranceDTO.getPartDetails()) {
+//                PartDetails part = assuranceMapper.mapToPartEntity(partDTO);
+//                part.setAssurance(existingAssurance);
+//                existingAssurance.getPartDetails().add(part);
+//            }
+//        }
+//
+//        // Update supplementary details
+//        if (assuranceDTO.getSupplementary() != null) {
+//        	existingAssurance.getSupplementary().clear();
+//            for (SupplementaryDTO suppDTO : assuranceDTO.getSupplementary()) {
+//                Supplementary supp = assuranceMapper.mapToSupplementaryEntity(suppDTO);
+//                supp.setAssurance(existingAssurance);
+//                existingAssurance.getSupplementary().add(supp);
+//            }
+//        }
+//
+//        // Save the updated assurance and return the DTO
+//        Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
+//        return assuranceMapper.mapToDTO(updatedAssurance);
+//    }
+
 	@Transactional
 	@Override
 	public AssuranceDTO updateAssuranceById(Long id, AssuranceDTO assuranceDTO) {
+	    // Fetch existing assurance by ID or throw an exception
+	    Assurance existingAssurance = assuranceRepository.findById(id)
+	            .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with ID: " + id));
 
-		// Check if the Assurance exists
-		Assurance existingAssurance = assuranceRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Assurance not found with id: " + id));
+	    // Map fields from DTO to the entity
+	    assuranceMapper.updateAssuranceFromDTO(assuranceDTO, existingAssurance);
 
-		// Map the incoming DTO to the entity
-		assuranceMapper.updateAssuranceFromDTO(assuranceDTO, existingAssurance);
+	    // Update PartDetails - Add new entries only
+	    if (assuranceDTO.getPartDetails() != null) {
+	        List<PartDetails> existingPartDetails = existingAssurance.getPartDetails();
 
-		// Save and return the updated entity
-		Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
+	        // Collect existing IDs for comparison
+	        Set<Long> existingIds = existingPartDetails.stream()
+	                .filter(part -> part.getId() != null) // Only consider parts with IDs
+	                .map(PartDetails::getId)
+	                .collect(Collectors.toSet());
 
-		// Return the updated AssuranceDTO
-		return assuranceMapper.toDTO(updatedAssurance);
+	        for (PartDetailsDTO partDTO : assuranceDTO.getPartDetails()) {
+	            if (partDTO.getId() == null || !existingIds.contains(partDTO.getId())) {
+	                // Add only if it's a new entry
+	                PartDetails newPart = assuranceMapper.mapToPartEntity(partDTO);
+	                newPart.setAssurance(existingAssurance);
+	                existingPartDetails.add(newPart);
+	            }
+	        }
+	    }
+
+	    // Update Supplementary - Add new entries only
+	    if (assuranceDTO.getSupplementary() != null) {
+	        List<Supplementary> existingSupplementary = existingAssurance.getSupplementary();
+
+	        // Collect existing IDs for comparison
+	        Set<Long> existingIds = existingSupplementary.stream()
+	                .filter(supp -> supp.getId() != null) // Only consider supplementary with IDs
+	                .map(Supplementary::getId)
+	                .collect(Collectors.toSet());
+
+	        for (SupplementaryDTO suppDTO : assuranceDTO.getSupplementary()) {
+	            if (suppDTO.getId() == null || !existingIds.contains(suppDTO.getId())) {
+	                // Add only if it's a new entry
+	                Supplementary newSupp = assuranceMapper.mapToSupplementaryEntity(suppDTO);
+	                newSupp.setAssurance(existingAssurance);
+	                existingSupplementary.add(newSupp);
+	            }
+	        }
+	    }
+
+	    // Save updated assurance
+	    Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
+
+	    // Return updated assurance as DTO
+	    return assuranceMapper.mapToDTO(updatedAssurance);
 	}
 
 
