@@ -28,7 +28,7 @@ public class ImplementationRequestDTO {
 	    private String partId;
 	    private String reason;
 	    private String assuranceNo;
-	    private Long implemetationTypeId;
+	    private Long implementationTypeId;
 	    private Long session;
 	    private CommitteeDecisionDTO committeeDecisionDTO;
 	    private ImplementationTypeDTO implementationTypeDTO;

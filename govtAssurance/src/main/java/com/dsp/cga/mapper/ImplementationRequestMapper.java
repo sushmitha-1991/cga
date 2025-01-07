@@ -23,7 +23,7 @@ public class ImplementationRequestMapper {
                .implementationReportFiles(entity.getImplementationReportFiles())
                 .partReportFiles(entity.getPartReportFiles())
                .otherFiles(entity.getOtherFiles())
-               .implemetationTypeId(entity.getImplementationTypeId())
+              .implementationTypeId(entity.getImplementationTypeId())
                .session(entity.getSession())
                 .build();
     }
@@ -46,7 +46,7 @@ public class ImplementationRequestMapper {
                 .implementationReportFiles(dto.getImplementationReportFiles())
                 .partReportFiles(dto.getPartReportFiles())
                 .otherFiles(dto.getOtherFiles())
-                .implementationTypeId(dto.getImplemetationTypeId())
+                .implementationTypeId(dto.getImplementationTypeId())
                 .session(dto.getSession())
                 .build();
     }
@@ -67,7 +67,7 @@ public class ImplementationRequestMapper {
         entity.setImplementationReportFiles(dto.getImplementationReportFiles());
         entity.setPartReportFiles(dto.getPartReportFiles());
         entity.setSession(dto.getSession());
-        entity.setImplementationTypeId(dto.getImplemetationTypeId());
+        entity.setImplementationTypeId(dto.getImplementationTypeId());
         entity.setOtherFiles(dto.getOtherFiles());
         
         // Note: createdBy and createdDate will remain unchanged as per JPA logic
