@@ -60,22 +60,22 @@ public class PartDetailsMapper {
     
     
 
-	public void updatePartDetailsFromDTO(PartDetailsDTO partDetailsDTO, PartDetails partDetails) {
-		 if (partDetailsDTO.getExtentOfAssurance() != null) {
-		        partDetails.setExtentOfAssurance(partDetailsDTO.getExtentOfAssurance());
-		    }
-		    if (partDetailsDTO.getPart() != null) {
-		        partDetails.setPart(partDetailsDTO.getPart());
-		    }
-		    if (partDetailsDTO.getSubject() != null) {
-		        partDetails.setSubject(partDetailsDTO.getSubject());
-		    }
-		    if (partDetailsDTO.getStatusId() != null) {
-		        partDetails.setStatusId(partDetailsDTO.getStatusId());
-		    }
+//	public void updatePartDetailsFromDTO(PartDetailsDTO partDetailsDTO, PartDetails partDetails) {
+//		 if (partDetailsDTO.getExtentOfAssurance() != null) {
+//		        partDetails.setExtentOfAssurance(partDetailsDTO.getExtentOfAssurance());
+//		    }
+//		    if (partDetailsDTO.getPart() != null) {
+//		        partDetails.setPart(partDetailsDTO.getPart());
+//		    }
+//		    if (partDetailsDTO.getSubject() != null) {
+//		        partDetails.setSubject(partDetailsDTO.getSubject());
+//		    }
+//		    if (partDetailsDTO.getStatusId() != null) {
+//		        partDetails.setStatusId(partDetailsDTO.getStatusId());
+//		    }
 		
 		
-	}
+	//}
 	 private  StatusDTO fetchStatusData(Long statusId) {
 	        String statusServiceUrl = codeServiceUrl + "/" + statusId;
 	        log.debug("Calling master service URL for Status: {}", statusServiceUrl);

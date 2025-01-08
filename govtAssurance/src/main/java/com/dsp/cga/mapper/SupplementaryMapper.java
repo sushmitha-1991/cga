@@ -185,32 +185,32 @@ public class SupplementaryMapper {
         }
     }
 
-    public void updateSupplementaryFromDTO(SupplementaryDTO supplementaryDTO, Supplementary supplementary) {
-        // Update supplementary fields
-        if (supplementaryDTO.getSupp() != null) {
-            supplementary.setSupp(supplementaryDTO.getSupp());
-        }
-        if (supplementaryDTO.getMemberId() != null) {
-            supplementary.setMemberId(supplementaryDTO.getMemberId());
-        }
-        if (supplementaryDTO.getClubbedMembers() != null) {
-            supplementary.setClubbedMembers(supplementaryDTO.getClubbedMembers().stream()
-                    .map(dto -> new ClubbedMemberInfo(dto.getClubbedMember(), dto.getPageNumber()))
-                    .collect(Collectors.toList()));
-        }
-        if (supplementaryDTO.getPart() != null) {
-            supplementary.setPart(supplementaryDTO.getPart());
-        }
-        if (supplementaryDTO.getSubject() != null) {
-            supplementary.setSubject(supplementaryDTO.getSubject());
-        }
-        if (supplementaryDTO.getStatusId() != null) {
-            supplementary.setStatusId(supplementaryDTO.getStatusId());
-        }
-        if (supplementaryDTO.getExtentOfAssurance() != null) {
-            supplementary.setExtentOfAssurance(supplementaryDTO.getExtentOfAssurance());
-        }
-    }
+//    public void updateSupplementaryFromDTO(SupplementaryDTO supplementaryDTO, Supplementary supplementary) {
+//        // Update supplementary fields
+//        if (supplementaryDTO.getSupp() != null) {
+//            supplementary.setSupp(supplementaryDTO.getSupp());
+//        }
+//        if (supplementaryDTO.getMemberId() != null) {
+//            supplementary.setMemberId(supplementaryDTO.getMemberId());
+//        }
+//        if (supplementaryDTO.getClubbedMembers() != null) {
+//            supplementary.setClubbedMembers(supplementaryDTO.getClubbedMembers().stream()
+//                    .map(dto -> new ClubbedMemberInfo(dto.getClubbedMember(), dto.getPageNumber()))
+//                    .collect(Collectors.toList()));
+//        }
+//        if (supplementaryDTO.getPart() != null) {
+//            supplementary.setPart(supplementaryDTO.getPart());
+//        }
+//        if (supplementaryDTO.getSubject() != null) {
+//            supplementary.setSubject(supplementaryDTO.getSubject());
+//        }
+//        if (supplementaryDTO.getStatusId() != null) {
+//            supplementary.setStatusId(supplementaryDTO.getStatusId());
+//        }
+//        if (supplementaryDTO.getExtentOfAssurance() != null) {
+//            supplementary.setExtentOfAssurance(supplementaryDTO.getExtentOfAssurance());
+//        }
+//    }
 
    
     

@@ -104,7 +104,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	                                    .build();
 	                        })
 	                        .collect(Collectors.toList());
-
+System.out.println(clubbedPairs);
 	                dto.setClubbedAssurances(clubbedPairs);
 	                return dto;
 	            })

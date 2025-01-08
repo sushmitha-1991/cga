@@ -69,30 +69,25 @@ public class ClubbedAssuranceController {
 	 @Operation(summary = "Get Clubbed Assurances by Assurance ID")
 	 @ApiResponses(value = {
 	     @ApiResponse(responseCode = "200", description = "Clubbed assurances retrieved successfully"),
-	     @ApiResponse(responseCode = "404", description = "No clubbed assurances found for the given assurance ID"),
+	     //@ApiResponse(responseCode = "404", description = "No clubbed assurances found for the given assurance ID"),
 	     @ApiResponse(responseCode = "500", description = "Internal server error")
 	 })
 	 public ResponseEntity<GenericResponse<List<ClubbedAssuranceDTO>>> getClubbedAssurancesByAssuranceId(
-	         @PathVariable Long assuranceId) {
-	     List<ClubbedAssuranceDTO> clubbedAssurances = clubbedAssuranceService.getClubbedAssurancesByAssuranceId(assuranceId);
+		        @PathVariable Long assuranceId) {
+		    // Fetch clubbed assurances by assuranceId using the service layer
+		    List<ClubbedAssuranceDTO> clubbedAssurances = clubbedAssuranceService.getClubbedAssurancesByAssuranceId(assuranceId);
 
-	     if (clubbedAssurances.isEmpty()) {
-	         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-	                 .body(new GenericResponse<>(
-	                         HttpStatus.NOT_FOUND.value(),
-	                         false,
-	                         "No clubbed assurances found for assurance ID " + assuranceId,
-	                         null
-	                 ));
-	     }
+		    // If no clubbed assurances are found, return a response with an appropriate message
+		    if (clubbedAssurances.isEmpty()) {
+		        return ResponseEntity.status(HttpStatus.OK)
+		                .body(new GenericResponse<>(HttpStatus.OK.value(), false, "No Clubbed Assurance(s) found", null));
+		    }
 
-	     return ResponseEntity.status(HttpStatus.OK)
-	             .body(new GenericResponse<>(
-	                     HttpStatus.OK.value(),
-	                     true,
-	                     "Clubbed assurances retrieved successfully",
-	                     clubbedAssurances
-	             ));
-	 }
+		    // If clubbed assurances are found, return a success response with the data
+		    GenericResponse<List<ClubbedAssuranceDTO>> response = new GenericResponse<>(
+		            HttpStatus.OK.value(), true, "Clubbed assurance(s) retrieved successfully", clubbedAssurances);
+
+		    return ResponseEntity.ok(response);
+		}
 
 }

@@ -33,6 +33,7 @@ public class DroppingRequestMapper {
 	                .type(dto.getType())
 	                .issueLetterMinistry(dto.getIssueLetterMinistry())
 	                .communicationDate(dto.getCommunicationDate())
+	             
 	                .session(dto.getSession())
 	                .build();
 	    }
@@ -82,7 +83,7 @@ public class DroppingRequestMapper {
 	            entity.setMeetingDate(dto.getMeetingDate());
 	            entity.setDroppingFiles(dto.getDroppingFiles());
 	            entity.setIssueLetterMinistry(dto.getIssueLetterMinistry());
-	            entity.setCommunicationDate(dto.getCommunicationDate());
+	           entity.setCommunicationDate(dto.getCommunicationDate());
 	            entity.setSession(dto.getSession());
 	            entity.setRemarks(dto.getRemarks());
 	        }

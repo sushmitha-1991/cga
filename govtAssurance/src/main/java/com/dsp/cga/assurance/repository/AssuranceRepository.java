@@ -11,9 +11,11 @@ import org.springframework.stereotype.Repository;
 
 import com.dsp.cga.assurance.entity.Assurance;
 
+import jakarta.persistence.EntityManager;
+
 @Repository
 
-public interface AssuranceRepository extends JpaRepository<Assurance, Long> {
+public interface AssuranceRepository extends JpaRepository<Assurance, Long>, AssuranceRepositoryCustom {
 
 	@Query("SELECT a FROM Assurance a " +
 		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL AND a.lokSabhaSessionNo IS NULL " +
@@ -54,7 +56,9 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long> {
 			+ "AND (a.lokSabhaSessionNo IS NOT NULL) " + "AND (a.assuranceDate >= :fromDate or :fromDate is null)"
 			+ "AND (a.assuranceDate <= :toDate or :toDate is null)" + "AND (a.ministryId = :ministryId or :ministryId is null) " + "AND (a.memberId = :memberId or :memberId is null)")
 	List<Assurance> findFilteredAssurancesLs(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
-			@Param("ministryId") Long ministryId, @Param("memberId") Long memberId);  
+			@Param("ministryId") Long ministryId, @Param("memberId") Long memberId);
+
+	
 	
 	
 //	 @Query ("SELECT a FROM Assurance a WHERE a.rajyaSabhaSessionNo is not NULL"

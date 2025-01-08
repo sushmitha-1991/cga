@@ -1,12 +1,9 @@
 package com.dsp.cga.assurance.service.impl;
 
 import java.time.LocalDate;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -19,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
 import com.dsp.cga.assurance.dto.AssuranceTypeDTO;
@@ -51,6 +49,8 @@ import com.dsp.cga.response.GenericResponse;
 
 @Service
 public class AssuranceServiceImpl implements AssuranceService {
+	
+	
 
 	private static final Logger log = LoggerFactory.getLogger(AssuranceServiceImpl.class);
 
@@ -197,6 +197,11 @@ public class AssuranceServiceImpl implements AssuranceService {
 			if (assurance.getPendingDueTo() != null) {
 				dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
 			}
+			
+			if (assurance.getStatusId() != null) {
+				dto.setStatusDTO(fetchStatusData(assurance.getStatusId()));
+			}
+			
 			List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
 			dto.setClubbedMembersData(clubbedMembersData);
 			assuranceDTOs.add(dto);
@@ -542,6 +547,11 @@ public class AssuranceServiceImpl implements AssuranceService {
 			dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
 			
 			}
+		
+		if (assurance.getStatusId() != null) {
+			dto.setStatusDTO(fetchStatusData(assurance.getStatusId()));
+		}
+		
 		if (assurance.getLokSabhaNo() != null) {
 			dto.setLokSabhaNoDTO(fetchLokSabhaData(assurance.getLokSabhaNo()));
 		}
@@ -559,57 +569,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 		return dto;
 	}
 
-//	@Transactional
-//	@Override
-//	public AssuranceDTO updateAssuranceById(Long id, AssuranceDTO assuranceDTO) {
-//
-//		// Check if the Assurance exists
-//		Assurance existingAssurance = assuranceRepository.findById(id)
-//				.orElseThrow(() -> new ResourceNotFoundException("Assurance not found with id: " + id));
-//
-//		// Map the incoming DTO to the entity
-//		assuranceMapper.updateAssuranceFromDTO(assuranceDTO, existingAssurance);
-//
-//		// Save and return the updated entity
-//		Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
-//
-//		// Return the updated AssuranceDTO
-//		return assuranceMapper.toDTO(updatedAssurance);
-//	}
+
 	
-//	@Transactional
-//	@Override
-//	public AssuranceDTO updateAssuranceById(Long id, AssuranceDTO assuranceDTO) {
-//		Assurance existingAssurance = assuranceRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with ID: " + id));
-//
-//        // Map the fields from DTO to entity
-//		assuranceMapper.updateAssuranceFromDTO(assuranceDTO, existingAssurance);
-//
-//        // Update part details
-//        if (assuranceDTO.getPartDetails() != null) {
-//        	existingAssurance.getPartDetails().clear();
-//            for (PartDetailsDTO partDTO : assuranceDTO.getPartDetails()) {
-//                PartDetails part = assuranceMapper.mapToPartEntity(partDTO);
-//                part.setAssurance(existingAssurance);
-//                existingAssurance.getPartDetails().add(part);
-//            }
-//        }
-//
-//        // Update supplementary details
-//        if (assuranceDTO.getSupplementary() != null) {
-//        	existingAssurance.getSupplementary().clear();
-//            for (SupplementaryDTO suppDTO : assuranceDTO.getSupplementary()) {
-//                Supplementary supp = assuranceMapper.mapToSupplementaryEntity(suppDTO);
-//                supp.setAssurance(existingAssurance);
-//                existingAssurance.getSupplementary().add(supp);
-//            }
-//        }
-//
-//        // Save the updated assurance and return the DTO
-//        Assurance updatedAssurance = assuranceRepository.save(existingAssurance);
-//        return assuranceMapper.mapToDTO(updatedAssurance);
-//    }
+
 
 	@Transactional
 	@Override
@@ -669,6 +631,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 	}
 
 
+	
+
+
 
 	@Override
 	public List<AssuranceListDTO> getAllAssurancesList() {
@@ -677,35 +642,47 @@ public class AssuranceServiceImpl implements AssuranceService {
 				.toList(); // Collect as a list
 	}
 
+
+
 	@Override
 	public List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
-	    // Fetch the filtered assurances from the repository
-	    List<Assurance> assurances = assuranceRepository.findFilteredAssurances(fromDate, toDate, ministryId, memberId);
+	    // Fetch filtered assurances dynamically using Criteria API
+	    List<Assurance> assurances = assuranceRepository.findFilteredAssurancesWithCriteria(fromDate, toDate, ministryId, memberId);
 
 	    // Map entities to DTOs with additional data populated
 	    List<AssuranceDTO> assuranceDTOs = assurances.stream().map(assurance -> {
 	        log.debug("Processing Assurance: {}", assurance);
 
-	        // Convert Assurance to AssuranceDTO
 	        AssuranceDTO dto = assuranceMapper.toDTO(assurance);
 
-	        // Populate additional data
+	        // Populate additional data (reusing your existing logic)
+	        if (assurance.getMemberId() != null) {
 	        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+	        }
+	        if (assurance.getMinistryId() != null) {
 	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+	        }
+	        if (assurance.getDepartmentId() != null) {
 	        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+	        }
 	        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+	        if (assurance.getRajyaSabhaSessionNo() != null) {
 	        dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
-
+	        }
 	        if (assurance.getPendingDueTo() != null) {
 	            dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
 	        }
 
-	        if (assurance.getSourceId() != null) { // Corrected to use the proper condition for sourceId
+	        if (assurance.getStatusId() != null) {
+				dto.setStatusDTO(fetchStatusData(assurance.getStatusId()));
+			}
+	        
+	        if (assurance.getSourceId() != null) {
 	            dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
 	        }
-
+	        if (assurance.getClubbedMembers() != null) {
 	        dto.setClubbedMembersData(fetchClubbedMembersData(assurance.getClubbedMembers()));
-
+	        }
 	        return dto;
 	    }).collect(Collectors.toList());
 
@@ -744,10 +721,15 @@ public class AssuranceServiceImpl implements AssuranceService {
 			if (assurance.getAssuranceTypeId() != null) {
 			dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
 			}
+			
 			if (assurance.getLokSabhaSessionNo() != null) {
 			dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
 			}
+			
+			if (assurance.getLokSabhaNo() != null) {
 			dto.setLokSabhaNoDTO(fetchLokSabhaData(assurance.getLokSabhaNo()));
+			}
+			
 			if (assurance.getPendingDueTo() != null) {
 				dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
 			}
@@ -755,7 +737,10 @@ public class AssuranceServiceImpl implements AssuranceService {
 				dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
 			}
 			
-			
+			 if (assurance.getStatusId() != null) {
+					dto.setStatusDTO(fetchStatusData(assurance.getStatusId()));
+				}
+			 
 			if (assurance.getClubbedMembers() != null) {
 			List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
 			dto.setClubbedMembersData(clubbedMembersData);
@@ -768,47 +753,55 @@ public class AssuranceServiceImpl implements AssuranceService {
 	}
 
 	@Override
-	public List<AssuranceDTO> getFilteredAssurancesLs(LocalDate fromDate, LocalDate toDate, Long ministryId,
-			Long memberId) {
-		List<Assurance> assurances = assuranceRepository.findFilteredAssurancesLs(fromDate, toDate, ministryId, memberId);
-		  List<AssuranceDTO> assuranceDTOs = assurances.stream().map(assurance -> {
-		        log.debug("Processing Assurance: {}", assurance);
+	public List<AssuranceDTO> getFilteredAssurancesLs(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
+	    // Fetch filtered assurances dynamically using Criteria API
+	    List<Assurance> assurances = assuranceRepository.findFilteredAssurancesLsWithCriteria(fromDate, toDate, ministryId, memberId);
 
-		        // Convert Assurance to AssuranceDTO
-		        AssuranceDTO dto = assuranceMapper.toDTO(assurance);
+	    // Map entities to DTOs with additional data populated
+	    List<AssuranceDTO> assuranceDTOs = assurances.stream().map(assurance -> {
+	        log.debug("Processing Assurance for LS: {}", assurance);
 
-		        // Populate additional data
-		        if (assurance.getMemberId() != null) {
-		        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
-		        }
-		        if (assurance.getMinistryId() != null) {
-		        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
-		        }
-		        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
-		        if (assurance.getAssuranceTypeId() != null) {
+	        AssuranceDTO dto = assuranceMapper.toDTO(assurance);
 
-		        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
-		        }
-		        if (assurance.getLokSabhaSessionNo() != null) {
-					dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
-					}
-				if (assurance.getLokSabhaNo() != null) {
-					dto.setLokSabhaNoDTO(fetchLokSabhaData(assurance.getLokSabhaNo()));
+	        // Populate additional data (reusing your existing logic)
+	        if (assurance.getMemberId() != null) {
+	            dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+	        }
+	        if (assurance.getMinistryId() != null) {
+	            dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+	        }
+	        if (assurance.getDepartmentId() != null) {
+	            dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+	        }
+	        if (assurance.getAssuranceTypeId() != null) {
+	            dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+	        }
+	        if (assurance.getLokSabhaSessionNo() != null) {
+	            dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
+	        }
+	        if (assurance.getLokSabhaNo() != null) {
+	            dto.setLokSabhaNoDTO(fetchLokSabhaData(assurance.getLokSabhaNo()));
+	        }
+	        if (assurance.getPendingDueTo() != null) {
+	            dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+	        }
+	        if (assurance.getSourceId() != null) {
+	            dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+	        }
+	        if (assurance.getClubbedMembers() != null) {
+	            dto.setClubbedMembersData(fetchClubbedMembersData(assurance.getClubbedMembers()));
+	        }
+
+
+			 if (assurance.getStatusId() != null) {
+					dto.setStatusDTO(fetchStatusData(assurance.getStatusId()));
 				}
-		        if (assurance.getPendingDueTo() != null) {
-		            dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
-		        }
+			 
+	        return dto;
+	    }).collect(Collectors.toList());
 
-		        if (assurance.getSourceId() != null) { // Corrected to use the proper condition for sourceId
-		            dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
-		        }
+	    log.debug("Returning list of AssuranceDTOs for LS: {}", assuranceDTOs);
+	    return assuranceDTOs;
+	}
 
-		        dto.setClubbedMembersData(fetchClubbedMembersData(assurance.getClubbedMembers()));
-
-		        return dto;
-		    }).collect(Collectors.toList());
-
-		    log.debug("Returning list of AssuranceDTOs: {}", assuranceDTOs);
-		    return assuranceDTOs;
-		}
 }

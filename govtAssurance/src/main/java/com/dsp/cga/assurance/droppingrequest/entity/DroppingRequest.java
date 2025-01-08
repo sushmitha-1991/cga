@@ -65,7 +65,7 @@ public class DroppingRequest extends Auditable {
 	@Column(name = "type")
 	private Long type;
 	
-	@Column(name = "communicationDate")
+	@Column(name = "communication_date")
 	private LocalDate communicationDate;
 
 	@Column(name = "subject")
