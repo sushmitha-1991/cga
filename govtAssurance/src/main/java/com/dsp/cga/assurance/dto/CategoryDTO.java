@@ -1,0 +1,10 @@
+package com.dsp.cga.assurance.dto;
+
+import lombok.Data;
+
+@Data
+public class CategoryDTO {
+
+	private Long id;
+	private String code;
+}

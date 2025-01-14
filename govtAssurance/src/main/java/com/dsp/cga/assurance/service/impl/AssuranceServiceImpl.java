@@ -111,6 +111,13 @@ public class AssuranceServiceImpl implements AssuranceService {
 		// Fetch external names using the external service
 
 		validateAssuranceFields(assuranceDTO);
+		
+		 // Fetch Lok Sabha Number details
+	  //  LokSabhaNoDTO lokSabhaNoDTO = fetchLokSabhaData(assuranceDTO.getLokSabhaNo());
+
+	    // Fetch Lok Sabha Session details
+	   // LoksabhaSessionNoDTO loksabhaSessionNoDTO = fetchLoksabhaSessionData(assuranceDTO.getLokSabhaSessionNo());
+
 
 		// Map the AssuranceDTO to Assurance entity
 		Assurance assurance = assuranceMapper.toEntity(assuranceDTO);
