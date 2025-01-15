@@ -43,22 +43,22 @@ public class ExtensionRequest extends Auditable {
 //	@Column(name = "question_no", length = 10)
 //	private String questionNo;
 
-	@Column(name = "extension_no", nullable = false)
+	@Column(name = "extension_no")
 	private String extensionNo;
 
-	@Column(name = "subject", nullable = false)
+	@Column(name = "subject")
 	private String subject;
 
-	@Column(name = "ext_requested_till_date", nullable = false)
+	@Column(name = "ext_requested_till_date")
 	private LocalDate extRequestedTillDate;
 
-	@Column(name = "ext_granted_till_date", nullable = false)
+	@Column(name = "ext_granted_till_date")
 	private LocalDate extGrantedTillDate;
 
-	@Column(name = "ministry_ref_no", length = 50, nullable = false)
+	@Column(name = "ministry_ref_no", length = 50)
 	private String ministryRefNo;
 
-	@Column(name = "ministry_ref_date", nullable = false)
+	@Column(name = "ministry_ref_date")
 	private LocalDate ministryRefDate;
 
 	@Column(name = "remarks", length = 512)
