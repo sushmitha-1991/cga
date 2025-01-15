@@ -7,24 +7,48 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
+import com.dsp.cga.assurance.dto.MemberDTO;
 import com.dsp.cga.assurance.dto.PartDetailsDTO;
+import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.SupplementaryDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
+import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
+import com.dsp.cga.exception.ResourceNotFoundException;
+import com.dsp.cga.response.GenericResponse;
 
 @Component
 public class AssuranceMapper {
+	
+    private static final Logger log = LoggerFactory.getLogger(AssuranceMapper.class);
+
 
 	@Autowired
 	private SupplementaryMapper supplementaryMapper;
 	
 	@Autowired
 	private PartDetailsMapper partDetailsMapper;
+	
+	 @Autowired
+	    private RestTemplate restTemplate;
+	    
+	    @Value("${master.codeServiceUrl}")
+		private String codeServiceUrl;
+
+	    @Value("${member.memberServiceUrl}")
+	    private String memberServiceUrl;
 
 	// Map Assurance entity to AssuranceDTO
 	public AssuranceDTO toDTO(Assurance assurance) {
@@ -262,6 +286,9 @@ public class AssuranceMapper {
 	                .part(suppDTO.getPart())
 	                .subject(suppDTO.getSubject())
 	                .statusId(suppDTO.getStatusId())
+	                .clubbedMembers(suppDTO.getClubbedMembers().stream()
+	                        .map(dto -> new ClubbedMemberInfo(dto.getClubbedMember(), dto.getPageNumber()))
+	                        .collect(Collectors.toList()))
 	                .extentOfAssurance(suppDTO.getExtentOfAssurance())
 	                .build();
 	    }
@@ -310,13 +337,124 @@ public class AssuranceMapper {
 
 	    // Map Supplementary entity to DTO
 	    public SupplementaryDTO mapToSupplementaryDTO(Supplementary supplementary) {
+	    	
+	    	List<MemberDTO> clubbedMemberDetails = supplementary.getClubbedMembers().stream()
+	                .map(this::mapClubbedMemberInfoToMemberDTO)
+	                .collect(Collectors.toList());
+	        
+	        MemberDTO memberDTO = null;
+	        if (supplementary.getMemberId() != null) {
+	            memberDTO = fetchMemberData(supplementary.getMemberId());
+	        }
+
+	        // Fetch StatusDTO
+	        StatusDTO statusDTO = null;
+	        if (supplementary.getStatusId() != null) {
+	            statusDTO = fetchStatusData(supplementary.getStatusId());
+	        }
 	        SupplementaryDTO dto = new SupplementaryDTO();
 	        dto.setSupp(supplementary.getSupp());
 	        dto.setMemberId(supplementary.getMemberId());
 	        dto.setPart(supplementary.getPart());
 	        dto.setSubject(supplementary.getSubject());
 	        dto.setStatusId(supplementary.getStatusId());
+	       dto.setStatusDTO(statusDTO);
+	       dto.setMemberDTO(memberDTO);
 	        dto.setExtentOfAssurance(supplementary.getExtentOfAssurance());
 	        return dto;
+	    }
+	    
+	    // New method to map ClubbedMemberInfo to MemberDTO with pageNumber
+	    private MemberDTO mapClubbedMemberInfoToMemberDTO(ClubbedMemberInfo clubbedMemberInfo) {
+	        MemberDTO memberDTO = fetchMemberData(clubbedMemberInfo);
+	      //  memberDTO.setPageNumber(clubbedMemberInfo.getPageNumber()); // Set pageNumber explicitly
+	        return memberDTO;
+	    }
+	    
+	    private StatusDTO fetchStatusData(Long statusId) {
+			String statusServiceUrl = codeServiceUrl + statusId;
+			log.debug("Calling master service URL for Status: {}", statusServiceUrl);
+
+			ResponseEntity<GenericResponse<StatusDTO>> response = restTemplate.exchange(statusServiceUrl, HttpMethod.GET,
+					null, new ParameterizedTypeReference<GenericResponse<StatusDTO>>() {
+					});
+			System.out.println(response);
+
+			if (!response.getStatusCode().is2xxSuccessful()) {
+				log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(),
+						response.getBody());
+				throw new RuntimeException(
+						"Failed to fetch data from master service for Status. Status: " + response.getStatusCode());
+			}
+
+			StatusDTO statusDTO = response.getBody().getData();
+			log.debug("Fetched StatusDTO: {}", statusDTO);
+
+			return statusDTO;
+		}
+	    
+	    private MemberDTO fetchMemberData(Long memberId) {
+			String url = memberServiceUrl + memberId;
+			log.debug("Fetching Member by memberId from URL: {}", url);
+
+			try {
+				ResponseEntity<GenericResponse<MemberDTO>> response = restTemplate.exchange(url, HttpMethod.GET, null,
+						new ParameterizedTypeReference<GenericResponse<MemberDTO>>() {
+						});
+
+				if (response == null || response.getBody() == null || response.getBody().getData() == null) {
+					log.error("Response or body is null when fetching Member for memberId: {}", memberId);
+					throw new RuntimeException("Failed to fetch Member, response is null");
+				}
+
+				MemberDTO memberDTO = response.getBody().getData();
+				 memberDTO.generateMemberName();
+				log.debug("Fetched MemberDTO: {}", memberDTO);
+				return memberDTO;
+
+			} catch (ResourceNotFoundException e) {
+				log.error("Resource not found for memberId: {}", memberId);
+				throw e;
+			} catch (Exception e) {
+				log.error("Error fetching Member for memberId: {}", memberId, e);
+				throw new RuntimeException("Failed to fetch Member data", e);
+			}
+		}
+
+	    private MemberDTO fetchMemberData(ClubbedMemberInfo clubbedMemberInfo) {
+	        if (clubbedMemberInfo == null) {
+	            log.error("ClubbedMemberInfo is null");
+	            throw new IllegalArgumentException("ClubbedMemberInfo cannot be null");
+	        }
+	        
+	        Long memberId = clubbedMemberInfo.getClubbedMember();
+	        if (memberId == null) {
+	            log.error("ClubbedMemberInfo has null memberId");
+	            throw new IllegalArgumentException("Member ID cannot be null");  
+	        }
+
+	        String url = memberServiceUrl + memberId;
+	        log.debug("Fetching Member by memberId from URL: {}", url);
+
+	        try {
+	            ResponseEntity<GenericResponse<MemberDTO>> response = restTemplate.exchange(url, HttpMethod.GET, null,
+	                    new ParameterizedTypeReference<>() {});
+
+	            if (response == null || response.getBody() == null || response.getBody().getData() == null) {
+	                log.error("Response or body is null when fetching Member for memberId: {}", memberId);
+	                throw new ResourceNotFoundException("Member not found for ID: " + memberId);
+	            }
+	            MemberDTO memberDTO = response.getBody().getData();
+	            memberDTO.generateMemberName();  // Call generateMemberName to populate memberName
+	            return memberDTO;
+
+	          //  return response.getBody().getData();
+	        } catch (ResourceNotFoundException e) {
+	            log.error("Resource not found for memberId: {}", memberId);
+	            throw e;
+	        } catch (Exception e) {
+	            log.error("Error fetching Member for memberId: {}", memberId, e);
+	            throw new RuntimeException("Failed to fetch Member data", e);
+	        }
 	    }
 }

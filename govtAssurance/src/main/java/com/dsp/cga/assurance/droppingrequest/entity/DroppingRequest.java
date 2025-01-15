@@ -71,7 +71,7 @@ public class DroppingRequest extends Auditable {
 	@Column(name = "subject")
 	private String subject;
 	
-	@Column(name = "issue_letter_ministry", nullable = false)
+	@Column(name = "issue_letter_ministry")
 	private Boolean issueLetterMinistry = Boolean.FALSE;
 	
 	

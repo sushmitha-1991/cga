@@ -17,10 +17,16 @@ import jakarta.persistence.EntityManager;
 
 public interface AssuranceRepository extends JpaRepository<Assurance, Long>, AssuranceRepositoryCustom {
 
+//	@Query("SELECT a FROM Assurance a " +
+//		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL AND a.lokSabhaSessionNo IS NULL " +
+//		       "ORDER BY a.createdAt DESC")
+//		List<Assurance> findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull();
+	
 	@Query("SELECT a FROM Assurance a " +
 		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL AND a.lokSabhaSessionNo IS NULL " +
 		       "ORDER BY a.createdAt DESC")
 		List<Assurance> findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull();
+
 
 
 //	@Query("SELECT a FROM Assurance a " +
