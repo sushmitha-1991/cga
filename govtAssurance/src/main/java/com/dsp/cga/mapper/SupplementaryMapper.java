@@ -71,8 +71,9 @@ public class SupplementaryMapper {
     // New method to map ClubbedMemberInfo to MemberDTO with pageNumber
     private MemberDTO mapClubbedMemberInfoToMemberDTO(ClubbedMemberInfo clubbedMemberInfo) {
         MemberDTO memberDTO = fetchMemberData(clubbedMemberInfo);
-      //  memberDTO.setPageNumber(clubbedMemberInfo.getPageNumber()); // Set pageNumber explicitly
-        return memberDTO;
+        if (clubbedMemberInfo != null && clubbedMemberInfo.getPageNumber() != null) {
+            memberDTO.setPageNumber(clubbedMemberInfo.getPageNumber());
+        }        return memberDTO;
     }
 
 
