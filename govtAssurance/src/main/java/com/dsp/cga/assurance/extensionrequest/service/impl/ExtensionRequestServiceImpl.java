@@ -9,9 +9,15 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
 import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
@@ -29,6 +35,13 @@ import com.dsp.cga.response.GenericResponse;
 public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 
 	private static final Logger log = LoggerFactory.getLogger(ExtensionRequestServiceImpl.class);
+	
+	@Value("${master.codeServiceUrl}")
+	private String codeServiceUrl;
+	
+	@Autowired
+	private RestTemplate restTemplate;
+	
 
 	@Autowired
 	private ExtensionRequestRepository extenionRequestRepository;
@@ -62,6 +75,11 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	            .map(request -> {
 	                ExtensionRequestDTO dto = ExtensionRequestMapper.toDTO(request);
 	                dto.setAssuranceNo(assuranceNo);  // Set the assuranceNo in each DTO
+	                
+	                if (request.getStatusId() != null) {
+	                    StatusDTO statusDTO = fetchStatusData(request.getStatusId());
+	                    dto.setStatusDTO(statusDTO); // Add StatusDTO to the ExtensionRequestDTO
+	                }
 	                return dto;
 	            })
 	            .collect(Collectors.toList());
@@ -136,6 +154,26 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	            savedDTOs
 	    );
 	}
+	private StatusDTO fetchStatusData(Long statusId) {
+		String statusServiceUrl = codeServiceUrl + statusId;
+		log.debug("Calling master service URL for Status: {}", statusServiceUrl);
 
+		ResponseEntity<GenericResponse<StatusDTO>> response = restTemplate.exchange(statusServiceUrl, HttpMethod.GET,
+				null, new ParameterizedTypeReference<GenericResponse<StatusDTO>>() {
+				});
+		System.out.println(response);
+
+		if (!response.getStatusCode().is2xxSuccessful()) {
+			log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(),
+					response.getBody());
+			throw new RuntimeException(
+					"Failed to fetch data from master service for Status. Status: " + response.getStatusCode());
+		}
+
+		StatusDTO statusDTO = response.getBody().getData();
+		log.debug("Fetched StatusDTO: {}", statusDTO);
+
+		return statusDTO;
+	}
 
 }

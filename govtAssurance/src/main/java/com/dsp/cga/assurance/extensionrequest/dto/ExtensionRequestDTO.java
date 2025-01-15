@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import com.dsp.cga.assurance.dto.StatusDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +29,7 @@ public class ExtensionRequestDTO {
 	private LocalDate ministryRefDate;
 	private String remarks;
 	private Long statusId;
+	private StatusDTO statusDTO;
 	//private String extensionFiles;
 	private Boolean draftStatus;
 	private String assuranceNo;
