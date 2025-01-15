@@ -41,7 +41,7 @@ public class ExtensionRequestMapper {
 	            entity.setRemarks(dto.getRemarks());
 	            entity.setExtensionFiles(dto.getExtensionFiles());
 	            entity.setDraftStatus(dto.getDraftStatus());
-	            entity.setStatusId(dto.getStatusId());
+	           entity.setStatusId(dto.getStatusId());
 	        }
 	    }
 	    public static ExtensionRequest toEntity(ExtensionRequestDTO dto) {
