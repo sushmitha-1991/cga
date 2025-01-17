@@ -60,7 +60,7 @@ public class Assurance extends Auditable {
 	@Column(name = "category_id")
 	private Long categoryId;
 
-	@Column(name = "question_no", length = 100)
+	@Column(name = "question_no", length = 50)
 	private String questionNo;
 
 	@Column(name = "assurance_type_id")
@@ -81,7 +81,7 @@ public class Assurance extends Auditable {
 	@Column(name = "page_no", length = 50)
 	private String pageNo;
 
-	@Column(name = "file_no", length = 100)
+	@Column(name = "file_no", length = 50)
 	private String fileNo;
 
 	@Column(name = "status_id")
