@@ -3,8 +3,10 @@ package com.dsp.cga.mapper;
 import java.util.ArrayList;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -24,6 +26,7 @@ import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.SupplementaryDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
+import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.exception.ResourceNotFoundException;
@@ -40,6 +43,8 @@ public class AssuranceMapper {
 	
 	@Autowired
 	private PartDetailsMapper partDetailsMapper;
+	
+	
 	
 	 @Autowired
 	    private RestTemplate restTemplate;
@@ -280,6 +285,8 @@ public class AssuranceMapper {
 	    }
 
 	public Supplementary mapToSupplementaryEntity(SupplementaryDTO suppDTO) {
+		
+	  
 		 return Supplementary.builder()
 	                .supp(suppDTO.getSupp())
 	                .memberId(suppDTO.getMemberId())
@@ -289,6 +296,8 @@ public class AssuranceMapper {
 	                .clubbedMembers(suppDTO.getClubbedMembers().stream()
 	                        .map(dto -> new ClubbedMemberInfo(dto.getClubbedMember(), dto.getPageNumber()))
 	                        .collect(Collectors.toList()))
+	               
+
 	                .extentOfAssurance(suppDTO.getExtentOfAssurance())
 	                .build();
 	    }

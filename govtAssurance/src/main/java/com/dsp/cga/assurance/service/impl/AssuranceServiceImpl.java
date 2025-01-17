@@ -2,6 +2,7 @@ package com.dsp.cga.assurance.service.impl;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,9 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import com.dsp.cga.assurance.dto.AssuranceCategory;
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
 import com.dsp.cga.assurance.dto.AssuranceTypeDTO;
+import com.dsp.cga.assurance.dto.CategoryDTO;
 import com.dsp.cga.assurance.dto.DepartmentsDTO;
 import com.dsp.cga.assurance.dto.LokSabhaNoDTO;
 import com.dsp.cga.assurance.dto.LoksabhaSessionNoDTO;
@@ -112,13 +115,21 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 		validateAssuranceFields(assuranceDTO);
 		
-		 // Fetch Lok Sabha Number details
-	  //  LokSabhaNoDTO lokSabhaNoDTO = fetchLokSabhaData(assuranceDTO.getLokSabhaNo());
-
-	    // Fetch Lok Sabha Session details
-	   // LoksabhaSessionNoDTO loksabhaSessionNoDTO = fetchLoksabhaSessionData(assuranceDTO.getLokSabhaSessionNo());
-
-
+        // Check if both LokSabhaNo and LokSabhaSessionNo are available to generate AssuranceNo
+        if (assuranceDTO.getLokSabhaNo() != null && assuranceDTO.getLokSabhaSessionNo() != null) {
+            // Generate the Assurance No only when both lokSabhaNo and lokSabhaSessionNo are provided
+            String assuranceNo = generateAssuranceNo(
+                assuranceDTO.getLokSabhaNo(),
+                assuranceDTO.getLokSabhaSessionNo(),
+                assuranceDTO.getSourceId(),
+                assuranceDTO.getQuestionNo(),
+                assuranceDTO.getAssuranceTypeId()
+            );
+            
+            // Set the generated Assurance No in the DTO
+            assuranceDTO.setAssuranceNo(assuranceNo);
+        }
+        
 		// Map the AssuranceDTO to Assurance entity
 		Assurance assurance = assuranceMapper.toEntity(assuranceDTO);
 		// assurance.setClubbedMembers(assuranceDTO.getClubbedMembers());
@@ -126,6 +137,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 			supplementary.setAssurance(assurance); // Link Assurance to Supplementary
 		});
 
+		
 		// Save Assurance entity
 		Assurance savedAssurance = assuranceRepository.save(assurance); // Save once, to make it effectively final
 
@@ -162,6 +174,50 @@ public class AssuranceServiceImpl implements AssuranceService {
 			throw new IllegalArgumentException(
 					"Invalid data: If Session Number is provided, Lok Sabha Number must also be provided.");
 		}
+		
+		
+
+	}
+	
+	private String generateAssuranceNo(Long lokSabhaNo, Long lokSabhaSessionNo, Long sourceId, String questionNo, Long AssuranceTypeId) {
+	    // Fetching data using the provided IDs
+	    LokSabhaNoDTO lokSabhaDTO = fetchLokSabhaData(lokSabhaNo);
+	    LoksabhaSessionNoDTO lokSabhaSessionDTO = fetchLoksabhaSessionData(lokSabhaSessionNo);
+	    SourceDTO categoryDTO = fetchSourceData(sourceId);
+	    AssuranceTypeDTO assuranceTypeDTO = fetchAssuranceTypeData(AssuranceTypeId);
+	    
+	    // Determine the category code
+	    String categoryCode;
+	    if ("QUESTION".equalsIgnoreCase(categoryDTO.getCode())) {
+	        // Fetch AssuranceType data if the source code is "QUESTION"
+	       // Long assuranceTypeId = categoryDTO.getAssuranceTypeId(); // Assuming SourceDTO has assuranceTypeId
+	        String assuranceType = assuranceTypeDTO.getCode();
+
+	        // Set category code based on AssuranceType code
+	        if ("starred".equalsIgnoreCase(assuranceTypeDTO.getCode())) {
+	            categoryCode = "SQ";
+	        } else if ("unstarred".equalsIgnoreCase(assuranceTypeDTO.getCode())) {
+	            categoryCode = "USQ";
+	        } else {
+	            throw new IllegalArgumentException("Invalid AssuranceType code for source QUESTION: " + assuranceTypeDTO.getCode());
+	        }
+	    } else {
+	        // For other source codes, map directly to AssuranceCategory
+	        AssuranceCategory categoryEnum = AssuranceCategory.valueOf(categoryDTO.getCode());
+	        categoryCode = categoryEnum.getCode();
+	    }
+//	    AssuranceCategory categoryEnum = AssuranceCategory.valueOf(categoryDTO.getCode());
+//	    String categoryCode = categoryEnum.getCode();  // Get the mapped code (e.g., "SQ" for "QUESTION")
+//	    
+	    // Extracting relevant information from fetched data
+	   // String categoryCode = (categoryDTO.getCode()).getName();  // Mapping category name to code
+	    String lokSabhaNoStr = lokSabhaDTO.getLokSabhaNumber().toString();
+	    String sessionNoStr = lokSabhaSessionDTO.getSessionNumber().toString();
+	    String questionNoStr = questionNo.toString();
+
+	    // Generating Assurance No
+	    String assuranceNo = categoryCode + "-" + lokSabhaNoStr + "/" + sessionNoStr + "/" + questionNoStr;
+	    return assuranceNo;
 	}
 
 	@Override
@@ -342,6 +398,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 		return statusDTO;
 	}
+
 
 	private SourceDTO fetchSourceData(Long sourceId) {
 		String sourceServiceUrl = codeServiceUrl + sourceId;
@@ -810,5 +867,18 @@ public class AssuranceServiceImpl implements AssuranceService {
 	    log.debug("Returning list of AssuranceDTOs for LS: {}", assuranceDTOs);
 	    return assuranceDTOs;
 	}
+	
+
+//	String generateAssuranceNo(Long categoryId) {
+//		
+//		category label =  Get the lable of CategoryId
+//		
+//		String prefix = get From enum (category label)
+//		
+//		Get ls no & ls session no 
+//		
+//		Create assurance no
+//	}
+
 
 }

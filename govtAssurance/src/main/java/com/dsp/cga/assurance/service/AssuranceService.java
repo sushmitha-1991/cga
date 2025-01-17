@@ -2,6 +2,7 @@ package com.dsp.cga.assurance.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
@@ -27,6 +28,8 @@ public interface AssuranceService {
 	List<AssuranceDTO> getAllLokSabhaAssurance();
 
 	List<AssuranceDTO> getFilteredAssurancesLs(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId);
+
+	
 
 	
 }

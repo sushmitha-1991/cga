@@ -60,13 +60,13 @@ public class Assurance extends Auditable {
 	@Column(name = "category_id")
 	private Long categoryId;
 
-	@Column(name = "question_no", length = 50)
+	@Column(name = "question_no", length = 100)
 	private String questionNo;
 
 	@Column(name = "assurance_type_id")
 	private Long assuranceTypeId;
 
-	@Column(name = "subject", length = 255)
+	@Column(name = "subject", length = 200)
 	private String subject;
 
 	@Column(name = "member_id")
@@ -78,10 +78,10 @@ public class Assurance extends Auditable {
 	@Column(name = "department_id")
 	private Long departmentId;
 
-	@Column(name = "page_no", length = 20)
+	@Column(name = "page_no", length = 50)
 	private String pageNo;
 
-	@Column(name = "file_no", length = 50)
+	@Column(name = "file_no", length = 100)
 	private String fileNo;
 
 	@Column(name = "status_id")
@@ -96,7 +96,7 @@ public class Assurance extends Auditable {
 	@Column(name = "mpa_ref_no")
 	private String mpaRefNo;
 
-	@Column(name = "report_no", length = 30)
+	@Column(name = "report_no", length = 50)
 	private String reportNo;
 
 	@Column(name = "remarks", length = 500)
@@ -114,7 +114,7 @@ public class Assurance extends Auditable {
 	@Column(name = "text_of_assurance", length = 1000)
 	private String textOfAssurance;
 
-	@Column(name = "supplementary_page_no", length = 10)
+	@Column(name = "supplementary_page_no")
 	private String supplementaryPageNo;
 
 	@Column(name = "supplementary_member_id")
@@ -141,13 +141,13 @@ public class Assurance extends Auditable {
 	@Column(name = "group_name", nullable = true, length = 50)
 	private String groupName;
 
-	@Column(name = "assuranceNo", length = 25)
+	@Column(name = "assuranceNo")
 	private String assuranceNo;
 
-	@Column(name = "pageNoUncorrected", length = 10)
+	@Column(name = "pageNoUncorrected")
 	private String pageNoUncorrected;
 
-	@Column(name = "pageNoCorrected", length = 10)
+	@Column(name = "pageNoCorrected")
 	private String pageNoCorrected;
 
 	@ElementCollection(fetch = FetchType.EAGER)
