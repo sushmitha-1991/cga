@@ -179,46 +179,107 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	}
 	
-	private String generateAssuranceNo(Long lokSabhaNo, Long lokSabhaSessionNo, Long sourceId, String questionNo, Long AssuranceTypeId) {
+//	private String generateAssuranceNo(Long lokSabhaNo, Long lokSabhaSessionNo, Long sourceId, String questionNo, Long AssuranceTypeId) {
+//	    // Fetching data using the provided IDs
+//	    LokSabhaNoDTO lokSabhaDTO = fetchLokSabhaData(lokSabhaNo);
+//	    LoksabhaSessionNoDTO lokSabhaSessionDTO = fetchLoksabhaSessionData(lokSabhaSessionNo);
+//	    SourceDTO categoryDTO = fetchSourceData(sourceId);
+//	    //AssuranceTypeDTO assuranceTypeDTO = fetchAssuranceTypeData(AssuranceTypeId);
+//	    
+//	    // Determine the category code
+//	    String categoryCode;
+//	    if ("QUESTION".equalsIgnoreCase(categoryDTO.getCode())) {
+//	        // Fetch AssuranceType data if the source code is "QUESTION"
+//	       // Long assuranceTypeId = categoryDTO.getAssuranceTypeId(); // Assuming SourceDTO has assuranceTypeId
+//	    	
+//	    	 if (AssuranceTypeId != null) {
+//	             // Fetch AssuranceType data if assuranceTypeId is provided
+//	             AssuranceTypeDTO assuranceTypeDTO = fetchAssuranceTypeData(AssuranceTypeId);
+//
+//	        String assuranceType = assuranceTypeDTO.getCode();
+//
+//	        // Set category code based on AssuranceType code
+//	        if ("starred".equalsIgnoreCase(assuranceTypeDTO.getCode())) {
+//	            categoryCode = "SQ";
+//	        } else if ("unstarred".equalsIgnoreCase(assuranceTypeDTO.getCode())) {
+//	            categoryCode = "USQ";
+//	        } else {
+//	            throw new IllegalArgumentException("Invalid AssuranceType code for source QUESTION: " + assuranceTypeDTO.getCode());
+//	        }
+//	    } else {
+//	        // For other source codes, map directly to AssuranceCategory
+//	        AssuranceCategory categoryEnum = AssuranceCategory.valueOf(categoryDTO.getCode());
+//	        categoryCode = categoryEnum.getCode();
+//	    }
+////	    AssuranceCategory categoryEnum = AssuranceCategory.valueOf(categoryDTO.getCode());
+////	    String categoryCode = categoryEnum.getCode();  // Get the mapped code (e.g., "SQ" for "QUESTION")
+////	    
+//	    // Extracting relevant information from fetched data
+//	   // String categoryCode = (categoryDTO.getCode()).getName();  // Mapping category name to code
+//	    String lokSabhaNoStr = lokSabhaDTO.getLokSabhaNumber().toString();
+//	    String sessionNoStr = lokSabhaSessionDTO.getSessionNumber().toString();
+//	    String questionNoStr = questionNo.toString();
+//
+//	    // Generating Assurance No
+//	    String assuranceNo = categoryCode + "-" + lokSabhaNoStr + "/" + sessionNoStr + "/" + questionNoStr;
+//	    return assuranceNo;
+//	}
+	
+	private String generateAssuranceNo(Long lokSabhaNo, Long lokSabhaSessionNo, Long sourceId, String questionNo, Long assuranceTypeId) {
 	    // Fetching data using the provided IDs
 	    LokSabhaNoDTO lokSabhaDTO = fetchLokSabhaData(lokSabhaNo);
+//	    if (lokSabhaDTO == null) {
+//	        throw new IllegalArgumentException("Invalid Lok Sabha Number: " + lokSabhaNo);
+//	    }
+
 	    LoksabhaSessionNoDTO lokSabhaSessionDTO = fetchLoksabhaSessionData(lokSabhaSessionNo);
+//	    if (lokSabhaSessionDTO == null) {
+//	        throw new IllegalArgumentException("Invalid Lok Sabha Session Number: " + lokSabhaSessionNo);
+//	    }
+
 	    SourceDTO categoryDTO = fetchSourceData(sourceId);
-	    AssuranceTypeDTO assuranceTypeDTO = fetchAssuranceTypeData(AssuranceTypeId);
-	    
+//	    if (categoryDTO == null) {
+//	        throw new IllegalArgumentException("Invalid Source ID: " + sourceId);
+	 //   }
+
 	    // Determine the category code
 	    String categoryCode;
 	    if ("QUESTION".equalsIgnoreCase(categoryDTO.getCode())) {
-	        // Fetch AssuranceType data if the source code is "QUESTION"
-	       // Long assuranceTypeId = categoryDTO.getAssuranceTypeId(); // Assuming SourceDTO has assuranceTypeId
-	        String assuranceType = assuranceTypeDTO.getCode();
+	        if (assuranceTypeId != null) {
+	            AssuranceTypeDTO assuranceTypeDTO = fetchAssuranceTypeData(assuranceTypeId);
+	            if (assuranceTypeDTO == null) {
+	                throw new IllegalArgumentException("Invalid Assurance Type ID: " + assuranceTypeId);
+	            }
 
-	        // Set category code based on AssuranceType code
-	        if ("starred".equalsIgnoreCase(assuranceTypeDTO.getCode())) {
-	            categoryCode = "SQ";
-	        } else if ("unstarred".equalsIgnoreCase(assuranceTypeDTO.getCode())) {
-	            categoryCode = "USQ";
+	            String assuranceType = assuranceTypeDTO.getCode();
+	            if ("starred".equalsIgnoreCase(assuranceType)) {
+	                categoryCode = "SQ";
+	            } else if ("unstarred".equalsIgnoreCase(assuranceType)) {
+	                categoryCode = "USQ";
+	            } else {
+	                throw new IllegalArgumentException("Invalid AssuranceType code for source QUESTION: " + assuranceType);
+	            }
 	        } else {
-	            throw new IllegalArgumentException("Invalid AssuranceType code for source QUESTION: " + assuranceTypeDTO.getCode());
+	            throw new IllegalArgumentException("AssuranceTypeId is required for source type QUESTION.");
 	        }
 	    } else {
-	        // For other source codes, map directly to AssuranceCategory
-	        AssuranceCategory categoryEnum = AssuranceCategory.valueOf(categoryDTO.getCode());
+	        AssuranceCategory categoryEnum;
+	        try {
+	            categoryEnum = AssuranceCategory.valueOf(categoryDTO.getCode());
+	        } catch (IllegalArgumentException e) {
+	            throw new IllegalArgumentException("Invalid AssuranceCategory code: " + categoryDTO.getCode(), e);
+	        }
 	        categoryCode = categoryEnum.getCode();
 	    }
-//	    AssuranceCategory categoryEnum = AssuranceCategory.valueOf(categoryDTO.getCode());
-//	    String categoryCode = categoryEnum.getCode();  // Get the mapped code (e.g., "SQ" for "QUESTION")
-//	    
-	    // Extracting relevant information from fetched data
-	   // String categoryCode = (categoryDTO.getCode()).getName();  // Mapping category name to code
-	    String lokSabhaNoStr = lokSabhaDTO.getLokSabhaNumber().toString();
-	    String sessionNoStr = lokSabhaSessionDTO.getSessionNumber().toString();
-	    String questionNoStr = questionNo.toString();
 
 	    // Generating Assurance No
-	    String assuranceNo = categoryCode + "-" + lokSabhaNoStr + "/" + sessionNoStr + "/" + questionNoStr;
-	    return assuranceNo;
+	    String lokSabhaNoStr = lokSabhaDTO.getLokSabhaNumber().toString();
+	    String sessionNoStr = lokSabhaSessionDTO.getSessionNumber().toString();
+
+	    return categoryCode + "-" + lokSabhaNoStr + "/" + sessionNoStr + "/" + questionNo;
 	}
+
+	
 
 	@Override
 	@Transactional
