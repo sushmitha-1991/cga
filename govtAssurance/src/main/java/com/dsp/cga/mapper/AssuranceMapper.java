@@ -267,6 +267,10 @@ public class AssuranceMapper {
 	            assurance.setPageNoUncorrected(assuranceDTO.getPageNoUncorrected());
 	        }
 	        
+	        if (assuranceDTO.getAssuranceFiles() != null) {
+	            assurance.setAssuranceFiles(assuranceDTO.getAssuranceFiles());
+	        }
+	        
 	        List<Long> clubbedMembers = Optional.ofNullable(assuranceDTO.getClubbedMembers())
 					.orElse(Collections.emptyList());
 			assurance.setClubbedMembers(clubbedMembers);
@@ -322,7 +326,7 @@ public class AssuranceMapper {
 	        dto.setReportNo(updatedAssurance.getReportNo());
 	        dto.setRemarks(updatedAssurance.getRemarks());
 	        dto.setMpaRefDate(updatedAssurance.getMpaRefDate());
-	        
+	        dto.setAssuranceFiles(updatedAssurance.getAssuranceFiles());
 	        // Set partDetails and supplementary
 	        dto.setPartDetails(updatedAssurance.getPartDetails().stream()
 	                .map(this::mapToPartDTO)
