@@ -84,6 +84,7 @@ public class DroppingRequestMapper {
 	            entity.setDroppingFiles(dto.getDroppingFiles());
 	            entity.setIssueLetterMinistry(dto.getIssueLetterMinistry());
 	           entity.setCommunicationDate(dto.getCommunicationDate());
+	           entity.setDroppingFiles(dto.getDroppingFiles());
 	            entity.setSession(dto.getSession());
 	            entity.setRemarks(dto.getRemarks());
 	        }

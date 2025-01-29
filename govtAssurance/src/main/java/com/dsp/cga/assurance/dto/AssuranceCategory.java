@@ -12,8 +12,8 @@ public enum AssuranceCategory {
     MISC("MI"),
 	SPLM("SM"),
 	Resolution("RS"),
-	Bills("BI");
-
+	Bills("BI"),
+	EXMPL("EXM");
     private final String code;
 
     AssuranceCategory(String code) {

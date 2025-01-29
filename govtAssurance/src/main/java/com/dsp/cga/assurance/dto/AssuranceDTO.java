@@ -81,5 +81,7 @@ public class AssuranceDTO {
 	private LokSabhaNoDTO lokSabhaNoDTO;
 	// private LoksabhaSessionNoDTO loksabhaSessionNoDTO;
 	private List<MemberDTO> clubbedMembersData = new ArrayList<>();
+    private List<Map<String, Object>> extensionFiles;
+
 
 }

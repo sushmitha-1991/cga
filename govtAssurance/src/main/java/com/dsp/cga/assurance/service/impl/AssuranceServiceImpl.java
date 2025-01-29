@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,8 @@ import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.SupplementDTO;
 import com.dsp.cga.assurance.dto.SupplementaryDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
+import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestRepository;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 //import com.dsp.cga.assurance.external.service.ExternalService;
 import com.dsp.cga.assurance.partdetails.repository.PartDetailsRepository;
@@ -107,6 +110,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private ExtensionRequestRepository extensionRequestRepository;
 
 	@Transactional
 	@Override
@@ -266,6 +272,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 	        AssuranceCategory categoryEnum;
 	        try {
 	            categoryEnum = AssuranceCategory.valueOf(categoryDTO.getCode());
+	            System.out.println("$$$$$$$$$$$$$$$" + categoryDTO.getCode());
 	        } catch (IllegalArgumentException e) {
 	            throw new IllegalArgumentException("Invalid AssuranceCategory code: " + categoryDTO.getCode(), e);
 	        }
@@ -747,6 +754,16 @@ public class AssuranceServiceImpl implements AssuranceService {
 	            }
 	        }
 	    }
+	    
+	 // Update ExtensionRequests - Save directly to repository
+	    if (assuranceDTO.getExtensionFiles() != null) {
+	        ExtensionRequest newRequest = new ExtensionRequest();
+	        newRequest.setAssuranceId(existingAssurance.getId());
+	        newRequest.setExtensionFiles(assuranceDTO.getExtensionFiles()); // Set the entire list
+	        extensionRequestRepository.save(newRequest);
+	    }
+
+
 
 	    // Save updated assurance
 	    Assurance updatedAssurance = assuranceRepository.save(existingAssurance);

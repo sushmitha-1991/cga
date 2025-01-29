@@ -62,6 +62,7 @@ public class ExtensionRequestMapper {
 	                .remarks(dto.getRemarks())
 	                .extensionFiles(dto.getExtensionFiles())
 	                .draftStatus(dto.getDraftStatus())
+	                .extensionFiles(dto.getExtensionFiles())
 	                .statusId(dto.getStatusId())
 	                .build();
 	    }

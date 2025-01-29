@@ -71,7 +71,7 @@ public class ExtensionRequest extends Auditable {
 	@Convert(converter = JsonMapConverter.class)
 	private List<Map<String, Object>> extensionFiles;
 
-	@Column(name = "draft_status", nullable = false)
+	@Column(name = "draft_status")
 	private Boolean draftStatus = false;
 
 }
