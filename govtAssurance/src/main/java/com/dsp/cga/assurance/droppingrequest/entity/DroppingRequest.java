@@ -89,7 +89,7 @@ public class DroppingRequest extends Auditable {
 	@Convert(converter = JsonMapConverter.class)
 	private List<Map<String, Object>> droppingFiles;
 
-	@Column(name = "draft_status", nullable = false)
+	@Column(name = "draft_status")
 	private Boolean draftStatus = Boolean.FALSE;
 
 }

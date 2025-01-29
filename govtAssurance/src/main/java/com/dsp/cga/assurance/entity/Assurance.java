@@ -123,7 +123,7 @@ public class Assurance extends Auditable {
 	@Column(name = "question_type")
 	private Long questionType;
 
-	@Column(name = "draft_status", nullable = false)
+	@Column(name = "draft_status")
 	private Boolean draftStatus = false;
 
 	@Column(name = "supplement")
