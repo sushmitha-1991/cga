@@ -749,13 +749,36 @@ public class AssuranceServiceImpl implements AssuranceService {
 			}
 		}
 
+//		// Update ExtensionRequests - Save directly to repository
+//		if (assuranceDTO.getExtensionFiles() != null && !assuranceDTO.getExtensionFiles().isEmpty()) {
+//			ExtensionRequest newRequest = new ExtensionRequest();
+//			newRequest.setAssuranceId(existingAssurance.getId());
+//			newRequest.setExtensionFiles(assuranceDTO.getExtensionFiles());
+//			extensionRequestRepository.save(newRequest);
+//		}
+		
 		// Update ExtensionRequests - Save directly to repository
 		if (assuranceDTO.getExtensionFiles() != null && !assuranceDTO.getExtensionFiles().isEmpty()) {
-			ExtensionRequest newRequest = new ExtensionRequest();
-			newRequest.setAssuranceId(existingAssurance.getId());
-			newRequest.setExtensionFiles(assuranceDTO.getExtensionFiles());
-			extensionRequestRepository.save(newRequest);
+		    // Find existing ExtensionRequest(s) by Assurance ID
+		    List<ExtensionRequest> existingRequests = extensionRequestRepository.findByAssuranceId(existingAssurance.getId());
+
+		    if (existingRequests != null && !existingRequests.isEmpty()) {
+		        // Assuming you only expect one matching record, update the first one
+		        ExtensionRequest existingRequest = existingRequests.get(0);  // Get the first match (or apply other logic if needed)
+		        existingRequest.setExtensionFiles(assuranceDTO.getExtensionFiles());
+		        extensionRequestRepository.save(existingRequest);
+		    } else {
+		        // If no existing request is found, create a new one
+		        ExtensionRequest newRequest = new ExtensionRequest();
+		        newRequest.setAssuranceId(existingAssurance.getId());
+		        newRequest.setExtensionFiles(assuranceDTO.getExtensionFiles());
+		        extensionRequestRepository.save(newRequest);
+		    }
 		}
+
+
+//		
+		
 
 		if (assuranceDTO.getLokSabhaNo() != null && assuranceDTO.getLokSabhaSessionNo() != null
 				&& assuranceDTO.getSourceId() != null && assuranceDTO.getQuestionNo() != null) {
