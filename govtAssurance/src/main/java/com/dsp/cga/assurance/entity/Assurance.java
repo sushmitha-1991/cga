@@ -99,7 +99,7 @@ public class Assurance extends Auditable {
 	@Column(name = "report_no", length = 50)
 	private String reportNo;
 
-	@Column(name = "remarks", length = 500)
+	@Column(name = "remarks", length = 2000)
 	private String remarks;
 
 	@Column(name = "due_date_of_implementation")

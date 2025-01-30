@@ -42,7 +42,7 @@ public class PartDetails {
     @Column(name = "status_id")
     private Long statusId;
 
- 
+    @Column(name = "extent_Of_Assurance", length = 2000)
     private String extentOfAssurance;
     
     @ManyToOne
