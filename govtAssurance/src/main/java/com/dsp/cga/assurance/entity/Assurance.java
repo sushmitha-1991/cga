@@ -60,13 +60,13 @@ public class Assurance extends Auditable {
 	@Column(name = "category_id")
 	private Long categoryId;
 
-	@Column(name = "question_no", length = 50)
+	@Column(name = "question_no")
 	private String questionNo;
 
 	@Column(name = "assurance_type_id")
 	private Long assuranceTypeId;
 
-	@Column(name = "subject", length = 200)
+	@Column(name = "subject")
 	private String subject;
 
 	@Column(name = "member_id")
@@ -96,10 +96,10 @@ public class Assurance extends Auditable {
 	@Column(name = "mpa_ref_no")
 	private String mpaRefNo;
 
-	@Column(name = "report_no", length = 50)
+	@Column(name = "report_no")
 	private String reportNo;
 
-	@Column(name = "remarks", length = 2000)
+	@Column(name = "remarks", columnDefinition = "TEXT")
 	private String remarks;
 
 	@Column(name = "due_date_of_implementation")
@@ -108,10 +108,10 @@ public class Assurance extends Auditable {
 	@Column(name = "date_of_implementation")
 	private LocalDate dateOfImplementation;
 
-	@Column(name = "details_of_implementation", columnDefinition = "TEXT", length =500)
+	@Column(name = "details_of_implementation", columnDefinition = "TEXT")
 	private String detailsOfImplementation;
 
-	@Column(name = "text_of_assurance", length = 1000)
+	@Column(name = "text_of_assurance", columnDefinition = "TEXT")
 	private String textOfAssurance;
 
 	@Column(name = "supplementary_page_no")
@@ -138,7 +138,7 @@ public class Assurance extends Auditable {
 	@Column(name = "ans_date")
 	private LocalDate ansDate;
 
-	@Column(name = "group_name", nullable = true, length = 50)
+	@Column(name = "group_name", nullable = true)
 	private String groupName;
 
 	@Column(name = "assuranceNo")

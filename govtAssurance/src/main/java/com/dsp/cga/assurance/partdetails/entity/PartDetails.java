@@ -35,14 +35,14 @@ public class PartDetails {
     private String part;
 
   
-    @Column(name = "subject", length = 255)
+    @Column(name = "subject")
     private String subject;
 
   
     @Column(name = "status_id")
     private Long statusId;
 
-    @Column(name = "extent_Of_Assurance", length = 2000)
+    @Column(name = "extent_Of_Assurance", columnDefinition = "TEXT")
     private String extentOfAssurance;
     
     @ManyToOne
