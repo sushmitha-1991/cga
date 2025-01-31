@@ -93,10 +93,10 @@ public class Assurance extends Auditable {
 	@Column(name = "mpa_ref_date")
 	private LocalDate mpaRefDate;
 
-	@Column(name = "mpa_ref_no")
+	@Column(name = "mpa_ref_no", columnDefinition = "TEXT")
 	private String mpaRefNo;
 
-	@Column(name = "report_no")
+	@Column(name = "report_no", columnDefinition = "TEXT")
 	private String reportNo;
 
 	@Column(name = "remarks", columnDefinition = "TEXT")
@@ -144,10 +144,10 @@ public class Assurance extends Auditable {
 	@Column(name = "assuranceNo")
 	private String assuranceNo;
 
-	@Column(name = "pageNoUncorrected")
+	@Column(name = "pageNoUncorrected", columnDefinition = "TEXT")
 	private String pageNoUncorrected;
 
-	@Column(name = "pageNoCorrected")
+	@Column(name = "pageNoCorrected", columnDefinition = "TEXT")
 	private String pageNoCorrected;
 
 	@ElementCollection(fetch = FetchType.EAGER)

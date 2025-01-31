@@ -49,7 +49,7 @@ public class Supplementary extends Auditable{
 
 	private String part;
 
-	@Column(name = "subject")
+	@Column(name = "subject",columnDefinition = "TEXT")
 	private String subject;
 
 	@Column(name = "status_id")

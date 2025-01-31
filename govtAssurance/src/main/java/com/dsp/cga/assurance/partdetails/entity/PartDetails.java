@@ -35,7 +35,7 @@ public class PartDetails {
     private String part;
 
   
-    @Column(name = "subject")
+    @Column(name = "subject", columnDefinition = "TEXT")
     private String subject;
 
   
