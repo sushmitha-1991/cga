@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,6 +47,7 @@ import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.partdetails.repository.PartDetailsRepository;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.service.AssuranceService;
+import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.assurance.supplementry.repository.SupplementaryRepository;
 import com.dsp.cga.exception.ResourceNotFoundException;
@@ -751,33 +753,95 @@ public class AssuranceServiceImpl implements AssuranceService {
 	        }
 	    }
 
-	    // Update Supplementary - Add new entries only
+//	    // Update Supplementary - Add new entries only
+//	    if (assuranceDTO.getSupplementary() != null) {
+//	        List<Supplementary> existingSupplementary = existingAssurance.getSupplementary();
+//
+//	        // Collect existing IDs for comparison
+//	        Set<Long> existingIds = existingSupplementary.stream()
+//	                .filter(supp -> supp.getId() != null) // Only consider supplementary with IDs
+//	                .map(Supplementary::getId)
+//	                .collect(Collectors.toSet());
+//
+//	        for (SupplementaryDTO suppDTO : assuranceDTO.getSupplementary()) {
+//	            if (suppDTO.getId() == null || !existingIds.contains(suppDTO.getId())) {
+//	                // Add only if it's a new entry
+//	                Supplementary newSupp = assuranceMapper.mapToSupplementaryEntity(suppDTO);
+//	                newSupp.setAssurance(existingAssurance);
+//	                existingSupplementary.add(newSupp);
+//	            }
+//	        }
+//	    }
+
+
 	    if (assuranceDTO.getSupplementary() != null) {
 	        List<Supplementary> existingSupplementary = existingAssurance.getSupplementary();
 
-	        // Collect existing IDs for comparison
-	        Set<Long> existingIds = existingSupplementary.stream()
-	                .filter(supp -> supp.getId() != null) // Only consider supplementary with IDs
-	                .map(Supplementary::getId)
+	        // Collect incoming supplementary IDs from DTO
+	        Set<Long> incomingIds = assuranceDTO.getSupplementary().stream()
+	                .map(SupplementaryDTO::getId)
+	                .filter(Objects::nonNull)
 	                .collect(Collectors.toSet());
 
+	        // Remove supplementary entries not in incoming list
+	        existingSupplementary.removeIf(existing ->
+	                existing.getId() != null && !incomingIds.contains(existing.getId())
+	        );
+
 	        for (SupplementaryDTO suppDTO : assuranceDTO.getSupplementary()) {
-	            if (suppDTO.getId() == null || !existingIds.contains(suppDTO.getId())) {
-	                // Add only if it's a new entry
+	            if (suppDTO.getId() != null) {
+	                // Find the existing supplementary by ID
+	                Optional<Supplementary> existingOpt = existingSupplementary.stream()
+	                        .filter(supp -> supp.getId().equals(suppDTO.getId()))
+	                        .findFirst();
+
+	                if (existingOpt.isPresent()) {
+	                    Supplementary existingSupp = existingOpt.get();
+	                    existingSupp.setSupp(suppDTO.getSupp());
+	                    existingSupp.setMemberId(suppDTO.getMemberId());
+	                    existingSupp.setPart(suppDTO.getPart());
+	                    existingSupp.setSubject(suppDTO.getSubject());
+	                    existingSupp.setStatusId(suppDTO.getStatusId());
+
+	                    // Handle clubbed members update
+	                    List<ClubbedMemberInfo> updatedClubbedMembers = suppDTO.getClubbedMembers().stream()
+	                            .map(dto -> new ClubbedMemberInfo(dto.getClubbedMember(), dto.getPageNumber()))
+	                            .collect(Collectors.toList());
+
+	                    existingSupp.getClubbedMembers().removeIf(existing ->
+	                            updatedClubbedMembers.stream()
+	                                    .noneMatch(newMember ->
+	                                            newMember.getClubbedMember().equals(existing.getClubbedMember()) &&
+	                                            newMember.getPageNumber().equals(existing.getPageNumber()))
+	                    );
+
+	                    existingSupp.getClubbedMembers().addAll(
+	                            updatedClubbedMembers.stream()
+	                                    .filter(newMember -> existingSupp.getClubbedMembers().stream()
+	                                            .noneMatch(existing ->
+	                                                    existing.getClubbedMember().equals(newMember.getClubbedMember()) &&
+	                                                    existing.getPageNumber().equals(newMember.getPageNumber()))
+	                                    )
+	                                    .collect(Collectors.toList())
+	                    );
+
+	                } else {
+	                    // Add new supplementary entry if not found
+	                    Supplementary newSupp = assuranceMapper.mapToSupplementaryEntity(suppDTO);
+	                    newSupp.setAssurance(existingAssurance);
+	                    existingSupplementary.add(newSupp);
+	                }
+	            } else {
+	                // Handle completely new supplementary
 	                Supplementary newSupp = assuranceMapper.mapToSupplementaryEntity(suppDTO);
 	                newSupp.setAssurance(existingAssurance);
 	                existingSupplementary.add(newSupp);
 	            }
 	        }
 	    }
-	    
-//	 // Update ExtensionRequests - Save directly to repository
-//	    if (assuranceDTO.getExtensionFiles() != null && !assuranceDTO.getExtensionFiles().isEmpty()) {
-//	        ExtensionRequest newRequest = new ExtensionRequest();
-//	        newRequest.setAssuranceId(existingAssurance.getId());
-//	        newRequest.setExtensionFiles(assuranceDTO.getExtensionFiles());
-//	        extensionRequestRepository.save(newRequest);
-//	    }
+
+
+
 	    
 //	 // Fetch existing extension request for the assurance ID
 	    List<ExtensionRequest> existingRequests = extensionRequestRepository.findByAssuranceId(existingAssurance.getId());

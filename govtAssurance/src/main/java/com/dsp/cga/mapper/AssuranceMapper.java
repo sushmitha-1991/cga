@@ -286,7 +286,7 @@ public class AssuranceMapper {
 	                .statusId(partDTO.getStatusId())
 	                .extentOfAssurance(partDTO.getExtentOfAssurance())
 	                .build();
-	    }
+	    } 
 
 	public Supplementary mapToSupplementaryEntity(SupplementaryDTO suppDTO) {
 		
@@ -300,8 +300,9 @@ public class AssuranceMapper {
 	                .clubbedMembers(suppDTO.getClubbedMembers().stream()
 	                        .map(dto -> new ClubbedMemberInfo(dto.getClubbedMember(), dto.getPageNumber()))
 	                        .collect(Collectors.toList()))
+	                
+	                
 	               
-
 	                .extentOfAssurance(suppDTO.getExtentOfAssurance())
 	                .build();
 	    }
