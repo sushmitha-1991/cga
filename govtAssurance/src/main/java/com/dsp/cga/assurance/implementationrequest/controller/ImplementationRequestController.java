@@ -1,5 +1,8 @@
 package com.dsp.cga.assurance.implementationrequest.controller;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,9 +11,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
+import com.dsp.cga.assurance.implementationrequest.dto.AssuranceImplementationDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
 import com.dsp.cga.response.GenericResponse;
@@ -79,4 +84,34 @@ public class ImplementationRequestController {
 //						HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Error fetching assurance", null));
 //			}
 		}
+	 
+	 @GetMapping("/implementation-details")
+	 @Operation(summary = "Get Implementation Details by filters")
+	 @ApiResponses(value = {
+	     @ApiResponse(responseCode = "200", description = "Implementation details fetched successfully"),
+	     @ApiResponse(responseCode = "404", description = "No implementation details found"),
+	     @ApiResponse(responseCode = "500", description = "Internal server error")
+	 })
+	 public ResponseEntity<GenericResponse<List<AssuranceImplementationDTO>>> getAssuranceImplementations(
+	         @RequestParam(required = false) Long sessionNo,
+	         @RequestParam(required = false) LocalDate layingDate,
+	         @RequestParam(required = false) Long implementationTypeId,
+	         @RequestParam(required = false) Long statusId,
+	         @RequestParam(required = false) Integer ministryCode
+	 ) {
+	     List<AssuranceImplementationDTO> implementations = implementationRequestService.getAssuranceImplementations(
+	             sessionNo, layingDate, implementationTypeId, statusId, ministryCode);
+
+	     if (implementations.isEmpty()) {
+	         return ResponseEntity.status(HttpStatus.OK)
+	                 .body(new GenericResponse<>(HttpStatus.OK.value(), false, "No implementation details found", null));
+	     }
+
+	     GenericResponse<List<AssuranceImplementationDTO>> response = new GenericResponse<>(HttpStatus.OK.value(),
+	             true, "Implementation details fetched successfully", implementations);
+
+	     return ResponseEntity.ok(response);
+	 }
+
+
 }

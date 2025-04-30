@@ -1,17 +1,24 @@
 package com.dsp.cga.assurance.implementationrequest.service.impl;
 
+import java.time.LocalDate;
+
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
@@ -19,16 +26,24 @@ import com.dsp.cga.assurance.dto.CommitteeDecisionDTO;
 import com.dsp.cga.assurance.dto.ImplementationTypeDTO;
 import com.dsp.cga.assurance.dto.MemberDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
+import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.entity.Ministries;
+import com.dsp.cga.assurance.implementationrequest.dto.AssuranceImplementationDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
+import com.dsp.cga.assurance.repository.CodeRepository;
+import com.dsp.cga.assurance.repository.MasterLSSRepository;
+import com.dsp.cga.assurance.repository.MastersRSSRepository;
+import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.service.impl.AssuranceServiceImpl;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.response.GenericResponse;
+
 
 @Service
 public class ImplemantationRequestServiceImpl implements ImplementationRequestService {
@@ -44,6 +59,18 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	
 	@Autowired
 	private AssuranceRepository assuranceRepository;
+	
+	@Autowired
+	private MinistryRepository ministryRepository;
+	
+	@Autowired
+	private MasterLSSRepository lssRepo;
+	
+	@Autowired
+	private MastersRSSRepository rssRepo;
+	
+	@Autowired
+	private CodeRepository codeRepository;
 
 	@Override
 	public ImplementationRequestDTO createImplementationRequest(ImplementationRequestDTO implementationRequestDTO) {
@@ -197,5 +224,83 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	}
 
 
+
+	@Override
+	public List<AssuranceImplementationDTO> getAssuranceImplementations(Long sessionNo, LocalDate layingDate,
+	        Long implementationTypeId, Long statusId, Integer ministryCode) {
+		
+		 Long ministryId = null;
+		    if (ministryCode != null) {
+		        Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
+		        if (ministry != null) {
+		            ministryId = ministry.getId();
+		        } else {
+		            return List.of(); // No such ministry code
+		        }
+		    }
+
+		    Long houseId = getHouseId();
+		    if (sessionNo == null) {
+		        if (houseId == 1) {
+		            sessionNo = rssRepo.findLatestByCreatedAt();
+		        } else if (houseId == 2) {
+		            sessionNo = lssRepo.findLatestByCreatedAt();
+		        }
+		    }
+
+		    
+	    Specification<ImplementationRequest> spec = ImplementationRequestSpecification.filterByCriteria(
+	            sessionNo, layingDate, implementationTypeId, statusId, ministryId, houseId
+	    );
+
+	    List<ImplementationRequest> implementationRequests = implementationRequestRepository.findAll(spec);
+
+	    if (CollectionUtils.isEmpty(implementationRequests)) {
+	        return List.of();
+	    }
+	    
+	    
+	    return implementationRequests.stream()
+	            .map(implementationRequest -> {
+	                Assurance assurance = assuranceRepository.findById(implementationRequest.getAssuranceId())
+	                        .orElse(null);
+
+	                if (assurance == null) {
+	                    return null;
+	                }
+	            
+	                if ((houseId == 1 && assurance.getRajyaSabhaSessionNo() == null)
+	                        || (houseId == 2 &&
+	                            (assurance.getLokSabhaNo() == null || assurance.getLokSabhaSessionNo() == null))) {
+	                        return null;
+	                    }
+	                
+	                return AssuranceImplementationDTO.builder()
+	                        .assuranceNo(assurance.getAssuranceNo())
+	                     //   .lokSabhaNo(assurance.getLokSabhaNo())
+	                     //   .lokSabhaSessionNo(assurance.getLokSabhaSessionNo())
+	                      //  .statusId(assurance.getStatusId())
+	                       .status(codeRepository.findCodeById(assurance.getStatusId()))
+	                       .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
+	                       .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaNo()))
+	    	                .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()))
+	                        .dueDateOfImplementation(assurance.getDueDateOfImplementation())
+	                        .detailsOfImplementation(assurance.getDetailsOfImplementation())
+	                        .dateOfImplementation(assurance.getDateOfImplementation())
+	                        .build();
+	            })
+	            .filter(Objects::nonNull)
+	            .collect(Collectors.toList());
+	}
+
+
+	private Long getHouseId() {
+		Long houseId = null;
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (principal instanceof UserDetailsDTO) {
+			houseId = ((UserDetailsDTO) principal).getHouseId();
+		}
+		return houseId;
+	}
 
 }
