@@ -1,7 +1,7 @@
 package com.dsp.cga.assurance.implementationrequest.service.impl;
 
 import java.time.LocalDate;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,6 +43,11 @@ import com.dsp.cga.assurance.service.impl.AssuranceServiceImpl;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.response.GenericResponse;
+
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 
 
 @Service
@@ -225,65 +230,158 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 
 
+//	@Override
+//	public List<AssuranceImplementationDTO> getAssuranceImplementations(Long sessionNo, LocalDate layingDate,
+//	        Long implementationTypeId, Long statusId, Integer ministryCode) {
+//		
+//		 Long ministryId = null;
+//		    if (ministryCode != null) {
+//		        Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
+//		        if (ministry != null) {
+//		            ministryId = ministry.getId();
+//		        } else {
+//		            return List.of(); // No such ministry code
+//		        }
+//		    }
+//
+//		    Long houseId = getHouseId();
+//		    if (sessionNo == null) {
+//		        if (houseId == 1) {
+//		            sessionNo = rssRepo.findLatestByCreatedAt();
+//		        } else if (houseId == 2) {
+//		            sessionNo = lssRepo.findLatestByCreatedAt();
+//		        }
+//		    }
+//
+//		    
+//	    Specification<ImplementationRequest> spec = ImplementationRequestSpecification.filterByCriteria(
+//	            sessionNo, layingDate, implementationTypeId, statusId, ministryId, houseId
+//	    );
+//
+//	    List<ImplementationRequest> implementationRequests = implementationRequestRepository.findAll(spec);
+//
+//	    if (CollectionUtils.isEmpty(implementationRequests)) {
+//	        return List.of();
+//	    }
+//	    
+//	    
+//	    return implementationRequests.stream()
+//	            .map(implementationRequest -> {
+//	                Assurance assurance = assuranceRepository.findById(implementationRequest.getAssuranceId())
+//	                        .orElse(null);
+//
+//	                if (assurance == null) {
+//	                    return null;
+//	                }
+//	            
+//	                if ((houseId == 1 && assurance.getRajyaSabhaSessionNo() == null)
+//	                        || (houseId == 2 &&
+//	                            (assurance.getLokSabhaNo() == null || assurance.getLokSabhaSessionNo() == null))) {
+//	                        return null;
+//	                    }
+//	                
+//	                return AssuranceImplementationDTO.builder()
+//	                        .assuranceNo(assurance.getAssuranceNo())
+//	                     //   .lokSabhaNo(assurance.getLokSabhaNo())
+//	                     //   .lokSabhaSessionNo(assurance.getLokSabhaSessionNo())
+//	                      //  .statusId(assurance.getStatusId())
+//	                       .status(codeRepository.findCodeById(assurance.getStatusId()))
+//	                       .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
+//	                       .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaNo()))
+//	    	                .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()))
+//	                        .dueDateOfImplementation(assurance.getDueDateOfImplementation())
+//	                        .detailsOfImplementation(assurance.getDetailsOfImplementation())
+//	                        .dateOfImplementation(assurance.getDateOfImplementation())
+//	                        .build();
+//	            })
+//	            .filter(Objects::nonNull)
+//	            .collect(Collectors.toList());
+//	}
+	
 	@Override
 	public List<AssuranceImplementationDTO> getAssuranceImplementations(Long sessionNo, LocalDate layingDate,
 	        Long implementationTypeId, Long statusId, Integer ministryCode) {
-		
-		 Long ministryId = null;
-		    if (ministryCode != null) {
-		        Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
-		        if (ministry != null) {
-		            ministryId = ministry.getId();
-		        } else {
-		            return List.of(); // No such ministry code
-		        }
-		    }
 
-		    Long houseId = getHouseId();
-		    if (sessionNo == null) {
-		        if (houseId == 1) {
-		            sessionNo = rssRepo.findLatestByCreatedAt();
-		        } else if (houseId == 2) {
-		            sessionNo = lssRepo.findLatestByCreatedAt();
-		        }
-		    }
+	    // Initialize ministryId
+	    final Long ministryId;
+	    
+	    // If ministryCode is not null, get ministryId
+	    if (ministryCode != null) {
+	        Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
+	        if (ministry != null) {
+	            ministryId = ministry.getId();
+	        } else {
+	            return List.of(); // No such ministry code
+	        }
+	    } else {
+	        ministryId = null;
+	    }
 
-		    
-	    Specification<ImplementationRequest> spec = ImplementationRequestSpecification.filterByCriteria(
-	            sessionNo, layingDate, implementationTypeId, statusId, ministryId, houseId
+	    Long houseId = getHouseId();
+	    if (sessionNo == null) {
+	        sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
+	    }
+
+	    // Making sessionNo final for usage inside the lambda
+	    final Long finalSessionNo = sessionNo;
+
+	    // ✅ Lok Sabha Logic
+	    if (houseId == 2) {
+	        // Define the Specification for Lok Sabha
+	        Specification<Assurance> lokSabhaSpecification = (root, query, cb) -> {
+	            List<Predicate> predicates = new ArrayList<>();
+	            predicates.add(cb.isNotNull(root.get("dateOfImplementation")));
+	            predicates.add(cb.equal(root.get("lokSabhaSessionNo"), finalSessionNo));
+
+	            if (layingDate != null) {
+	                predicates.add(cb.equal(root.get("layingDate"), layingDate));
+	            }
+	            if (statusId != null) {
+	                predicates.add(cb.equal(root.get("statusId"), statusId));
+	            }
+	            if (ministryId != null) {
+	                predicates.add(cb.equal(root.get("ministryId"), ministryId));
+	            }
+
+	            return cb.and(predicates.toArray(new Predicate[0]));
+	        };
+
+	        List<Assurance> assurances = assuranceRepository.findAll(lokSabhaSpecification);
+
+	        return assurances.stream()
+	                .map(assurance -> AssuranceImplementationDTO.builder()
+	                        .assuranceNo(assurance.getAssuranceNo())
+	                        .status(codeRepository.findCodeById(assurance.getStatusId()))
+	                        .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
+	                        .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()))
+	                        .dueDateOfImplementation(assurance.getDueDateOfImplementation())
+	                        .detailsOfImplementation(assurance.getDetailsOfImplementation())
+	                        .dateOfImplementation(assurance.getDateOfImplementation())
+	                        .build())
+	                .collect(Collectors.toList());
+	    }
+
+	    // ✅ Rajya Sabha Logic
+	    Specification<ImplementationRequest> rajyaSabhaSpecification = ImplementationRequestSpecification.filterByCriteria(
+	            finalSessionNo, layingDate, implementationTypeId, statusId, ministryId, houseId
 	    );
 
-	    List<ImplementationRequest> implementationRequests = implementationRequestRepository.findAll(spec);
-
+	    List<ImplementationRequest> implementationRequests = implementationRequestRepository.findAll(rajyaSabhaSpecification);
 	    if (CollectionUtils.isEmpty(implementationRequests)) {
 	        return List.of();
 	    }
-	    
-	    
+
 	    return implementationRequests.stream()
 	            .map(implementationRequest -> {
-	                Assurance assurance = assuranceRepository.findById(implementationRequest.getAssuranceId())
-	                        .orElse(null);
-
-	                if (assurance == null) {
+	                Assurance assurance = assuranceRepository.findById(implementationRequest.getAssuranceId()).orElse(null);
+	                if (assurance == null || (houseId == 1 && assurance.getRajyaSabhaSessionNo() == null)) {
 	                    return null;
 	                }
-	            
-	                if ((houseId == 1 && assurance.getRajyaSabhaSessionNo() == null)
-	                        || (houseId == 2 &&
-	                            (assurance.getLokSabhaNo() == null || assurance.getLokSabhaSessionNo() == null))) {
-	                        return null;
-	                    }
-	                
+
 	                return AssuranceImplementationDTO.builder()
 	                        .assuranceNo(assurance.getAssuranceNo())
-	                     //   .lokSabhaNo(assurance.getLokSabhaNo())
-	                     //   .lokSabhaSessionNo(assurance.getLokSabhaSessionNo())
-	                      //  .statusId(assurance.getStatusId())
-	                       .status(codeRepository.findCodeById(assurance.getStatusId()))
-	                       .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
-	                       .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaNo()))
-	    	                .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()))
+	                        .status(codeRepository.findCodeById(assurance.getStatusId()))
+	                        .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()))
 	                        .dueDateOfImplementation(assurance.getDueDateOfImplementation())
 	                        .detailsOfImplementation(assurance.getDetailsOfImplementation())
 	                        .dateOfImplementation(assurance.getDateOfImplementation())
@@ -292,6 +390,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	            .filter(Objects::nonNull)
 	            .collect(Collectors.toList());
 	}
+
+
 
 
 	private Long getHouseId() {

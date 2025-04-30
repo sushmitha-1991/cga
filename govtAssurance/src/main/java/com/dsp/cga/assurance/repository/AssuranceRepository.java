@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,7 @@ import jakarta.persistence.EntityManager;
 
 @Repository
 
-public interface AssuranceRepository extends JpaRepository<Assurance, Long>, AssuranceRepositoryCustom {
+public interface AssuranceRepository extends JpaRepository<Assurance, Long>, AssuranceRepositoryCustom , JpaSpecificationExecutor<Assurance>{
 
 //	@Query("SELECT a FROM Assurance a " +
 //		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL AND a.lokSabhaSessionNo IS NULL " +
@@ -63,6 +64,10 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 			+ "AND (a.assuranceDate <= :toDate or :toDate is null)" + "AND (a.ministryId = :ministryId or :ministryId is null) " + "AND (a.memberId = :memberId or :memberId is null)")
 	List<Assurance> findFilteredAssurancesLs(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
 			@Param("ministryId") Long ministryId, @Param("memberId") Long memberId);
+
+
+
+	//List<Assurance> findAll(Object example);
 
 	
 	
