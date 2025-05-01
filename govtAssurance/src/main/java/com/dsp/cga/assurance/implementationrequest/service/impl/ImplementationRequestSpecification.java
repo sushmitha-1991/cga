@@ -24,19 +24,7 @@ public class ImplementationRequestSpecification {
 	    return (Root<ImplementationRequest> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
 	        List<Predicate> predicates = new ArrayList<>();
 
-//	        if (sessionNo != null) {
-//	            predicates.add(cb.equal(root.get("sessionNo"), sessionNo));
-//	        }
-	        
-//	        if (sessionNo != null && houseId != null) {
-//	            Join<ImplementationRequest, Assurance> assuranceJoin = root.join("assurance");
-//
-//	            if (houseId == 1) {
-//	                predicates.add(cb.equal(assuranceJoin.get("rajyaSabhaSessionNo"), sessionNo));
-//	            } else if (houseId == 2) {
-//	                predicates.add(cb.equal(assuranceJoin.get("lokSabhaSessionNo"), sessionNo));
-//	            }
-//	        }
+
 	        
 	        if (sessionNo != null && houseId != null) {
 	            Subquery<Long> subquery = query.subquery(Long.class);

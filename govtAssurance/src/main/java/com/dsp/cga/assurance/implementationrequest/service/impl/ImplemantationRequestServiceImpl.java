@@ -385,6 +385,11 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                        .dueDateOfImplementation(assurance.getDueDateOfImplementation())
 	                        .detailsOfImplementation(assurance.getDetailsOfImplementation())
 	                        .dateOfImplementation(assurance.getDateOfImplementation())
+	                        .supplementaryId(implementationRequest.getSupplementaryId())
+	                        .partId(implementationRequest.getPartId())
+	                        .reason(implementationRequest.getReason())
+	                        .layingDate(implementationRequest.getLayingDate())
+	                        .implementationTypeId(codeRepository.findCodeById(implementationRequest.getImplementationTypeId()))
 	                        .build();
 	            })
 	            .filter(Objects::nonNull)

@@ -24,5 +24,11 @@ public class AssuranceImplementationDTO {
 	    private String lokSabhaNumber;
 	    private String lokSabhaSessionNumber;
 	    private String rajyaSabhaSessionNumber;
+	    private String supplementaryId;
+	    private String partId;
+	    private String implementationTypeId;
+		private String reason;
+		private LocalDate layingDate;
+	    
 
 }
