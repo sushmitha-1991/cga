@@ -1,57 +1,78 @@
 package com.dsp.cga.assurance.clubbedassurance.service.impl;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.dsp.cga.assurance.clubbedassurance.dto.AssuranceIdNoPairDTO;
+import com.dsp.cga.assurance.clubbedassurance.dto.AssuranceResponseDTO;
 import com.dsp.cga.assurance.clubbedassurance.dto.ClubbedAssuranceDTO;
 import com.dsp.cga.assurance.clubbedassurance.entity.ClubbedAssurance;
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
 import com.dsp.cga.assurance.clubbedassurance.service.ClubbedAssuranceService;
+import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
+import com.dsp.cga.assurance.repository.CodeRepository;
+import com.dsp.cga.assurance.repository.MasterLSSRepository;
+import com.dsp.cga.assurance.repository.MastersRSSRepository;
+import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.mapper.ClubbedAssuranceMapper;
 import com.dsp.cga.response.GenericResponse;
 
+import jakarta.persistence.criteria.Predicate;
+
 @Service
 public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
-	
+
 	@Autowired
 	private ClubbedAssuranceRepository clubbedAssuranceRepository;
-	
+
 	@Autowired
 	private AssuranceRepository assuranceRepository;
 
+	@Autowired
+	private MinistryRepository ministryRepository;
+
+	@Autowired
+	private MasterLSSRepository lssRepo;
+
+	@Autowired
+	private MastersRSSRepository rssRepo;
+
+	@Autowired
+	private CodeRepository codeRepository;
+
 	@Override
-	public GenericResponse<ClubbedAssuranceDTO> createOrUpdateClubbedAssurance(ClubbedAssuranceDTO clubbedAssuranceDTO) {
-	    Optional<ClubbedAssurance> existingAssuranceOpt = clubbedAssuranceRepository
-	            .findByAssuranceId(clubbedAssuranceDTO.getAssuranceId());
+	public GenericResponse<ClubbedAssuranceDTO> createOrUpdateClubbedAssurance(
+			ClubbedAssuranceDTO clubbedAssuranceDTO) {
+		Optional<ClubbedAssurance> existingAssuranceOpt = clubbedAssuranceRepository
+				.findByAssuranceId(clubbedAssuranceDTO.getAssuranceId());
 
-	    ClubbedAssurance savedAssurance;
+		ClubbedAssurance savedAssurance;
 
-	    if (existingAssuranceOpt.isPresent()) {
-	        ClubbedAssurance existingAssurance = existingAssuranceOpt.get();
-	        ClubbedAssuranceMapper.updateEntityFromDTO(clubbedAssuranceDTO, existingAssurance);
-	        savedAssurance = clubbedAssuranceRepository.save(existingAssurance);
-	    } else {
-	        ClubbedAssurance newAssurance = ClubbedAssuranceMapper.toEntity(clubbedAssuranceDTO);
-	        savedAssurance = clubbedAssuranceRepository.save(newAssurance);
-	    }
+		if (existingAssuranceOpt.isPresent()) {
+			ClubbedAssurance existingAssurance = existingAssuranceOpt.get();
+			ClubbedAssuranceMapper.updateEntityFromDTO(clubbedAssuranceDTO, existingAssurance);
+			savedAssurance = clubbedAssuranceRepository.save(existingAssurance);
+		} else {
+			ClubbedAssurance newAssurance = ClubbedAssuranceMapper.toEntity(clubbedAssuranceDTO);
+			savedAssurance = clubbedAssuranceRepository.save(newAssurance);
+		}
 
-	    ClubbedAssuranceDTO savedDTO = ClubbedAssuranceMapper.toDTO(savedAssurance);
-	    return new GenericResponse<>(
-	            HttpStatus.CREATED.value(),
-	            true,
-	            "ClubbedAssurance created or updated successfully",
-	            savedDTO
-	    );
+		ClubbedAssuranceDTO savedDTO = ClubbedAssuranceMapper.toDTO(savedAssurance);
+		return new GenericResponse<>(HttpStatus.CREATED.value(), true,
+				"ClubbedAssurance created or updated successfully", savedDTO);
 	}
-
 
 //	@Override
 //	public ClubbedAssuranceDTO getClubbedAssuranceByAssuranceId(Long id) {
@@ -79,46 +100,121 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 //	    return dto;
 //	}
 
-
 	@Override
 	public List<ClubbedAssuranceDTO> getClubbedAssurancesByAssuranceId(Long assuranceId) {
-	    List<ClubbedAssurance> clubbedAssurances = clubbedAssuranceRepository.findClubbedAssuranceByAssuranceId(assuranceId);
+		List<ClubbedAssurance> clubbedAssurances = clubbedAssuranceRepository
+				.findClubbedAssuranceByAssuranceId(assuranceId);
 
-	    // Fetch AssuranceNo for the given assuranceId
-	    String assuranceNo = fetchAssuranceNoById(assuranceId);
+		// Fetch AssuranceNo for the given assuranceId
+		String assuranceNo = fetchAssuranceNoById(assuranceId);
 
-	    return clubbedAssurances.stream()
-	            .map(clubbedAssurance -> {
-	                // Map the main ClubbedAssurance
-	                ClubbedAssuranceDTO dto = ClubbedAssuranceMapper.toDTO(clubbedAssurance);
-	                dto.setAssuranceId(assuranceId);
-	                dto.setAssuranceNo(assuranceNo);
+		return clubbedAssurances.stream().map(clubbedAssurance -> {
+			// Map the main ClubbedAssurance
+			ClubbedAssuranceDTO dto = ClubbedAssuranceMapper.toDTO(clubbedAssurance);
+			dto.setAssuranceId(assuranceId);
+			dto.setAssuranceNo(assuranceNo);
 
-	                // Fetch AssuranceId and AssuranceNo pairs for clubbedAssuranceIds
-	                List<AssuranceIdNoPairDTO> clubbedPairs = clubbedAssurance.getClubbedAssuranceIds().stream()
-	                        .map(id -> {
-	                            String no = fetchAssuranceNoById(id);
-	                            return AssuranceIdNoPairDTO.builder()
-	                                    .id(id)
-	                                    .no(no)
-	                                    .build();
-	                        })
-	                        .collect(Collectors.toList());
-System.out.println(clubbedPairs);
-	                dto.setClubbedAssurances(clubbedPairs);
-	                return dto;
-	            })
-	            .collect(Collectors.toList());
+			// Fetch AssuranceId and AssuranceNo pairs for clubbedAssuranceIds
+			List<AssuranceIdNoPairDTO> clubbedPairs = clubbedAssurance.getClubbedAssuranceIds().stream().map(id -> {
+				String no = fetchAssuranceNoById(id);
+				return AssuranceIdNoPairDTO.builder().id(id).no(no).build();
+			}).collect(Collectors.toList());
+			System.out.println(clubbedPairs);
+			dto.setClubbedAssurances(clubbedPairs);
+			return dto;
+		}).collect(Collectors.toList());
 	}
 
 	// Fetch AssuranceNo by AssuranceId
 	private String fetchAssuranceNoById(Long assuranceId) {
-	    Optional<Assurance> assurance = assuranceRepository.findById(assuranceId);
-	    return assurance.map(Assurance::getAssuranceNo).orElse(null);
+		Optional<Assurance> assurance = assuranceRepository.findById(assuranceId);
+		return assurance.map(Assurance::getAssuranceNo).orElse(null);
+	}
+	@Override
+	public List<AssuranceResponseDTO> getFilteredClubbedAssurances(Long sessionNo, LocalDate assuranceDate,
+			Long statusId, Integer ministryCode) {
+
+		// 🔹 Convert ministryCode to ministryId
+		final Long ministryId;
+		if (ministryCode != null) {
+			Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
+			if (ministry != null) {
+				ministryId = ministry.getId();
+			} else {
+				return List.of(); // Invalid ministry code
+			}
+		} else {
+			ministryId = null;
+		}
+
+		// 🔹 Get current houseId
+		Long houseId = getHouseId();
+
+		// 🔹 Use latest session if sessionNo is null
+		if (sessionNo == null) {
+			sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
+		}
+		Long finalSessionNo = sessionNo;
+
+		// 🔹 Step 1: Get assuranceIds from clubbed_assurances table
+		List<Long> assuranceIdsInClubbed = clubbedAssuranceRepository.findAll().stream()
+				.map(ClubbedAssurance::getAssuranceId)
+				.toList();
+
+		if (assuranceIdsInClubbed.isEmpty()) {
+			return List.of(); // No data in clubbed
+		}
+
+		// 🔹 Step 2: Filter Assurance where ID in clubbed list
+		Specification<Assurance> specification = (root, query, cb) -> {
+			List<Predicate> predicates = new ArrayList<>();
+
+			predicates.add(root.get("id").in(assuranceIdsInClubbed)); // 👈 filter by clubbed assurance IDs
+
+			if (assuranceDate != null) {
+				predicates.add(cb.equal(root.get("assuranceDate"), assuranceDate));
+			}
+			if (statusId != null) {
+				predicates.add(cb.equal(root.get("statusId"), statusId));
+			}
+			if (ministryId != null) {
+				predicates.add(cb.equal(root.get("ministryId"), ministryId));
+			}
+			if (houseId == 1) {
+				predicates.add(cb.equal(root.get("rajyaSabhaSessionNo"), finalSessionNo));
+			} else {
+				predicates.add(cb.equal(root.get("lokSabhaSessionNo"), finalSessionNo));
+			}
+			return cb.and(predicates.toArray(new Predicate[0]));
+		};
+
+		List<Assurance> assurances = assuranceRepository.findAll(specification);
+
+		// 🔹 Step 3: Map to DTO
+		return assurances.stream().map(a -> {
+			ClubbedAssurance clubbed = clubbedAssuranceRepository.findByAssuranceId(a.getId()).orElse(null);
+
+			return AssuranceResponseDTO.builder()
+					.assuranceNo(a.getAssuranceNo())
+					.lokSabhaSessionNo(a.getLokSabhaSessionNo() != null ? lssRepo.findSessionNumberById(a.getLokSabhaSessionNo()) : null)
+					.lokSabhaNo(a.getLokSabhaNo() != null ? lssRepo.findLokSabhaNumberById(a.getLokSabhaNo()) : null)
+					.rajyaSabhaSessionNo(a.getRajyaSabhaSessionNo() != null ? rssRepo.findSessionNumberById(a.getRajyaSabhaSessionNo()) : null)
+					.assuranceDate(a.getAssuranceDate())
+					.questionNo(a.getQuestionNo())
+					.status(codeRepository.findCodeById(a.getStatusId()))
+					.clubbedAssuranceIds(clubbed != null ? clubbed.getClubbedAssuranceIds() : List.of())
+					.build();
+		}).collect(Collectors.toList());
 	}
 
 
-
-
+	private Long getHouseId() {
+		Long houseId = null;
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (principal instanceof UserDetailsDTO) {
+			houseId = ((UserDetailsDTO) principal).getHouseId();
+		}
+		return houseId;
+	}
 
 }

@@ -1,5 +1,6 @@
 package com.dsp.cga.assurance.clubbedassurance.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dsp.cga.assurance.clubbedassurance.dto.AssuranceResponseDTO;
 import com.dsp.cga.assurance.clubbedassurance.dto.ClubbedAssuranceDTO;
 import com.dsp.cga.assurance.clubbedassurance.service.ClubbedAssuranceService;
 import com.dsp.cga.response.GenericResponse;
@@ -89,5 +92,35 @@ public class ClubbedAssuranceController {
 
 		    return ResponseEntity.ok(response);
 		}
+
+	 @GetMapping("/clubbedAssurance")
+	 @Operation(summary = "Get Filtered Clubbed Assurances")
+	 @ApiResponses(value = {
+	     @ApiResponse(responseCode = "200", description = "Assurances retrieved successfully"),
+	     @ApiResponse(responseCode = "500", description = "Internal server error")
+	 })
+	 public ResponseEntity<GenericResponse<List<AssuranceResponseDTO>>> getAssurances(
+	         @RequestParam(required = false) Long sessionNo,
+	         @RequestParam(required = false) LocalDate assuranceDate,
+	         @RequestParam(required = false) Long statusId,
+	         @RequestParam(required = false) Integer ministryCode) {
+
+	     List<AssuranceResponseDTO> response = clubbedAssuranceService.getFilteredClubbedAssurances(
+	             sessionNo, assuranceDate, statusId, ministryCode
+	     );
+
+	     if (response.isEmpty()) {
+	         return ResponseEntity.ok(
+	                 new GenericResponse<>(HttpStatus.OK.value(), false, "No assurances found", null)
+	         );
+	     }
+
+	     GenericResponse<List<AssuranceResponseDTO>> genericResponse = new GenericResponse<>(
+	             HttpStatus.OK.value(), true, "Assurances retrieved successfully", response
+	     );
+
+	     return ResponseEntity.ok(genericResponse);
+	 }
+
 
 }
