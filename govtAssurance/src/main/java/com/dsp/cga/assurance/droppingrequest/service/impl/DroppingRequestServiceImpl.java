@@ -1,18 +1,25 @@
 package com.dsp.cga.assurance.droppingrequest.service.impl;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.dsp.cga.assurance.droppingrequest.dto.AssuranceDroppingResponseDTO;
 import com.dsp.cga.assurance.droppingrequest.dto.DroppingRequestDTO;
 import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
 import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
@@ -20,11 +27,19 @@ import com.dsp.cga.assurance.droppingrequest.service.DroppingRequestService;
 import com.dsp.cga.assurance.dto.AcceptedDTO;
 import com.dsp.cga.assurance.dto.DroppingTypeDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
+import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.implementationrequest.service.impl.ImplemantationRequestServiceImpl;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
+import com.dsp.cga.assurance.repository.CodeRepository;
+import com.dsp.cga.assurance.repository.MasterLSSRepository;
+import com.dsp.cga.assurance.repository.MastersRSSRepository;
+import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.mapper.DroppingRequestMapper;
 import com.dsp.cga.response.GenericResponse;
+
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 public class DroppingRequestServiceImpl implements DroppingRequestService {
@@ -40,6 +55,18 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	@Autowired
 	private RestTemplate restTemplate;
 
+	@Autowired
+	private MinistryRepository ministryRepository;
+	
+	@Autowired
+	private MasterLSSRepository lssRepo;
+	
+	@Autowired
+	private MastersRSSRepository rssRepo;
+	
+	@Autowired
+	private CodeRepository codeRepository;
+	
 	@Autowired
 	private AssuranceRepository assuranceRepository;
 
@@ -167,4 +194,121 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		return new GenericResponse<>(HttpStatus.CREATED.value(), true,
 				"DroppingRequest created or updated successfully", savedDTO);
 	}
+
+
+	@Override
+	public List<AssuranceDroppingResponseDTO> getFilteredDroppingRequests(Long sessionNo,
+	        Long droppingTypeId,
+	        LocalDate requestedDate,
+	        LocalDate dateOfDropping,
+	        Long statusId,
+	        Integer ministryCode) {
+
+	    // 🔹 Get ministryId from ministryCode
+	    final Long ministryId;
+	    if (ministryCode != null) {
+	        Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
+	        if (ministry != null) {
+	            ministryId = ministry.getId();
+	        } else {
+	            return List.of(); // Invalid ministryCode
+	        }
+	    } else {
+	        ministryId = null;
+	    }
+
+	    // 🔹 Determine houseId
+	    Long houseId = getHouseId(); // Implement this method
+
+	    // 🔹 Get latest session if sessionNo is null
+	    if (sessionNo == null) {
+	        sessionNo = (houseId == 1)
+	                ? rssRepo.findLatestByCreatedAt()
+	                : lssRepo.findLatestByCreatedAt();
+	    }
+
+	    Long finalSessionNo = sessionNo;
+
+	    // 🔹 Specification for DroppingRequest entity
+	    Specification<DroppingRequest> specification = (root, query, cb) -> {
+	        List<Predicate> predicates = new ArrayList<>();
+
+	        if (droppingTypeId != null) {
+	            predicates.add(cb.equal(root.get("droppingType"), droppingTypeId));
+	        }
+
+	        if (requestedDate != null) {
+	            predicates.add(cb.equal(root.get("dropRequestDate"), requestedDate));
+	        }
+
+	        if (dateOfDropping != null) {
+	            predicates.add(cb.equal(root.get("actualDropDate"), dateOfDropping));
+	        }
+
+	        return cb.and(predicates.toArray(new Predicate[0]));
+	    };
+
+	
+	    List<DroppingRequest> filteredList = droppingRequestRepository.findAll(specification).stream()
+	            .filter(dr -> {
+	                Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
+	                if (assurance == null) return false;
+
+	                if (houseId == 1) {
+	                    return finalSessionNo.equals(assurance.getRajyaSabhaSessionNo());
+	                } else {
+	                    return finalSessionNo.equals(assurance.getLokSabhaSessionNo());
+	                }
+	            })
+	            .filter(dr -> {
+	                Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
+	                if (assurance == null) return false;
+
+	                if (statusId != null && !statusId.equals(assurance.getStatusId())) return false;
+	                if (ministryId != null && !ministryId.equals(assurance.getMinistryId())) return false;
+
+	                return true;
+	            })
+	            .collect(Collectors.toList());
+
+	    // 🔹 Map to DTO
+	    return filteredList.stream()
+	            .map(dr -> {
+	                Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
+	                return AssuranceDroppingResponseDTO.builder()
+	                		.lokSabhaNo(assurance != null
+	                        ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo())
+	                        : null)
+	                        .lokSabhaSessionNo(assurance != null
+	                                ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
+	                                : null)
+	                        .rajyaSabhaSessionNo(assurance != null
+	                                ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
+	                                : null)
+	                        .partId(dr.getPartId())
+	                        .supplementaryId(dr.getSupplementaryId())
+	                      
+	                        .droppingType(assurance != null
+	                                ? codeRepository.findCodeById(dr.getDroppingType())
+	                                : null)
+	                        .dropRequestDate(dr.getDropRequestDate())
+	                        .actualDropDate(dr.getActualDropDate())
+	                        .status(assurance != null
+	                                ? codeRepository.findCodeById(assurance.getStatusId())
+	                                : null)
+	                        .remarks(dr.getRemarks())
+	                        .build();
+	            })
+	            .collect(Collectors.toList());
+	}
+
+
+		private Long getHouseId() {
+			Long houseId = null;
+			Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			if (principal instanceof UserDetailsDTO) {
+				houseId = ((UserDetailsDTO) principal).getHouseId();
+			}
+			return houseId;
+		}
 }

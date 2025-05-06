@@ -1,6 +1,10 @@
 package com.dsp.cga.assurance.droppingrequest.controller;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,9 +12,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dsp.cga.assurance.droppingrequest.dto.AssuranceDroppingResponseDTO;
 import com.dsp.cga.assurance.droppingrequest.dto.DroppingRequestDTO;
+import com.dsp.cga.assurance.droppingrequest.dto.DroppingResponseWrapperDTO;
 import com.dsp.cga.assurance.droppingrequest.service.DroppingRequestService;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.response.GenericResponse;
@@ -61,5 +68,38 @@ public class DroppingRequestController {
 	        GenericResponse<DroppingRequestDTO> response = droppingRequestService.createOrUpdateDroppingRequest(droppingRequestDTO);
 	        return ResponseEntity.status(HttpStatus.OK).body(response);
 	    }
+	 @GetMapping("/assurance-droppingRequest")
+	 @Operation(summary = "Get filtered Dropping Requests")
+	 @ApiResponses(value = {
+	         @ApiResponse(responseCode = "200", description = "Filtered dropping requests fetched successfully"),
+	         @ApiResponse(responseCode = "500", description = "Internal server error")
+	 })
+	 public ResponseEntity<GenericResponse<DroppingResponseWrapperDTO>> getFilteredDroppingRequests(
+	         @RequestParam(required = false) Long sessionNo,
+	         @RequestParam(required = false) Long droppingTypeId,
+	         @RequestParam(required = false) Integer ministryCode,
+	         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedDate,
+	         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfDropping,
+	         @RequestParam(required = false) Long statusId) {
+
+	     List<AssuranceDroppingResponseDTO> result = droppingRequestService.getFilteredDroppingRequests(
+	             sessionNo, droppingTypeId, requestedDate, dateOfDropping, statusId, ministryCode);
+
+	     DroppingResponseWrapperDTO wrapper = DroppingResponseWrapperDTO.builder()
+	             .data(result)
+	             .count(result.size())
+	             .build();
+
+	     GenericResponse<DroppingResponseWrapperDTO> response = new GenericResponse<>(
+	             HttpStatus.OK.value(),
+	             true,
+	             "Filtered dropping requests fetched successfully",
+	             wrapper
+	     );
+
+	     return ResponseEntity.ok(response);
+	 }
+
+
 	 
 }
