@@ -1,5 +1,6 @@
 package com.dsp.cga.assurance.extensionrequest.service.impl;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,15 +12,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.dsp.cga.assurance.dto.StatusDTO;
+import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
+import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestResponseDTO;
 import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
 import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestRepository;
 //import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestRepository;
@@ -27,9 +33,17 @@ import com.dsp.cga.assurance.extensionrequest.service.ExtensionRequestService;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
+import com.dsp.cga.assurance.repository.CodeRepository;
+import com.dsp.cga.assurance.repository.MasterLSSRepository;
+import com.dsp.cga.assurance.repository.MastersRSSRepository;
+import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.mapper.ExtensionRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.response.GenericResponse;
+
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 public class ExtensionRequestServiceImpl implements ExtensionRequestService {
@@ -48,6 +62,18 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	
 	@Autowired
 	private AssuranceRepository assuranceRepository;
+	
+	@Autowired
+	private MinistryRepository ministryRepository;
+	
+	@Autowired
+	private MasterLSSRepository lssRepo;
+	
+	@Autowired
+	private MastersRSSRepository rssRepo;
+	
+	@Autowired
+	private CodeRepository codeRepository;
 
 	@Override
 	public ExtensionRequestDTO createExtensionRequest(ExtensionRequestDTO extensionRequestDTO) {
@@ -174,6 +200,116 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 		log.debug("Fetched StatusDTO: {}", statusDTO);
 
 		return statusDTO;
+	}
+
+	@Override
+	public List<ExtensionRequestResponseDTO> getFilteredExtensions(Long sessionNo, Long statusId,
+	        LocalDate extRequestedTillDate, LocalDate extGrantedTillDate, LocalDate ministryRefDate,
+	        Integer ministryCode) {
+
+	    // 🔹 Get ministryId using ministryCode
+	    final Long ministryId;
+	    if (ministryCode != null) {
+	        Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
+	        if (ministry != null) {
+	            ministryId = ministry.getId();
+	        } else {
+	            return List.of(); // Invalid ministryCode
+	        }
+	    } else {
+	        ministryId = null;
+	    }
+
+	    // 🔹 Determine houseId (Lok Sabha = 2, Rajya Sabha = 1)
+	    Long houseId = getHouseId(); // You should have this implemented
+
+	    if (sessionNo == null) {
+	        sessionNo = (houseId == 1)
+	            ? rssRepo.findLatestByCreatedAt()
+	            : lssRepo.findLatestByCreatedAt();
+	    }
+
+	    Long finalSessionNo = sessionNo;
+
+	    // 🔹 Specification without join
+	    Specification<ExtensionRequest> specification = (root, query, cb) -> {
+	        List<Predicate> predicates = new ArrayList<>();
+
+	        if (statusId != null) {
+	            predicates.add(cb.equal(root.get("statusId"), statusId));
+	        }
+
+	        if (extRequestedTillDate != null) {
+	            predicates.add(cb.equal(root.get("extRequestedTillDate"), extRequestedTillDate));
+	        }
+
+	        if (extGrantedTillDate != null) {
+	            predicates.add(cb.equal(root.get("extGrantedTillDate"), extGrantedTillDate));
+	        }
+
+	        if (ministryRefDate != null) {
+	            predicates.add(cb.equal(root.get("ministryRefDate"), ministryRefDate));
+	        }
+
+	        return cb.and(predicates.toArray(new Predicate[0]));
+	    };
+
+	    // 🔹 Fetch and filter manually using assuranceId
+	    List<ExtensionRequest> filteredList = extenionRequestRepository.findAll(specification).stream()
+	        .filter(er -> {
+	            Assurance assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
+	            if (assurance == null) return false;
+
+	            if (houseId == 1) {
+	                if (assurance.getRajyaSabhaSessionNo() == null) return false;
+	                if (finalSessionNo != null && !finalSessionNo.equals(assurance.getRajyaSabhaSessionNo())) return false;
+	            } else if (houseId == 2) {
+	                if (assurance.getLokSabhaSessionNo() == null || assurance.getLokSabhaNo() == null) return false;
+	                if (finalSessionNo != null && !finalSessionNo.equals(assurance.getLokSabhaSessionNo())) return false;
+	            }
+
+	            if (ministryId != null && !ministryId.equals(assurance.getMinistryId())) return false;
+
+	            return true;
+	        })
+	        .collect(Collectors.toList());
+
+	    // 🔹 Convert to DTO
+	    return filteredList.stream().map(er -> {
+	        Assurance assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
+	        return ExtensionRequestResponseDTO.builder()
+	                .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
+	                
+	                .extensionNo(er.getExtensionNo())
+	                .status(codeRepository.findCodeById(
+	                        assurance != null ? assurance.getStatusId() : null))
+	                .lokSabhaSessionNo(assurance != null
+	                        ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
+	                        : null)
+	                .lokSabhaNo(assurance != null
+                    ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo())
+                    : null)
+	                .rajyaSabhaSessionNumber(assurance != null
+                    ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
+                    : null)
+	                .remarks(er.getRemarks())
+	                .extGrantedTillDate(er.getExtGrantedTillDate())
+	                .extRequestedTillDate(er.getExtRequestedTillDate())
+	                .ministryRefDate(er.getMinistryRefDate())
+	                .ministryRefNo(er.getMinistryRefNo())
+	                .build();
+	    }).collect(Collectors.toList());
+	}
+
+
+	
+	private Long getHouseId() {
+		Long houseId = null;
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (principal instanceof UserDetailsDTO) {
+			houseId = ((UserDetailsDTO) principal).getHouseId();
+		}
+		return houseId;
 	}
 
 }

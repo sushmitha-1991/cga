@@ -1,8 +1,10 @@
 package com.dsp.cga.assurance.extensionrequest.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,9 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
+import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestResponseDTO;
 import com.dsp.cga.assurance.extensionrequest.service.ExtensionRequestService;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.response.GenericResponse;
@@ -83,6 +87,21 @@ public class ExtensionRequestController {
 
 	    // Return the response wrapped in ResponseEntity
 	    return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	@GetMapping("/extension-requests")
+	public ResponseEntity<List<ExtensionRequestResponseDTO>> getExtensionRequests(
+	    @RequestParam(required = false) Long sessionNo,
+	    @RequestParam(required = false) Long statusId,
+	    @RequestParam(required = false) Integer ministryCode,
+	    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate extRequestedTillDate,
+	    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate extGrantedTillDate,
+	    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ministryRefDate
+	) {
+	    List<ExtensionRequestResponseDTO> results = extensionRequestService.getFilteredExtensions(
+	        sessionNo, statusId, extRequestedTillDate, extGrantedTillDate, ministryRefDate,ministryCode
+	    );
+	    return ResponseEntity.ok(results);
 	}
 
 }
