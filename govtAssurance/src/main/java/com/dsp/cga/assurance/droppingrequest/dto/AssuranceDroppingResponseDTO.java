@@ -20,6 +20,7 @@ public class AssuranceDroppingResponseDTO {
     private String droppingType;
     private LocalDate dropRequestDate;
     private LocalDate actualDropDate;
+    private String assuranceNo;
     private String status;
     private String remarks;
 }

@@ -292,6 +292,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	                .rajyaSabhaSessionNumber(assurance != null
                     ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
                     : null)
+	                .questionNo(assurance.getQuestionNo())
 	                .remarks(er.getRemarks())
 	                .extGrantedTillDate(er.getExtGrantedTillDate())
 	                .extRequestedTillDate(er.getExtRequestedTillDate())

@@ -23,7 +23,7 @@ public class ExtensionRequestResponseDTO {
     private LocalDate extGrantedTillDate;
     private LocalDate extRequestedTillDate;
     private String ministryRefNo;
-
+    private String questionNo;
 
 	private LocalDate ministryRefDate;
 	private String lokSabhaSessionNo;

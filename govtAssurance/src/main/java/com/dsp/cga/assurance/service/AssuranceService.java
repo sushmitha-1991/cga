@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
+import com.dsp.cga.assurance.implementationrequest.dto.AssuranceWithImplementationRequestDTO;
 
 public interface AssuranceService {
 
@@ -28,6 +29,12 @@ public interface AssuranceService {
 	List<AssuranceDTO> getAllLokSabhaAssurance();
 
 	List<AssuranceDTO> getFilteredAssurancesLs(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId);
+
+	
+
+	List<String> getAssuranceNos(Integer ministryCode, Long sessionNo, Integer houseId);
+
+	void createAssuranceWithImplementation(AssuranceWithImplementationRequestDTO dto);
 
 	
 

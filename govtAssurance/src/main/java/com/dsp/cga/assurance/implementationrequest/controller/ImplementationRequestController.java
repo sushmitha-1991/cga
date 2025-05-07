@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceImplementationDTO;
+import com.dsp.cga.assurance.implementationrequest.dto.AssuranceWithImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
+import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +32,9 @@ public class ImplementationRequestController {
 	
 	@Autowired
 	private ImplementationRequestService implementationRequestService;
+	
+	@Autowired
+	private AssuranceService assuranceService;
 	
 	@PostMapping("/create")
 	 @Operation(summary = "Create a new Assurance")
@@ -113,5 +118,19 @@ public class ImplementationRequestController {
 	     return ResponseEntity.ok(response);
 	 }
 
+	 @PostMapping("/assurance/create")
+	 public ResponseEntity<GenericResponse<Void>> createAssuranceWithImplementation(
+	         @RequestBody AssuranceWithImplementationRequestDTO dto) {
+
+	     assuranceService.createAssuranceWithImplementation(dto);
+
+	     GenericResponse<Void> response = new GenericResponse<>(
+	             HttpStatus.CREATED.value(),
+	             true,
+	             "Assurance and ImplementationRequest created successfully",
+	             null
+	     );
+	     return new ResponseEntity<>(response, HttpStatus.CREATED);
+	 }
 
 }

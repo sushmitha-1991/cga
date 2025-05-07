@@ -285,6 +285,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	                        .rajyaSabhaSessionNo(assurance != null
 	                                ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
 	                                : null)
+	                        .assuranceNo(assurance.getAssuranceNo())
 	                        .partId(dr.getPartId())
 	                        .supplementaryId(dr.getSupplementaryId())
 	                      

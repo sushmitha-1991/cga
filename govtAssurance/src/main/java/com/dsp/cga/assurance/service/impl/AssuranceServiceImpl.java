@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -40,12 +41,18 @@ import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.SupplementDTO;
 import com.dsp.cga.assurance.dto.SupplementaryDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
 import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestRepository;
+import com.dsp.cga.assurance.implementationrequest.dto.AssuranceWithImplementationRequestDTO;
+import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
+import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
+import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 //import com.dsp.cga.assurance.external.service.ExternalService;
 import com.dsp.cga.assurance.partdetails.repository.PartDetailsRepository;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
+import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
@@ -104,6 +111,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 	private AssuranceMapper assuranceMapper;
 	
 	@Autowired
+	private ImplementationRequestService implementationRequestService;
+	
+	@Autowired
 	private SupplementaryMapper supplementaryMapper;
 	
 	@Autowired
@@ -116,7 +126,13 @@ public class AssuranceServiceImpl implements AssuranceService {
 	private RestTemplate restTemplate;
 	
 	@Autowired
+	private MinistryRepository ministryRepository;
+	
+	@Autowired
 	private ExtensionRequestRepository extensionRequestRepository;
+	
+	@Autowired
+	private ImplementationRequestRepository implementationRequestRepository;
 
 	@Transactional
 	@Override
@@ -1062,18 +1078,58 @@ public class AssuranceServiceImpl implements AssuranceService {
 	    log.debug("Returning list of AssuranceDTOs for LS: {}", assuranceDTOs);
 	    return assuranceDTOs;
 	}
-	
 
-//	String generateAssuranceNo(Long categoryId) {
-//		
-//		category label =  Get the lable of CategoryId
-//		
-//		String prefix = get From enum (category label)
-//		
-//		Get ls no & ls session no 
-//		
-//		Create assurance no
-//	}
+	@Override
+	public List<String> getAssuranceNos(Integer ministryCode, Long sessionNo, Integer houseId) {
+		  final Long ministryId;
+	        if (ministryCode != null) {
+	            Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
+	            if (ministry != null) {
+	                ministryId = ministry.getId();
+	            } else {
+	                return List.of(); // Invalid ministryCode
+	            }
+	        } else {
+	            ministryId = null;
+	        }
+
+	        Specification<Assurance> spec = AssuranceSpecification.filterByParams(ministryId, sessionNo, houseId);
+
+	        return assuranceRepository.findAll(spec)
+	                .stream()
+	                .map(Assurance::getAssuranceNo)
+	                .filter(Objects::nonNull)
+	                .collect(Collectors.toList());
+	    }
+
+	@Override
+	public void createAssuranceWithImplementation(AssuranceWithImplementationRequestDTO dto) {
+		 Assurance assurance = Assurance.builder()
+	                .assuranceNo(dto.getAssuranceNo())
+	                .lokSabhaSessionNo(dto.getSessionNo()) // assuming session is LS
+	                .questionNo(dto.getQuestionNo())
+	                .subject(dto.getSubject())
+	                .ministryId(dto.getMinistryId())
+	                .departmentId(dto.getDepartmentId())
+	                .memberId(dto.getMemberId())
+	                .build();
+
+	        Assurance savedAssurance = assuranceRepository.save(assurance);
+
+	        ImplementationRequest implRequest = ImplementationRequest.builder()
+	                .assuranceId(savedAssurance.getId())
+	                .implementationTypeId(dto.getImplementationTypeId())
+	                .partId(dto.getPartId())
+	                .supplementaryId(dto.getSupplementaryId())
+	                .layingDate(dto.getLayingDate())
+	                .reason(dto.getReason())
+	                .implementationReportFiles(dto.getImplementationReportFiles())
+	                .partReportFiles(dto.getPartReportFiles())
+	                .draftStatus(false)
+	                .build();
+
+	        implementationRequestRepository.save(implRequest);
+	    }
 
 
 }
