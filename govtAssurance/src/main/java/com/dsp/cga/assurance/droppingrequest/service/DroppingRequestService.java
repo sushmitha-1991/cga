@@ -16,4 +16,6 @@ public interface DroppingRequestService {
 	List<AssuranceDroppingResponseDTO> getFilteredDroppingRequests(Long sessionNo, Long droppingTypeId,
 			LocalDate requestedDate, LocalDate dateOfDropping, Long statusId, Integer ministryCode);
 
+	DroppingRequestDTO createDroppingRequest(DroppingRequestDTO droppingRequestDTO);
+
 }

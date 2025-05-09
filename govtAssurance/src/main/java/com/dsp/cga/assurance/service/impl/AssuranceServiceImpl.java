@@ -136,6 +136,10 @@ public class AssuranceServiceImpl implements AssuranceService {
 	private MastersRSSRepository rssRepo;
 	
 	@Autowired
+	private MinistryRepository ministryRepo;
+
+	
+	@Autowired
 	private ImplementationRequestService implementationRequestService;
 	
 	@Autowired

@@ -312,4 +312,11 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 			}
 			return houseId;
 		}
+
+		@Override
+		public DroppingRequestDTO createDroppingRequest(DroppingRequestDTO droppingRequestDTO) {
+			  DroppingRequest entity = DroppingRequestMapper.toEntity(droppingRequestDTO);
+		        DroppingRequest saved = droppingRequestRepository.save(entity);
+		        return DroppingRequestMapper.toDTO(saved);
+		    }
 }

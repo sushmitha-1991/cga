@@ -74,12 +74,15 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	
 	@Autowired
 	private CodeRepository codeRepository;
+	
+
 
 	@Override
 	public ExtensionRequestDTO createExtensionRequest(ExtensionRequestDTO extensionRequestDTO) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		ExtensionRequest extensionRequest = ExtensionRequestMapper.toEntity(extensionRequestDTO);
+        ExtensionRequest saved = extenionRequestRepository.save(extensionRequest);
+        return ExtensionRequestMapper.toDTO(saved);
+    }
 
 	@Override
 	public List<ExtensionRequestDTO> getExtensionRequestByAssuranceId(Long id) {

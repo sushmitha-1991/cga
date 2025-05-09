@@ -100,6 +100,18 @@ public class DroppingRequestController {
 	     return ResponseEntity.ok(response);
 	 }
 
-
+	 @PostMapping("/create")
+	    @Operation(summary = "Create a new Dropping Request")
+	    @ApiResponses(value = {
+	        @ApiResponse(responseCode = "201", description = "Dropping request created successfully"),
+	        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+	        @ApiResponse(responseCode = "500", description = "Internal server error")
+	    })
+	    public ResponseEntity<GenericResponse<DroppingRequestDTO>> createDroppingRequest(@RequestBody DroppingRequestDTO droppingRequestDTO) {
+	        DroppingRequestDTO createdRequest = droppingRequestService.createDroppingRequest(droppingRequestDTO);
+	        GenericResponse<DroppingRequestDTO> response = new GenericResponse<>(HttpStatus.CREATED.value(), true,
+	                "Dropping request created successfully", createdRequest);
+	        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	    }
 	 
 }
