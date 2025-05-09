@@ -1,7 +1,5 @@
-package com.dsp.cga.assurance.entity;
+package com.dsp.cga.entity;
 import org.hibernate.envers.Audited;
-
-import com.dsp.cga.entity.Auditable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,16 +22,17 @@ import lombok.Setter;
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    @Table(name ="rajya_sabha_session_master",schema = "master")
+    @Table(name ="lok_sabha_masters",schema = "master")
     @Entity
-    public class MastersRajyaSabha extends Auditable {
+    public class MastersLokSabha extends Auditable {
     
         @Id
+        @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lok_sabha_seq")
+        @SequenceGenerator(name = "lok_sabha_seq", sequenceName = "lok_sabha_seq", allocationSize = 1)
         private Long id;
-        @Column(name = "session_number")
-        private String sessionNumber;
 
+        @Column(name = "lok_sabha_number", nullable = false, length = 50)
+        private String lokSabhaNumber;
 
     }
    
-

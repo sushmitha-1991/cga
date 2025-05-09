@@ -118,19 +118,6 @@ public class ImplementationRequestController {
 	     return ResponseEntity.ok(response);
 	 }
 
-	 @PostMapping("/assurance/create")
-	 public ResponseEntity<GenericResponse<Void>> createAssuranceWithImplementation(
-	         @RequestBody AssuranceWithImplementationRequestDTO dto) {
-
-	     assuranceService.createAssuranceWithImplementation(dto);
-
-	     GenericResponse<Void> response = new GenericResponse<>(
-	             HttpStatus.CREATED.value(),
-	             true,
-	             "Assurance and ImplementationRequest created successfully",
-	             null
-	     );
-	     return new ResponseEntity<>(response, HttpStatus.CREATED);
-	 }
+	
 
 }

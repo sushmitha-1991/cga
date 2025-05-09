@@ -20,11 +20,19 @@ public class AssuranceWithImplementationRequestDTO {
     private Long sessionNo;
     private String questionNo;
     private String subject;
-
+private Long lokSabhaSessionNo;
+private Long rajyaSabhaSessionNo;
+private Long lokSabhaNo;
     private Long ministryId;
     private Long departmentId;
     private Long memberId;
     private Long houseId;
+    private Long applicationId;
+    private String applicationNo;
+    private LocalDate documentDate;
+    private String lokSabhaSessionNumber;
+    private String lokSabhaSession;
+    private String rajyaSabhaSession;
 
     // ImplementationRequest-related
     private Long implementationTypeId;

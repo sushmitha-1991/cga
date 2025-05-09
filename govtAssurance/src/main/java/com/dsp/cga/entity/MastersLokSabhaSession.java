@@ -1,8 +1,7 @@
-package com.dsp.cga.assurance.entity;
+package com.dsp.cga.entity;
  
 import org.hibernate.envers.Audited;
 
-import com.dsp.cga.entity.Auditable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

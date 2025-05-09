@@ -36,6 +36,8 @@ public interface AssuranceService {
 
 	void createAssuranceWithImplementation(AssuranceWithImplementationRequestDTO dto);
 
+	AssuranceDTO getByAssuranceNo(String assuranceNo);
+
 	
 
 	

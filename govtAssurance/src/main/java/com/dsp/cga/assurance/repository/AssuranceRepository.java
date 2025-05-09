@@ -3,6 +3,7 @@ package com.dsp.cga.assurance.repository;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -64,6 +65,10 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 			+ "AND (a.assuranceDate <= :toDate or :toDate is null)" + "AND (a.ministryId = :ministryId or :ministryId is null) " + "AND (a.memberId = :memberId or :memberId is null)")
 	List<Assurance> findFilteredAssurancesLs(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
 			@Param("ministryId") Long ministryId, @Param("memberId") Long memberId);
+
+
+
+	Optional<Assurance> findByAssuranceNo(String assuranceNo);
 
 
 

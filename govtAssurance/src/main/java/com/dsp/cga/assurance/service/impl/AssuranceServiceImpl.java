@@ -3,7 +3,6 @@ package com.dsp.cga.assurance.service.impl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,8 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -27,7 +30,6 @@ import com.dsp.cga.assurance.dto.AssuranceCategory;
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
 import com.dsp.cga.assurance.dto.AssuranceTypeDTO;
-import com.dsp.cga.assurance.dto.CategoryDTO;
 import com.dsp.cga.assurance.dto.DepartmentsDTO;
 import com.dsp.cga.assurance.dto.LokSabhaNoDTO;
 import com.dsp.cga.assurance.dto.LoksabhaSessionNoDTO;
@@ -36,22 +38,27 @@ import com.dsp.cga.assurance.dto.MinistryDTO;
 import com.dsp.cga.assurance.dto.PartDetailsDTO;
 import com.dsp.cga.assurance.dto.PendingDueToDTO;
 import com.dsp.cga.assurance.dto.RajyaSabhaSessionNoDTO;
+import com.dsp.cga.assurance.dto.SerialNumberRequest;
+import com.dsp.cga.assurance.dto.SerialNumberResponse;
 import com.dsp.cga.assurance.dto.SourceDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.SupplementDTO;
 import com.dsp.cga.assurance.dto.SupplementaryDTO;
+import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
 import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceWithImplementationRequestDTO;
-import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
+import com.dsp.cga.assurance.implementationrequest.repository.ApplicationInstanceRepository;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 //import com.dsp.cga.assurance.external.service.ExternalService;
 import com.dsp.cga.assurance.partdetails.repository.PartDetailsRepository;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
+import com.dsp.cga.assurance.repository.MasterLSSRepository;
+import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
@@ -63,6 +70,10 @@ import com.dsp.cga.mapper.AssuranceMapper;
 import com.dsp.cga.mapper.PartDetailsMapper;
 import com.dsp.cga.mapper.SupplementaryMapper;
 import com.dsp.cga.response.GenericResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+
 
 @Service
 public class AssuranceServiceImpl implements AssuranceService {
@@ -79,6 +90,12 @@ public class AssuranceServiceImpl implements AssuranceService {
 	
 	@Value("${loksabha.session.url}")
     private String loksabhaSessionUrl;
+	
+//	@Value("${master.service.url}")
+//	private String masterServiceUrl;
+	
+//	@Value("${workflow.service.url}")
+//	private String draftedServiceUrl;
 
 //	@Value("${master.assuranceTypeServiceUrl}")
 //	private String assuranceTypeServiceUrl;
@@ -100,6 +117,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	@Autowired
 	private AssuranceRepository assuranceRepository;
+	
+	@Autowired
+	private HttpServletRequest httpRequest;
 
 	@Autowired
 	private PartDetailsRepository partDetailsRepository;
@@ -109,6 +129,11 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	@Autowired
 	private AssuranceMapper assuranceMapper;
+	
+	@Autowired
+	private MasterLSSRepository lssRepo;
+	@Autowired
+	private MastersRSSRepository rssRepo;
 	
 	@Autowired
 	private ImplementationRequestService implementationRequestService;
@@ -124,6 +149,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private ApplicationInstanceRepository applicationInstanceRepository;
 	
 	@Autowired
 	private MinistryRepository ministryRepository;
@@ -1102,34 +1130,99 @@ public class AssuranceServiceImpl implements AssuranceService {
 	                .collect(Collectors.toList());
 	    }
 
+//	@Override
+//	public void createAssuranceWithImplementation(AssuranceWithImplementationRequestDTO dto) {
+//		 Assurance assurance = Assurance.builder()
+//	                .assuranceNo(dto.getAssuranceNo())
+//	                .lokSabhaSessionNo(dto.getSessionNo()) // assuming session is LS
+//	                .questionNo(dto.getQuestionNo())
+//	                .subject(dto.getSubject())
+//	                .ministryId(dto.getMinistryId())
+//	                .departmentId(dto.getDepartmentId())
+//	                .memberId(dto.getMemberId())
+//	                .build();
+//
+//	        Assurance savedAssurance = assuranceRepository.save(assurance);
+//
+//	        ImplementationRequest implRequest = ImplementationRequest.builder()
+//	                .assuranceId(savedAssurance.getId())
+//	                .implementationTypeId(dto.getImplementationTypeId())
+//	                .partId(dto.getPartId())
+//	                .supplementaryId(dto.getSupplementaryId())
+//	                .layingDate(dto.getLayingDate())
+//	                .reason(dto.getReason())
+//	                .implementationReportFiles(dto.getImplementationReportFiles())
+//	                .partReportFiles(dto.getPartReportFiles())
+//	                .draftStatus(false)
+//	                .build();
+//
+//	        implementationRequestRepository.save(implRequest);
+//	    }
+
+	
+	
+
+
+	
+
+	private Long getHouseId() {
+		Long houseId = null;
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (principal instanceof UserDetailsDTO) {
+			houseId = ((UserDetailsDTO) principal).getHouseId();
+		}
+		return houseId;
+	}
+
+//	@Override
+//	public AssuranceDTO getByAssuranceNo(String assuranceNo) {
+//		Assurance assurance = assuranceRepository.findByAssuranceNo(assuranceNo)
+//                .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with assuranceNo: " + assuranceNo));
+//        return assuranceMapper.toDTO(assurance);
+//    }
+
 	@Override
-	public void createAssuranceWithImplementation(AssuranceWithImplementationRequestDTO dto) {
-		 Assurance assurance = Assurance.builder()
-	                .assuranceNo(dto.getAssuranceNo())
-	                .lokSabhaSessionNo(dto.getSessionNo()) // assuming session is LS
-	                .questionNo(dto.getQuestionNo())
-	                .subject(dto.getSubject())
-	                .ministryId(dto.getMinistryId())
-	                .departmentId(dto.getDepartmentId())
-	                .memberId(dto.getMemberId())
-	                .build();
+	public AssuranceDTO getByAssuranceNo(String assuranceNo) {
+	    Assurance assurance = assuranceRepository.findByAssuranceNo(assuranceNo)
+	            .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with assuranceNo: " + assuranceNo));
 
-	        Assurance savedAssurance = assuranceRepository.save(assurance);
+	    AssuranceDTO dto = assuranceMapper.toDTO(assurance);
 
-	        ImplementationRequest implRequest = ImplementationRequest.builder()
-	                .assuranceId(savedAssurance.getId())
-	                .implementationTypeId(dto.getImplementationTypeId())
-	                .partId(dto.getPartId())
-	                .supplementaryId(dto.getSupplementaryId())
-	                .layingDate(dto.getLayingDate())
-	                .reason(dto.getReason())
-	                .implementationReportFiles(dto.getImplementationReportFiles())
-	                .partReportFiles(dto.getPartReportFiles())
-	                .draftStatus(false)
-	                .build();
-
-	        implementationRequestRepository.save(implRequest);
+	    // Populate additional data
+	    if (assurance.getMemberId() != null) {
+	        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+	    }
+	    if (assurance.getSourceId() != null) {
+	        dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+	    }
+	    if (assurance.getMinistryId() != null) {
+	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+	    }
+	    if (assurance.getDepartmentId() != null) {
+	        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+	    }
+	    if (assurance.getAssuranceTypeId() != null) {
+	        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+	    }
+	    if (assurance.getRajyaSabhaSessionNo() != null) {
+	        dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
+	    }
+	    if (assurance.getPendingDueTo() != null) {
+	        dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+	    }
+	    if (assurance.getStatusId() != null) {
+	        dto.setStatusDTO(fetchStatusData(assurance.getStatusId()));
 	    }
 
+	    List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+	    dto.setClubbedMembersData(clubbedMembersData);
 
+	    return dto;
+	}
+
+	@Override
+	public void createAssuranceWithImplementation(AssuranceWithImplementationRequestDTO dto) {
+		// TODO Auto-generated method stub
+		
+	}
 }

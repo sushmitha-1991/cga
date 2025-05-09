@@ -233,6 +233,11 @@ public class AssuranceController {
 	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
+	@GetMapping("/by-assurance-no")
+    public ResponseEntity<AssuranceDTO> getByAssuranceNo(@RequestParam String assuranceNo) {
+        AssuranceDTO dto = assuranceService.getByAssuranceNo(assuranceNo);
+        return ResponseEntity.ok(dto);
+    }
 
 
 }
