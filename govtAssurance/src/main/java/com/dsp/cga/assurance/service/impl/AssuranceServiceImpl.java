@@ -1112,7 +1112,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 	}
 
 	@Override
-	public List<String> getAssuranceNos(Integer ministryCode, Long sessionNo, Integer houseId) {
+	public List<AssuranceListDTO> getAssuranceNos(Integer ministryCode, Long sessionNo, Integer houseId) {
 		  final Long ministryId;
 	        if (ministryCode != null) {
 	            Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
@@ -1129,8 +1129,12 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	        return assuranceRepository.findAll(spec)
 	                .stream()
-	                .map(Assurance::getAssuranceNo)
-	                .filter(Objects::nonNull)
+	                .filter(a -> a.getAssuranceNo() != null)
+	                .map(a -> AssuranceListDTO.builder()
+	                        .id(a.getId())
+	                        .assuranceNo(a.getAssuranceNo())
+	                        //.subject(a.getSubject())
+	                        .build())
 	                .collect(Collectors.toList());
 	    }
 

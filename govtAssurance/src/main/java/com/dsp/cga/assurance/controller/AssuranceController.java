@@ -210,28 +210,51 @@ public class AssuranceController {
 	}
 	
 	
-	@GetMapping("/assurance-numbers")
-	@Operation(summary = "Get assurance numbers")
-	@ApiResponses(value = {
-	        @ApiResponse(responseCode = "200", description = "Assurance numbers fetched successfully"),
-	        @ApiResponse(responseCode = "500", description = "Internal server error")
-	})
-	public ResponseEntity<GenericResponse<List<String>>> getAssuranceNumbers(
-	        @RequestParam(required = false) Integer ministryCode,
-	        @RequestParam(required = false) Long sessionNo,
-	        @RequestParam(required = false) Integer houseId) {
+//	@GetMapping("/assurance-numbers")
+//	@Operation(summary = "Get assurance numbers")
+//	@ApiResponses(value = {
+//	        @ApiResponse(responseCode = "200", description = "Assurance numbers fetched successfully"),
+//	        @ApiResponse(responseCode = "500", description = "Internal server error")
+//	})
+//	public ResponseEntity<GenericResponse<List<String>>> getAssuranceNumbers(
+//	        @RequestParam(required = false) Integer ministryCode,
+//	        @RequestParam(required = false) Long sessionNo,
+//	        @RequestParam(required = false) Integer houseId) {
+//
+//	    List<String> assuranceNos = assuranceService.getAssuranceNos(ministryCode, sessionNo, houseId);
+//
+//	    GenericResponse<List<String>> response = new GenericResponse<>(
+//	            HttpStatus.OK.value(),
+//	            true,
+//	            "Assurance numbers fetched successfully",
+//	            assuranceNos
+//	    );
+//
+//	    return new ResponseEntity<>(response, HttpStatus.OK);
+//	}
+	
+	 @GetMapping("/assurance-numbers")
+	    @Operation(summary = "Get assurance numbers")
+	    @ApiResponses(value = {
+	            @ApiResponse(responseCode = "200", description = "Assurance numbers fetched successfully"),
+	            @ApiResponse(responseCode = "500", description = "Internal server error")
+	    })
+	    public ResponseEntity<GenericResponse<List<AssuranceListDTO>>> getAssuranceNumbers(
+	            @RequestParam(required = false) Integer ministryCode,
+	            @RequestParam(required = false) Long sessionNo,
+	            @RequestParam(required = false) Integer houseId) {
 
-	    List<String> assuranceNos = assuranceService.getAssuranceNos(ministryCode, sessionNo, houseId);
+	        List<AssuranceListDTO> assuranceNos = assuranceService.getAssuranceNos(ministryCode, sessionNo, houseId);
 
-	    GenericResponse<List<String>> response = new GenericResponse<>(
-	            HttpStatus.OK.value(),
-	            true,
-	            "Assurance numbers fetched successfully",
-	            assuranceNos
-	    );
+	        GenericResponse<List<AssuranceListDTO>> response = new GenericResponse<>(
+	                HttpStatus.OK.value(),
+	                true,
+	                "Assurance numbers fetched successfully",
+	                assuranceNos
+	        );
 
-	    return new ResponseEntity<>(response, HttpStatus.OK);
-	}
+	        return new ResponseEntity<>(response, HttpStatus.OK);
+	    }
 
 	@GetMapping("/by-assurance-no")
     public ResponseEntity<AssuranceDTO> getByAssuranceNo(@RequestParam String assuranceNo) {
