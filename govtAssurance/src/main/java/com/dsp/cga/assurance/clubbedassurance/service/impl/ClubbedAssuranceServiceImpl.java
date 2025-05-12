@@ -217,4 +217,23 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 		return houseId;
 	}
 
+	@Override
+	public ClubbedAssuranceDTO createClubbedAssurance(ClubbedAssuranceDTO dto) {
+		
+		        ClubbedAssurance entity = ClubbedAssurance.builder()
+		                .assuranceId(dto.getAssuranceId())
+		                .clubbedAssuranceIds(dto.getClubbedAssuranceIds())
+		                .date(dto.getDate())
+		                .build();
+
+		        ClubbedAssurance saved = clubbedAssuranceRepository.save(entity);
+
+		        return ClubbedAssuranceDTO.builder()
+		                .id(saved.getId())
+		                .assuranceId(saved.getAssuranceId())
+		                .clubbedAssuranceIds(saved.getClubbedAssuranceIds())
+		                .date(saved.getDate())
+		                .build();
+		    }
+
 }

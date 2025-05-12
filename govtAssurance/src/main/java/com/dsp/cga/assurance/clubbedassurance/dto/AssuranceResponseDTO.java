@@ -15,6 +15,7 @@ public class AssuranceResponseDTO {
     private String rajyaSabhaSessionNo;
     private LocalDate assuranceDate;
     private String questionNo;
+    private LocalDate date;
     private String status;
     private List<Long> clubbedAssuranceIds;
 }

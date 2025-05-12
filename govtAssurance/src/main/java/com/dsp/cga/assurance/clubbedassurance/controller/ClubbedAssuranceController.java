@@ -30,6 +30,27 @@ public class ClubbedAssuranceController {
 	@Autowired
 	private ClubbedAssuranceService clubbedAssuranceService;
 	
+	 @PostMapping("/create")
+	    @Operation(summary = "Create a new Clubbed Assurance")
+	    @ApiResponses(value = {
+	        @ApiResponse(responseCode = "201", description = "Clubbed Assurance created successfully"),
+	        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+	        @ApiResponse(responseCode = "500", description = "Internal server error")
+	    })
+	    public ResponseEntity<GenericResponse<ClubbedAssuranceDTO>> createClubbedAssurance(
+	            @RequestBody ClubbedAssuranceDTO dto) {
+
+	        ClubbedAssuranceDTO created = clubbedAssuranceService.createClubbedAssurance(dto);
+	        GenericResponse<ClubbedAssuranceDTO> response = new GenericResponse<>(
+	            HttpStatus.CREATED.value(),
+	            true,
+	            "Clubbed Assurance created successfully",
+	            created
+	        );
+
+	        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	    }
+	
 	 @PostMapping("/create-or-update")
 	 @Operation(summary = "Create a new Assurance")
 		@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "ClubbedAssurance created successfully"),

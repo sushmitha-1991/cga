@@ -1,5 +1,6 @@
 package com.dsp.cga.assurance.clubbedassurance.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ public class ClubbedAssuranceDTO {
 	    private List<Long> clubbedAssuranceIds;
 	    private String AssuranceNo;
 	    private List<AssuranceIdNoPairDTO> clubbedAssurances; 
+	    private LocalDate date;
 	    
 
 }

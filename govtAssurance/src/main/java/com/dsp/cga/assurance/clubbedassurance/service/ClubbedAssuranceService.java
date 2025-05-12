@@ -18,4 +18,8 @@ public interface ClubbedAssuranceService {
 	List<AssuranceResponseDTO> getFilteredClubbedAssurances(Long sessionNo, LocalDate assuranceDate, Long statusId,
 			Integer ministryCode);
 
+	ClubbedAssuranceDTO createClubbedAssurance(ClubbedAssuranceDTO dto);
+	
+	
+
 }

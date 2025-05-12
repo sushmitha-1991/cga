@@ -257,9 +257,10 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	        return cb.and(predicates.toArray(new Predicate[0]));
 	    };
 
-	    // 🔹 Fetch and filter manually using assuranceId
+	    //  Fetch and filter manually using assuranceId
 	    List<ExtensionRequest> filteredList = extenionRequestRepository.findAll(specification).stream()
 	        .filter(er -> {
+	        	 if (er.getAssuranceId() == null) return false;
 	            Assurance assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
 	            if (assurance == null) return false;
 
@@ -277,7 +278,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	        })
 	        .collect(Collectors.toList());
 
-	    // 🔹 Convert to DTO
+	    //  Convert to DTO
 	    return filteredList.stream().map(er -> {
 	        Assurance assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
 	        return ExtensionRequestResponseDTO.builder()
@@ -295,7 +296,6 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	                .rajyaSabhaSessionNumber(assurance != null
                     ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
                     : null)
-	                .questionNo(assurance.getQuestionNo())
 	                .remarks(er.getRemarks())
 	                .extGrantedTillDate(er.getExtGrantedTillDate())
 	                .extRequestedTillDate(er.getExtRequestedTillDate())
@@ -315,5 +315,6 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 		}
 		return houseId;
 	}
+
 
 }

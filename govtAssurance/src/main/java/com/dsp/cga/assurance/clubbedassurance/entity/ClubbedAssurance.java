@@ -1,5 +1,6 @@
 package com.dsp.cga.assurance.clubbedassurance.entity;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.dsp.cga.entity.Auditable;
@@ -37,6 +38,9 @@ public class ClubbedAssurance extends Auditable{
 
 	@Column(name = "assurance_id", nullable = false)
 	private Long assuranceId;
+	
+	@Column(name = "date")
+	private LocalDate date;
 
 	@ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "clubbed_assurance_mapping", schema = "cga", 
