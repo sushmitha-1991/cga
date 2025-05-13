@@ -132,80 +132,81 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	}
 	@Override
 	public List<AssuranceResponseDTO> getFilteredClubbedAssurances(Long sessionNo, LocalDate assuranceDate,
-			Long statusId, Integer ministryCode) {
+	                                                               Long statusId, Integer ministryCode) {
 
-		// 🔹 Convert ministryCode to ministryId
-		final Long ministryId;
-		if (ministryCode != null) {
-			Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
-			if (ministry != null) {
-				ministryId = ministry.getId();
-			} else {
-				return List.of(); // Invalid ministry code
-			}
-		} else {
-			ministryId = null;
-		}
+	    // 🔹 Get ministryId from ministryCode
+	    final Long ministryId;
+	    if (ministryCode != null) {
+	        Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
+	        if (ministry != null) {
+	            ministryId = ministry.getId();
+	        } else {
+	            return List.of(); // Invalid ministryCode
+	        }
+	    } else {
+	        ministryId = null;
+	    }
 
-		// 🔹 Get current houseId
-		Long houseId = getHouseId();
+	    // 🔹 Get current houseId
+	    Long houseId = getHouseId(); // 1 = RS, else LS
 
-		// 🔹 Use latest session if sessionNo is null
-		if (sessionNo == null) {
-			sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
-		}
-		Long finalSessionNo = sessionNo;
+	    // 🔹 Get latest session if sessionNo is null
+	    if (sessionNo == null) {
+	        sessionNo = (houseId == 1)
+	                ? rssRepo.findLatestByCreatedAt()
+	                : lssRepo.findLatestByCreatedAt();
+	    }
+	    Long finalSessionNo = sessionNo;
 
-		// 🔹 Step 1: Get assuranceIds from clubbed_assurances table
-		List<Long> assuranceIdsInClubbed = clubbedAssuranceRepository.findAll().stream()
-				.map(ClubbedAssurance::getAssuranceId)
-				.toList();
+	    // 🔹 Get all clubbed assurance records
+	    List<ClubbedAssurance> allClubbedAssurances = clubbedAssuranceRepository.findAll();
 
-		if (assuranceIdsInClubbed.isEmpty()) {
-			return List.of(); // No data in clubbed
-		}
+	    // 🔹 Filter them based on Assurance fields
+	    List<ClubbedAssurance> filteredClubbedList = allClubbedAssurances.stream()
+	        .filter(clubbed -> {
+	            Assurance assurance = assuranceRepository.findById(clubbed.getAssuranceId()).orElse(null);
+	            if (assurance == null) return false;
 
-		// 🔹 Step 2: Filter Assurance where ID in clubbed list
-		Specification<Assurance> specification = (root, query, cb) -> {
-			List<Predicate> predicates = new ArrayList<>();
+	            if (assuranceDate != null && !assuranceDate.equals(assurance.getAssuranceDate())) return false;
+	            if (statusId != null && !statusId.equals(assurance.getStatusId())) return false;
+	            if (ministryId != null && !ministryId.equals(assurance.getMinistryId())) return false;
 
-			predicates.add(root.get("id").in(assuranceIdsInClubbed)); // 👈 filter by clubbed assurance IDs
+	            if (houseId == 1 && !finalSessionNo.equals(assurance.getRajyaSabhaSessionNo())) return false;
+	            if (houseId != 1 && !finalSessionNo.equals(assurance.getLokSabhaSessionNo())) return false;
 
-			if (assuranceDate != null) {
-				predicates.add(cb.equal(root.get("assuranceDate"), assuranceDate));
-			}
-			if (statusId != null) {
-				predicates.add(cb.equal(root.get("statusId"), statusId));
-			}
-			if (ministryId != null) {
-				predicates.add(cb.equal(root.get("ministryId"), ministryId));
-			}
-			if (houseId == 1) {
-				predicates.add(cb.equal(root.get("rajyaSabhaSessionNo"), finalSessionNo));
-			} else {
-				predicates.add(cb.equal(root.get("lokSabhaSessionNo"), finalSessionNo));
-			}
-			return cb.and(predicates.toArray(new Predicate[0]));
-		};
+	            return true;
+	        })
+	        .collect(Collectors.toList());
 
-		List<Assurance> assurances = assuranceRepository.findAll(specification);
+	    // 🔹 Map to DTO
+	    return filteredClubbedList.stream()
+	        .map(clubbed -> {
+	            Assurance assurance = assuranceRepository.findById(clubbed.getAssuranceId()).orElse(null);
 
-		// 🔹 Step 3: Map to DTO
-		return assurances.stream().map(a -> {
-			ClubbedAssurance clubbed = clubbedAssuranceRepository.findByAssuranceId(a.getId()).orElse(null);
+	            List<Long> clubbedIds = clubbed.getClubbedAssuranceIds() != null
+	                    ? clubbed.getClubbedAssuranceIds().stream().distinct().toList()
+	                    : List.of();
 
-			return AssuranceResponseDTO.builder()
-					.assuranceNo(a.getAssuranceNo())
-					.lokSabhaSessionNo(a.getLokSabhaSessionNo() != null ? lssRepo.findSessionNumberById(a.getLokSabhaSessionNo()) : null)
-					.lokSabhaNo(a.getLokSabhaNo() != null ? lssRepo.findLokSabhaNumberById(a.getLokSabhaNo()) : null)
-					.rajyaSabhaSessionNo(a.getRajyaSabhaSessionNo() != null ? rssRepo.findSessionNumberById(a.getRajyaSabhaSessionNo()) : null)
-					.assuranceDate(a.getAssuranceDate())
-					.questionNo(a.getQuestionNo())
-					.status(codeRepository.findCodeById(a.getStatusId()))
-					.clubbedAssuranceIds(clubbed != null ? clubbed.getClubbedAssuranceIds() : List.of())
-					.build();
-		}).collect(Collectors.toList());
+	            return AssuranceResponseDTO.builder()
+	                    .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
+	                    .lokSabhaSessionNo(assurance != null && assurance.getLokSabhaSessionNo() != null
+	                            ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()) : null)
+	                    .lokSabhaNo(assurance != null && assurance.getLokSabhaNo() != null
+	                            ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()) : null)
+	                    .rajyaSabhaSessionNo(assurance != null && assurance.getRajyaSabhaSessionNo() != null
+	                            ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()) : null)
+	                    .assuranceDate(assurance != null ? assurance.getAssuranceDate() : null)
+	                    .questionNo(assurance != null ? assurance.getQuestionNo() : null)
+	                    .status(assurance != null
+	                            ? codeRepository.findCodeById(assurance.getStatusId()) : null)
+	                    .clubbedAssuranceIds(clubbedIds)
+	                    .build();
+	        })
+	        .collect(Collectors.toList());
 	}
+
+
+
 
 
 	private Long getHouseId() {
