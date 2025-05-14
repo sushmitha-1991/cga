@@ -18,4 +18,6 @@ public interface DroppingRequestService {
 
 	DroppingRequestDTO createDroppingRequest(DroppingRequestDTO droppingRequestDTO);
 
+	AssuranceDroppingResponseDTO getDroppingRequestById(Long id);
+
 }

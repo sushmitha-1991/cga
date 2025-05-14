@@ -19,6 +19,8 @@ public interface ClubbedAssuranceService {
 			Integer ministryCode);
 
 	ClubbedAssuranceDTO createClubbedAssurance(ClubbedAssuranceDTO dto);
+
+	AssuranceResponseDTO getClubbedAssuranceById(Long id);
 	
 	
 

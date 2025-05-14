@@ -143,5 +143,25 @@ public class ClubbedAssuranceController {
 	     return ResponseEntity.ok(genericResponse);
 	 }
 
+	 @GetMapping("/clubbedAssurance/{id}")
+	 @Operation(summary = "Get Clubbed Assurance by ID")
+	 @ApiResponses(value = {
+	     @ApiResponse(responseCode = "200", description = "Clubbed assurance retrieved successfully"),
+	     @ApiResponse(responseCode = "404", description = "Clubbed assurance not found"),
+	     @ApiResponse(responseCode = "500", description = "Internal server error")
+	 })
+	 public ResponseEntity<GenericResponse<AssuranceResponseDTO>> getClubbedAssuranceById(@PathVariable Long id) {
+	     AssuranceResponseDTO dto = clubbedAssuranceService.getClubbedAssuranceById(id);
+
+	     if (dto == null) {
+	         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                 .body(new GenericResponse<>(HttpStatus.NOT_FOUND.value(), false, "Clubbed assurance not found", null));
+	     }
+
+	     return ResponseEntity.ok(
+	             new GenericResponse<>(HttpStatus.OK.value(), true, "Clubbed assurance retrieved successfully", dto)
+	     );
+	 }
+
 
 }

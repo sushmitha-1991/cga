@@ -298,6 +298,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
                     : null)
 	                .remarks(er.getRemarks())
 	                .extGrantedTillDate(er.getExtGrantedTillDate())
+	                .id(er.getId())
 	                .extRequestedTillDate(er.getExtRequestedTillDate())
 	                .ministryRefDate(er.getMinistryRefDate())
 	                .ministryRefNo(er.getMinistryRefNo())
@@ -315,6 +316,39 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 		}
 		return houseId;
 	}
+
+	@Override
+	public ExtensionRequestResponseDTO getExtensionRequestById(Long id) {
+	    ExtensionRequest er = extenionRequestRepository.findById(id).orElse(null);
+	    if (er == null) return null;
+
+	    Assurance assurance = null;
+	    if (er.getAssuranceId() != null) {
+	        assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
+	    }
+
+	    return ExtensionRequestResponseDTO.builder()
+	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
+	            .extensionNo(er.getExtensionNo())
+	            .status(codeRepository.findCodeById(assurance != null ? assurance.getStatusId() : null))
+	            .lokSabhaSessionNo(assurance != null
+	                    ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
+	                    : null)
+	            .lokSabhaNo(assurance != null
+	                    ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo())
+	                    : null)
+	            .rajyaSabhaSessionNumber(assurance != null
+	                    ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
+	                    : null)
+	            .remarks(er.getRemarks())
+	            .extGrantedTillDate(er.getExtGrantedTillDate())
+	            .extRequestedTillDate(er.getExtRequestedTillDate())
+	            .ministryRefDate(er.getMinistryRefDate())
+	            .id(er.getId())
+	            .ministryRefNo(er.getMinistryRefNo())
+	            .build();
+	}
+
 
 
 }

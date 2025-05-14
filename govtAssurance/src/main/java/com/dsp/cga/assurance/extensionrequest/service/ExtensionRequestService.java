@@ -21,4 +21,6 @@ public interface ExtensionRequestService {
 	List<ExtensionRequestResponseDTO> getFilteredExtensions(Long sessionNo, Long statusId,
 			LocalDate extRequestedTillDate, LocalDate extGrantedTillDate, LocalDate ministryRefDate, Integer ministryCode);
 
+	ExtensionRequestResponseDTO getExtensionRequestById(Long id);
+
 }

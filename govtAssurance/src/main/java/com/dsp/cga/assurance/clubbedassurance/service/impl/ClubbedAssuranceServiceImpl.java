@@ -130,6 +130,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 		Optional<Assurance> assurance = assuranceRepository.findById(assuranceId);
 		return assurance.map(Assurance::getAssuranceNo).orElse(null);
 	}
+	
 	@Override
 	public List<AssuranceResponseDTO> getFilteredClubbedAssurances(Long sessionNo, LocalDate assuranceDate,
 	                                                               Long statusId, Integer ministryCode) {
@@ -236,5 +237,33 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 		                .date(saved.getDate())
 		                .build();
 		    }
+
+	@Override
+	public AssuranceResponseDTO getClubbedAssuranceById(Long id) {
+	    ClubbedAssurance clubbed = clubbedAssuranceRepository.findById(id).orElse(null);
+	    if (clubbed == null) return null;
+
+	    Assurance assurance = assuranceRepository.findById(clubbed.getAssuranceId()).orElse(null);
+	    if (assurance == null) return null;
+
+	    List<Long> clubbedIds = clubbed.getClubbedAssuranceIds() != null
+	            ? clubbed.getClubbedAssuranceIds().stream().distinct().toList()
+	            : List.of();
+
+	    return AssuranceResponseDTO.builder()
+	            .assuranceNo(assurance.getAssuranceNo())
+	            .lokSabhaSessionNo(assurance.getLokSabhaSessionNo() != null
+	                    ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()) : null)
+	            .lokSabhaNo(assurance.getLokSabhaNo() != null
+	                    ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()) : null)
+	            .rajyaSabhaSessionNo(assurance.getRajyaSabhaSessionNo() != null
+	                    ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()) : null)
+	            .assuranceDate(assurance.getAssuranceDate())
+	            .questionNo(assurance.getQuestionNo())
+	            .status(codeRepository.findCodeById(assurance.getStatusId()))
+	            .clubbedAssuranceIds(clubbedIds)
+	            .build();
+	}
+
 
 }

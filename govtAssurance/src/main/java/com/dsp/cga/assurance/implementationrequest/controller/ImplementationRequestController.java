@@ -118,6 +118,26 @@ public class ImplementationRequestController {
 	     return ResponseEntity.ok(response);
 	 }
 
-	
+	 @GetMapping("/implementation-details/{id}")
+	 @Operation(summary = "Get Implementation Detail by ID")
+	 @ApiResponses(value = {
+	     @ApiResponse(responseCode = "200", description = "Implementation detail fetched successfully"),
+	     @ApiResponse(responseCode = "404", description = "Implementation detail not found"),
+	     @ApiResponse(responseCode = "500", description = "Internal server error")
+	 })
+	 public ResponseEntity<GenericResponse<AssuranceImplementationDTO>> getImplementationDetailById(
+	         @PathVariable Long id) {
+
+	     AssuranceImplementationDTO dto = implementationRequestService.getImplementationDetailById(id);
+
+	     if (dto == null) {
+	         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                 .body(new GenericResponse<>(HttpStatus.NOT_FOUND.value(), false, "Implementation detail not found", null));
+	     }
+
+	     return ResponseEntity.ok(new GenericResponse<>(HttpStatus.OK.value(), true,
+	             "Implementation detail fetched successfully", dto));
+	 }
+
 
 }

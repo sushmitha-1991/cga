@@ -386,6 +386,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                        .detailsOfImplementation(assurance.getDetailsOfImplementation())
 	                        .dateOfImplementation(assurance.getDateOfImplementation())
 	                        .supplementaryId(implementationRequest.getSupplementaryId())
+	                        .id(implementationRequest.getId())
 	                        .partId(implementationRequest.getPartId())
 	                        .reason(implementationRequest.getReason())
 	                        .layingDate(implementationRequest.getLayingDate())
@@ -407,5 +408,46 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		}
 		return houseId;
 	}
+
+
+
+	@Override
+	public AssuranceImplementationDTO getImplementationDetailById(Long id) {
+	    Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(id);
+	    if (optionalRequest.isEmpty()) return null;
+
+	    ImplementationRequest implementationRequest = optionalRequest.get();
+
+	    Assurance assurance = assuranceRepository.findById(implementationRequest.getAssuranceId()).orElse(null);
+	    if (assurance == null) return null;
+
+	    Long houseId = getHouseId();
+
+	    AssuranceImplementationDTO.AssuranceImplementationDTOBuilder builder = AssuranceImplementationDTO.builder()
+	            .assuranceNo(assurance.getAssuranceNo())
+	            .status(codeRepository.findCodeById(assurance.getStatusId()))
+	            .dueDateOfImplementation(assurance.getDueDateOfImplementation())
+	            .detailsOfImplementation(assurance.getDetailsOfImplementation())
+	            .dateOfImplementation(assurance.getDateOfImplementation())
+	            .supplementaryId(implementationRequest.getSupplementaryId())
+	            .partId(implementationRequest.getPartId())
+	            .id(implementationRequest.getId())
+	            .reason(implementationRequest.getReason())
+	            .layingDate(implementationRequest.getLayingDate())
+	            .implementationTypeId(codeRepository.findCodeById(implementationRequest.getImplementationTypeId()));
+
+	    if (houseId == 1) {
+	        builder.rajyaSabhaSessionNumber(
+	                rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()));
+	    } else {
+	        builder.lokSabhaSessionNumber(
+	                lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()))
+	               .lokSabhaNumber(
+	                lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()));
+	    }
+
+	    return builder.build();
+	}
+
 
 }

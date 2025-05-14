@@ -90,7 +90,12 @@ public class ExtensionRequestController {
 	}
 
 	@GetMapping("/extension-requests")
-	public ResponseEntity<List<ExtensionRequestResponseDTO>> getExtensionRequests(
+	@Operation(summary = "Get filtered list of ExtensionRequests")
+	@ApiResponses(value = {
+	    @ApiResponse(responseCode = "200", description = "ExtensionRequest(s) fetched successfully"),
+	    @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<GenericResponse<List<ExtensionRequestResponseDTO>>> getExtensionRequests(
 	    @RequestParam(required = false) Long sessionNo,
 	    @RequestParam(required = false) Long statusId,
 	    @RequestParam(required = false) Integer ministryCode,
@@ -99,9 +104,41 @@ public class ExtensionRequestController {
 	    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ministryRefDate
 	) {
 	    List<ExtensionRequestResponseDTO> results = extensionRequestService.getFilteredExtensions(
-	        sessionNo, statusId, extRequestedTillDate, extGrantedTillDate, ministryRefDate,ministryCode
+	        sessionNo, statusId, extRequestedTillDate, extGrantedTillDate, ministryRefDate, ministryCode
 	    );
-	    return ResponseEntity.ok(results);
+
+	    if (results.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.OK)
+	            .body(new GenericResponse<>(HttpStatus.OK.value(), false, "No ExtensionRequest(s) found", null));
+	    }
+
+	    GenericResponse<List<ExtensionRequestResponseDTO>> response = new GenericResponse<>(
+	        HttpStatus.OK.value(), true, "ExtensionRequest(s) fetched successfully", results
+	    );
+
+	    return ResponseEntity.ok(response);
 	}
+
+	@GetMapping("/extension-requests/{id}")
+	@Operation(summary = "Get ExtensionRequest by ID")
+	@ApiResponses(value = {
+	    @ApiResponse(responseCode = "200", description = "ExtensionRequest fetched successfully"),
+	    @ApiResponse(responseCode = "404", description = "ExtensionRequest not found"),
+	    @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<GenericResponse<ExtensionRequestResponseDTO>> getExtensionRequestById(@PathVariable Long id) {
+	    ExtensionRequestResponseDTO dto = extensionRequestService.getExtensionRequestById(id);
+
+	    if (dto == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                .body(new GenericResponse<>(HttpStatus.NOT_FOUND.value(), false, "ExtensionRequest not found", null));
+	    }
+
+	    GenericResponse<ExtensionRequestResponseDTO> response = new GenericResponse<>(
+	            HttpStatus.OK.value(), true, "ExtensionRequest fetched successfully", dto);
+
+	    return ResponseEntity.ok(response);
+	}
+
 
 }

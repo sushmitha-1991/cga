@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ExtensionRequestResponseDTO {
 
+	private Long id;
 	private String assuranceNo;
     private String lokSabhaNo;
     private Long sessionNo;

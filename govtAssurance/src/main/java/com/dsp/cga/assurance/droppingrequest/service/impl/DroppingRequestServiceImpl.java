@@ -298,6 +298,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	                                ? codeRepository.findCodeById(assurance.getStatusId())
 	                                : null)
 	                        .remarks(dr.getRemarks())
+	                        .id(dr.getId())
 	                        .build();
 	            })
 	            .collect(Collectors.toList());
@@ -319,4 +320,37 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		        DroppingRequest saved = droppingRequestRepository.save(entity);
 		        return DroppingRequestMapper.toDTO(saved);
 		    }
+
+		@Override
+		public AssuranceDroppingResponseDTO getDroppingRequestById(Long id) {
+		    DroppingRequest dr = droppingRequestRepository.findById(id).orElse(null);
+		    if (dr == null || dr.getAssuranceId() == null) return null;
+
+		    Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
+		    if (assurance == null) return null;
+
+		    return AssuranceDroppingResponseDTO.builder()
+		            .lokSabhaNo(assurance.getLokSabhaNo() != null
+		                    ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo())
+		                    : null)
+		            .lokSabhaSessionNo(assurance.getLokSabhaSessionNo() != null
+		                    ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
+		                    : null)
+		            .rajyaSabhaSessionNo(assurance.getRajyaSabhaSessionNo() != null
+		                    ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
+		                    : null)
+		            .assuranceNo(assurance.getAssuranceNo())
+		            .partId(dr.getPartId())
+		            .supplementaryId(dr.getSupplementaryId())
+		            .droppingType(codeRepository.findCodeById(dr.getDroppingType()))
+		            .dropRequestDate(dr.getDropRequestDate())
+		            .actualDropDate(dr.getActualDropDate())
+		            .id(dr.getId())
+		            .ministryRefDate(dr.getMinistryRefDate())
+		            .ministryRefNo(dr.getMinistryRefNo())
+		            .status(codeRepository.findCodeById(assurance.getStatusId()))
+		            .remarks(dr.getRemarks())
+		            .build();
+		}
+
 }

@@ -9,6 +9,8 @@ import lombok.Data;
 @Builder
 @Data
 public class AssuranceResponseDTO {
+	
+	private Long id;
     private String assuranceNo;
     private String lokSabhaNo;
     private String lokSabhaSessionNo;

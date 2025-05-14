@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AssuranceDroppingResponseDTO {
+	
+	private Long id;
     private String lokSabhaNo;
     private String lokSabhaSessionNo;
     private String rajyaSabhaSessionNo;
@@ -23,4 +25,7 @@ public class AssuranceDroppingResponseDTO {
     private String assuranceNo;
     private String status;
     private String remarks;
+    private String ministryRefNo;
+
+	private LocalDate ministryRefDate;
 }
