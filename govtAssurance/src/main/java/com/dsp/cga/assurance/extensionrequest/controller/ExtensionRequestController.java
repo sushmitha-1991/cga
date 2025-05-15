@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -136,6 +137,30 @@ public class ExtensionRequestController {
 
 	    GenericResponse<ExtensionRequestResponseDTO> response = new GenericResponse<>(
 	            HttpStatus.OK.value(), true, "ExtensionRequest fetched successfully", dto);
+
+	    return ResponseEntity.ok(response);
+	}
+
+	@PutMapping("/extension-requests/{id}")
+	@Operation(summary = "Update ExtensionRequest by ID")
+	@ApiResponses(value = {
+	    @ApiResponse(responseCode = "200", description = "ExtensionRequest updated successfully"),
+	    @ApiResponse(responseCode = "404", description = "ExtensionRequest not found"),
+	    @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<GenericResponse<ExtensionRequestResponseDTO>> updateExtensionRequest(
+	        @PathVariable Long id,
+	        @RequestBody ExtensionRequestDTO requestDTO) {
+
+	    ExtensionRequestResponseDTO dto = extensionRequestService.updateExtensionRequest(id, requestDTO);
+
+	    if (dto == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                .body(new GenericResponse<>(HttpStatus.NOT_FOUND.value(), false, "ExtensionRequest not found", null));
+	    }
+
+	    GenericResponse<ExtensionRequestResponseDTO> response = new GenericResponse<>(
+	            HttpStatus.OK.value(), true, "ExtensionRequest updated successfully", dto);
 
 	    return ResponseEntity.ok(response);
 	}

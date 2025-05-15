@@ -21,4 +21,6 @@ public interface ImplementationRequestService {
 
 	AssuranceImplementationDTO getImplementationDetailById(Long id);
 
+	AssuranceImplementationDTO updateImplementationRequest(Long id, ImplementationRequestDTO dto);
+
 }

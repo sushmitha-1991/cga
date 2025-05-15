@@ -242,7 +242,7 @@ public class AssuranceController {
 	    public ResponseEntity<GenericResponse<List<AssuranceListDTO>>> getAssuranceNumbers(
 	            @RequestParam(required = false) Integer ministryCode,
 	            @RequestParam(required = false) Long sessionNo,
-	            @RequestParam(required = false) Integer houseId) {
+	            @RequestParam(required = false) Long houseId) {
 
 	        List<AssuranceListDTO> assuranceNos = assuranceService.getAssuranceNos(ministryCode, sessionNo, houseId);
 

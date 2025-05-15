@@ -449,5 +449,52 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    return builder.build();
 	}
 
+	@Override
+	public AssuranceImplementationDTO updateImplementationRequest(Long id, ImplementationRequestDTO dto) {
+	    Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(id);
+	    if (optionalRequest.isEmpty()) return null;
+
+	    ImplementationRequest implReq = optionalRequest.get();
+
+	    Assurance assurance = assuranceRepository.findById(implReq.getAssuranceId()).orElse(null);
+	    if (assurance == null) return null;
+
+	    // Update ImplementationRequest fields if provided
+	    if (dto.getPartId() != null) {
+	        implReq.setPartId(dto.getPartId());
+	    }
+	    if (dto.getSupplementaryId() != null) {
+	        implReq.setSupplementaryId(dto.getSupplementaryId());
+	    }
+	    if (dto.getReason() != null) {
+	        implReq.setReason(dto.getReason());
+	    }
+	    if (dto.getLayingDate() != null) {
+	        implReq.setLayingDate(dto.getLayingDate());
+	    }
+	    if (dto.getImplementationTypeId() != null) {
+	        implReq.setImplementationTypeId(dto.getImplementationTypeId());
+	    }
+
+//	    // Update Assurance fields if provided
+//	    if (dto.getStatusId() != null) {
+//	        assurance.setStatusId(dto.getStatusId());
+//	    }
+//	    if (dto.getDueDateOfImplementation() != null) {
+//	        assurance.setDueDateOfImplementation(dto.getDueDateOfImplementation());
+//	    }
+//	    if (dto.getDetailsOfImplementation() != null) {
+//	        assurance.setDetailsOfImplementation(dto.getDetailsOfImplementation());
+//	    }
+//	    if (dto.getDateOfImplementation() != null) {
+//	        assurance.setDateOfImplementation(dto.getDateOfImplementation());
+//	    }
+
+	    // Save updated entities
+	    implementationRequestRepository.save(implReq);
+	    assuranceRepository.save(assurance);
+
+	    return getImplementationDetailById(id); // Reuse existing method for response DTO
+	}
 
 }

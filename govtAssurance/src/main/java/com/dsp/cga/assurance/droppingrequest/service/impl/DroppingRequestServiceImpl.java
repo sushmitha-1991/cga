@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.dsp.cga.assurance.droppingrequest.dto.AssuranceDroppingRequestDTO;
 import com.dsp.cga.assurance.droppingrequest.dto.AssuranceDroppingResponseDTO;
 import com.dsp.cga.assurance.droppingrequest.dto.DroppingRequestDTO;
 import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
@@ -352,5 +353,52 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		            .remarks(dr.getRemarks())
 		            .build();
 		}
+
+		@Override
+		public AssuranceDroppingResponseDTO updateDroppingRequest(Long id, AssuranceDroppingRequestDTO requestDTO) {
+		    DroppingRequest dr = droppingRequestRepository.findById(id).orElse(null);
+		    if (dr == null || dr.getAssuranceId() == null) return null;
+
+		    Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
+		    if (assurance == null) return null;
+
+		    // Update DroppingRequest fields if not null
+		    if (requestDTO.getPartId() != null) {
+		        dr.setPartId(requestDTO.getPartId());
+		    }
+		    if (requestDTO.getSupplementaryId() != null) {
+		        dr.setSupplementaryId(requestDTO.getSupplementaryId());
+		    }
+		    if (requestDTO.getDroppingType() != null) {
+		        dr.setDroppingType(requestDTO.getDroppingType());
+		    }
+		    if (requestDTO.getDropRequestDate() != null) {
+		        dr.setDropRequestDate(requestDTO.getDropRequestDate());
+		    }
+		    if (requestDTO.getActualDropDate() != null) {
+		        dr.setActualDropDate(requestDTO.getActualDropDate());
+		    }
+		    if (requestDTO.getMinistryRefDate() != null) {
+		        dr.setMinistryRefDate(requestDTO.getMinistryRefDate());
+		    }
+		    if (requestDTO.getMinistryRefNo() != null) {
+		        dr.setMinistryRefNo(requestDTO.getMinistryRefNo());
+		    }
+		    if (requestDTO.getRemarks() != null) {
+		        dr.setRemarks(requestDTO.getRemarks());
+		    }
+
+		    // Update Assurance status if provided
+		    if (requestDTO.getStatusId() != null) {
+		        assurance.setStatusId(requestDTO.getStatusId());
+		        assuranceRepository.save(assurance);
+		    }
+
+		    droppingRequestRepository.save(dr);
+
+		    // Return updated DTO
+		    return getDroppingRequestById(id);
+		}
+
 
 }

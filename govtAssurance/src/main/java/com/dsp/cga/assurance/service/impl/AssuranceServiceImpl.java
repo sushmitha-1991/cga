@@ -1112,7 +1112,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 	}
 
 	@Override
-	public List<AssuranceListDTO> getAssuranceNos(Integer ministryCode, Long sessionNo, Integer houseId) {
+	public List<AssuranceListDTO> getAssuranceNos(Integer ministryCode, Long sessionNo, Long houseId) {
 		  final Long ministryId;
 	        if (ministryCode != null) {
 	            Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
@@ -1123,6 +1123,10 @@ public class AssuranceServiceImpl implements AssuranceService {
 	            }
 	        } else {
 	            ministryId = null;
+	        }
+	        
+	        if (houseId == null) {
+	            houseId = getHouseId();  
 	        }
 
 	        Specification<Assurance> spec = AssuranceSpecification.filterByParams(ministryId, sessionNo, houseId);
@@ -1138,40 +1142,6 @@ public class AssuranceServiceImpl implements AssuranceService {
 	                .collect(Collectors.toList());
 	    }
 
-//	@Override
-//	public void createAssuranceWithImplementation(AssuranceWithImplementationRequestDTO dto) {
-//		 Assurance assurance = Assurance.builder()
-//	                .assuranceNo(dto.getAssuranceNo())
-//	                .lokSabhaSessionNo(dto.getSessionNo()) // assuming session is LS
-//	                .questionNo(dto.getQuestionNo())
-//	                .subject(dto.getSubject())
-//	                .ministryId(dto.getMinistryId())
-//	                .departmentId(dto.getDepartmentId())
-//	                .memberId(dto.getMemberId())
-//	                .build();
-//
-//	        Assurance savedAssurance = assuranceRepository.save(assurance);
-//
-//	        ImplementationRequest implRequest = ImplementationRequest.builder()
-//	                .assuranceId(savedAssurance.getId())
-//	                .implementationTypeId(dto.getImplementationTypeId())
-//	                .partId(dto.getPartId())
-//	                .supplementaryId(dto.getSupplementaryId())
-//	                .layingDate(dto.getLayingDate())
-//	                .reason(dto.getReason())
-//	                .implementationReportFiles(dto.getImplementationReportFiles())
-//	                .partReportFiles(dto.getPartReportFiles())
-//	                .draftStatus(false)
-//	                .build();
-//
-//	        implementationRequestRepository.save(implRequest);
-//	    }
-
-	
-	
-
-
-	
 
 	private Long getHouseId() {
 		Long houseId = null;

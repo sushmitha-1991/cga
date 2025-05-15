@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -139,5 +140,26 @@ public class ImplementationRequestController {
 	             "Implementation detail fetched successfully", dto));
 	 }
 
+	 @PutMapping("/implementation-details/{id}")
+	 @Operation(summary = "Update Implementation Detail by ID")
+	 @ApiResponses(value = {
+	     @ApiResponse(responseCode = "200", description = "Implementation detail updated successfully"),
+	     @ApiResponse(responseCode = "404", description = "Implementation detail not found"),
+	     @ApiResponse(responseCode = "500", description = "Internal server error")
+	 })
+	 public ResponseEntity<GenericResponse<AssuranceImplementationDTO>> updateImplementationRequestById(
+	         @PathVariable Long id,
+	         @RequestBody ImplementationRequestDTO dto) {
+
+	     AssuranceImplementationDTO updatedDto = implementationRequestService.updateImplementationRequest(id, dto);
+
+	     if (updatedDto == null) {
+	         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                 .body(new GenericResponse<>(HttpStatus.NOT_FOUND.value(), false, "Implementation detail not found", null));
+	     }
+
+	     return ResponseEntity.ok(new GenericResponse<>(
+	             HttpStatus.OK.value(), true, "Implementation detail updated successfully", updatedDto));
+	 }
 
 }

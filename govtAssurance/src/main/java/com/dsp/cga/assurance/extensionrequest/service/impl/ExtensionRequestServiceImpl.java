@@ -349,6 +349,46 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	            .build();
 	}
 
+	@Override
+	public ExtensionRequestResponseDTO updateExtensionRequest(Long id, ExtensionRequestDTO requestDTO) {
+		 ExtensionRequest er = extenionRequestRepository.findById(id).orElse(null);
+		    if (er == null) return null;
+
+		    Assurance assurance = null;
+		    if (er.getAssuranceId() != null) {
+		        assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
+		    }
+
+		    // Update ExtensionRequest fields only if non-null
+		    if (requestDTO.getExtensionNo() != null) {
+		        er.setExtensionNo(requestDTO.getExtensionNo());
+		    }
+		    if (requestDTO.getRemarks() != null) {
+		        er.setRemarks(requestDTO.getRemarks());
+		    }
+		    if (requestDTO.getExtGrantedTillDate() != null) {
+		        er.setExtGrantedTillDate(requestDTO.getExtGrantedTillDate());
+		    }
+		    if (requestDTO.getExtRequestedTillDate() != null) {
+		        er.setExtRequestedTillDate(requestDTO.getExtRequestedTillDate());
+		    }
+		    if (requestDTO.getMinistryRefDate() != null) {
+		        er.setMinistryRefDate(requestDTO.getMinistryRefDate());
+		    }
+		    if (requestDTO.getMinistryRefNo() != null) {
+		        er.setMinistryRefNo(requestDTO.getMinistryRefNo());
+		    }
+
+		    // Optionally update status in Assurance
+		    if (assurance != null && requestDTO.getStatusId() != null) {
+		        assurance.setStatusId(requestDTO.getStatusId());
+		        assuranceRepository.save(assurance);
+		    }
+
+		    extenionRequestRepository.save(er);
+
+		    return getExtensionRequestById(id); // Reuse existing method to return DTO
+		}
 
 
 }

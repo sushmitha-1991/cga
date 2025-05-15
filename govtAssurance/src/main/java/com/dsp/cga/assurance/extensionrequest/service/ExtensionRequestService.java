@@ -23,4 +23,6 @@ public interface ExtensionRequestService {
 
 	ExtensionRequestResponseDTO getExtensionRequestById(Long id);
 
+	ExtensionRequestResponseDTO updateExtensionRequest(Long id, ExtensionRequestDTO requestDTO);
+
 }

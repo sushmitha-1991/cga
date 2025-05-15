@@ -32,7 +32,7 @@ public interface AssuranceService {
 
 	
 
-	List<AssuranceListDTO> getAssuranceNos(Integer ministryCode, Long sessionNo, Integer houseId);
+	List<AssuranceListDTO> getAssuranceNos(Integer ministryCode, Long sessionNo, Long houseId);
 
 	void createAssuranceWithImplementation(AssuranceWithImplementationRequestDTO dto);
 
