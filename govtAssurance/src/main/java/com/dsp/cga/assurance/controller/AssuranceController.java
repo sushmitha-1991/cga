@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
+import com.dsp.cga.assurance.dto.AssuranceRequestCountDTO;
 import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.response.GenericResponse;
 
@@ -262,5 +263,12 @@ public class AssuranceController {
         return ResponseEntity.ok(dto);
     }
 
-
+//	 @GetMapping("/request-count")
+//	    public ResponseEntity<AssuranceRequestCountDTO> getRequestCount(
+//	            @RequestParam Long sessionNo,
+//	            @RequestParam(required = false) Integer ministryCode) {
+//
+//	        AssuranceRequestCountDTO result = assuranceService.getAssuranceRequestCounts(sessionNo, ministryCode);
+//	        return ResponseEntity.ok(result);
+//	    }
 }

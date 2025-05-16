@@ -294,6 +294,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	            .status(codeRepository.findCodeById(assurance.getStatusId()))
 	            .clubbedAssuranceIds(clubbedIds)
 	            .memberName(memberName)
+	            .id(clubbed.getId())
 	            .departmentName(departmentName)
 	            .ministryName(ministryName)
 	            .subject(assurance.getSubject())

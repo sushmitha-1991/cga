@@ -26,9 +26,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
+import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
 import com.dsp.cga.assurance.dto.AssuranceCategory;
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
+import com.dsp.cga.assurance.dto.AssuranceRequestCountDTO;
 import com.dsp.cga.assurance.dto.AssuranceTypeDTO;
 import com.dsp.cga.assurance.dto.DepartmentsDTO;
 import com.dsp.cga.assurance.dto.LokSabhaNoDTO;
@@ -53,6 +56,7 @@ import com.dsp.cga.assurance.implementationrequest.dto.AssuranceWithImplementati
 import com.dsp.cga.assurance.implementationrequest.repository.ApplicationInstanceRepository;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
+import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 //import com.dsp.cga.assurance.external.service.ExternalService;
 import com.dsp.cga.assurance.partdetails.repository.PartDetailsRepository;
@@ -137,6 +141,21 @@ public class AssuranceServiceImpl implements AssuranceService {
 	
 	@Autowired
 	private MinistryRepository ministryRepo;
+	
+	@Autowired
+	private ImplementationRequestRepository implementationRepo;
+	
+	@Autowired
+	private ExtensionRequestRepository extensionRepo;
+	
+	@Autowired
+	private DroppingRequestRepositiry droppingRepo;
+	
+	@Autowired
+	private ClubbedAssuranceRepository clubbedAssuranceRepo;
+	
+	@Autowired
+	private OtherRequestRepository otherRequestRepo;
 
 	
 	@Autowired
@@ -1203,4 +1222,35 @@ public class AssuranceServiceImpl implements AssuranceService {
 		// TODO Auto-generated method stub
 		
 	}
+
+	
+//		 @Override
+//		    public AssuranceRequestCountDTO getAssuranceRequestCounts(Long sessionNo, Integer ministryCode) {
+//			 Long houseId = getHouseId();
+//
+//		        Long ministryId = null;
+//		        if (ministryCode != null) {
+//		            Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
+//		            if (ministry != null) {
+//		                ministryId = ministry.getId();
+//		            } else {
+//		                // Ministry code invalid, aap chaho to exception throw kar sakte ho ya null handle karo
+//		                return AssuranceRequestCountDTO.builder()
+//		                        .implementationCount(0L)
+//		                        .extensionCount(0L)
+//		                        .droppingCount(0L)
+//		                        .build();
+//		            }
+//		        }
+//
+//		        Long implementationCount = implementationRepo.countByFilters(sessionNo, ministryId, houseId);
+//		        Long extensionCount = extensionRequestRepository.countByFilters(sessionNo, ministryId, houseId);
+//		        Long droppingCount = droppingRepo.countByFilters(sessionNo, ministryId, houseId);
+//
+//		        return AssuranceRequestCountDTO.builder()
+//		                .implementationCount(implementationCount)
+//		                .extensionCount(extensionCount)
+//		                .droppingCount(droppingCount)
+//		                .build();
+//		    }
 }

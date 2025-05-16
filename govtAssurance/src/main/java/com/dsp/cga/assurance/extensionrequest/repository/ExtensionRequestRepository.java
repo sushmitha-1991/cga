@@ -20,6 +20,17 @@ public interface ExtensionRequestRepository extends JpaRepository<ExtensionReque
 
 	Optional<ExtensionRequest> findByAssuranceIdAndExtensionNo(Long assuranceId, String extensionNo);
 
+//	 @Query("SELECT COUNT(e) FROM ExtensionRequest e WHERE " +
+//	           "(:ministryId IS NULL OR e.ministry.id = :ministryId) AND " +
+//	           "(:houseId IS NULL OR e.houseTypeId = :houseId) AND " +
+//	           "(:sessionNo IS NULL OR " +
+//	           "( :houseId = 1 AND e.rajyaSabhaSessionNo = :sessionNo ) OR " +
+//	           "( :houseId = 2 AND e.lokSabhaSessionNo = :sessionNo ))")
+//	    Long countByFilters(@Param("sessionNo") Long sessionNo,
+//	                        @Param("ministryId") Long ministryId,
+//	                        @Param("houseId") Long houseId);
+
+
 	
 
 }

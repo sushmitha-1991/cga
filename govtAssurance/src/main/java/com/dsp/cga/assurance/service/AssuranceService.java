@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
+import com.dsp.cga.assurance.dto.AssuranceRequestCountDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceWithImplementationRequestDTO;
 
 public interface AssuranceService {
@@ -37,6 +38,8 @@ public interface AssuranceService {
 	void createAssuranceWithImplementation(AssuranceWithImplementationRequestDTO dto);
 
 	AssuranceDTO getByAssuranceNo(String assuranceNo);
+
+	//AssuranceRequestCountDTO getAssuranceRequestCounts(Long sessionNo, Integer ministryCode);
 
 	
 
