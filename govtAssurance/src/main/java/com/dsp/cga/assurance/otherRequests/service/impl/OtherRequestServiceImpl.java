@@ -3,6 +3,7 @@ package com.dsp.cga.assurance.otherRequests.service.impl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.entity.Departments;
 import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.otherRequests.dto.OtherRequestDTO;
 import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
@@ -19,11 +21,14 @@ import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
 import com.dsp.cga.assurance.otherRequests.service.OtherRequestService;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
+import com.dsp.cga.assurance.repository.DepartmentRepository;
 import com.dsp.cga.assurance.repository.MasterLSSRepository;
 import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
+import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.transaction.Transactional;
 
 @Service
 public class OtherRequestServiceImpl implements OtherRequestService {
@@ -36,6 +41,12 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	
 	@Autowired
 	private MinistryRepository ministryRepository;
+	
+	@Autowired
+	private DepartmentRepository departmentRepository;
+	
+	@Autowired
+	private PersonalDetailsRepository personalDetailsRepository;
 	
 	@Autowired
 	private MasterLSSRepository lssRepo;
@@ -169,6 +180,99 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 		}
 		return houseId;
 	}
+
+	@Override
+	public OtherRequestDTO getOtherRequestById(Long id) {
+		   Optional<OtherRequests> optional = otherRequestRepo.findById(id);
+	        if (optional.isEmpty()) return null;
+
+	        OtherRequests or = optional.get();
+	        Assurance assurance = null;
+	        String memberName = null;
+		    String departmentName = null;
+		    String ministryName = null;
+
+	        if (or.getAssuranceId() != null) {
+	            assurance = assuranceRepository.findById(or.getAssuranceId()).orElse(null);
+	            
+	            if (assurance != null && assurance.getMemberId() != null) {
+		            memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
+		            
+		        }
+		        if (assurance.getDepartmentId() != null) {
+	                departmentName = departmentRepository.findById(assurance.getDepartmentId())
+	                    .map(Departments::getDepartmentName)
+	                    .orElse(null);
+	            }
+		        if (assurance.getMinistryId() != null) {
+	                ministryName = ministryRepository.findById(assurance.getDepartmentId())
+	                    .map(Ministries::getMinistryName)
+	                    .orElse(null);
+	            }
+	        }
+
+	        return OtherRequestDTO.builder()
+	            .id(or.getId())
+	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
+	            .status(codeRepository.findCodeById(assurance.getStatusId()))
+	            .memberName(memberName)
+	            .ministryName(ministryName)
+	            .departmentName(departmentName)
+	            .questionNo(assurance.getQuestionNo())
+	            .requestedDate(or.getRequestedDate())
+	            .remarks(or.getRemarks())
+	            .lokSabhaSessionNumber(assurance != null
+	                ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()) : null)
+	            .lokSabhaNumber(assurance != null
+	                ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()) : null)
+	            .rajyaSabhaSessionNumber(assurance != null
+	                ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()) : null)
+	            .build();
+	    }
+
+	@Override
+	
+	public OtherRequestDTO updateOtherRequestById(Long id, OtherRequestDTO dto) {
+	    Optional<OtherRequests> optional = otherRequestRepo.findById(id);
+	    if (optional.isEmpty()) {
+	        return null;
+	    }
+
+	    OtherRequests existing = optional.get();
+
+	    // Only update fields if they are not null (optional update)
+	    if (dto.getAssuranceId() != null) {
+	        existing.setAssuranceId(dto.getAssuranceId());
+	    }
+	    if (dto.getSubject() != null) {
+	        existing.setSubject(dto.getSubject());
+	    }
+	    if (dto.getRequestedDate() != null) {
+	        existing.setRequestedDate(dto.getRequestedDate());
+	    }
+	    if (dto.getStatusId() != null) {
+	        existing.setStatusId(dto.getStatusId());
+	    }
+	    if (dto.getRemarks() != null) {
+	        existing.setRemarks(dto.getRemarks());
+	    }
+	    if (dto.getFileUrl() != null) {
+	        existing.setFileUrl(dto.getFileUrl());
+	    }
+
+	    OtherRequests updated = otherRequestRepo.save(existing);
+
+	    return OtherRequestDTO.builder()
+	            .id(updated.getId())
+	            .assuranceId(updated.getAssuranceId())
+	            .subject(updated.getSubject())
+	            .requestedDate(updated.getRequestedDate())
+	            .statusId(updated.getStatusId())
+	            .remarks(updated.getRemarks())
+	            .fileUrl(updated.getFileUrl())
+	            .build();
+	}
+
 
 
 

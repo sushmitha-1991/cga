@@ -25,6 +25,11 @@ public class OtherRequestDTO {
     private String status;
 	private Long assuranceId;
 
+	private String departmentName;
+	private String ministryName;
+	private String memberName;
+	private String questionNo;
+	
 	 private LocalDate requestedDate;
 	
 	    private Long statusId; 

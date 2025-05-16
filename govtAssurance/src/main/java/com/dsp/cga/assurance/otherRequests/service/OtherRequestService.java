@@ -12,4 +12,8 @@ public interface OtherRequestService {
 	List<OtherRequestDTO> getFilteredOtherRequests(Long sessionNo, LocalDate requestedDate, Long statusId,
 			Integer ministryCode);
 
+	OtherRequestDTO getOtherRequestById(Long id);
+
+	OtherRequestDTO updateOtherRequestById(Long id, OtherRequestDTO dto);
+
 }

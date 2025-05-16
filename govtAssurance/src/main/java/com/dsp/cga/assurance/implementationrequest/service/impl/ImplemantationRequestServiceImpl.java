@@ -441,6 +441,14 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    if (dto.getImplementationTypeId() != null) {
 	        implReq.setImplementationTypeId(dto.getImplementationTypeId());
 	    }
+	    
+	    if (dto.getImplementationReportFiles() != null) {
+	        implReq.setImplementationReportFiles(dto.getImplementationReportFiles());
+	    }
+	    
+	    if (dto.getPartReportFiles() != null) {
+	        implReq.setPartReportFiles(dto.getPartReportFiles());
+	    }
 
 	    // Update Assurance fields if provided
 //	    if (dto.getStatusId() != null) {
