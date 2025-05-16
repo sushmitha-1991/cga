@@ -13,5 +13,6 @@ public class AssuranceIdNoPairDTO {
 	
 	 private Long id;    // Assurance ID
 	    private String no; 
+	    
 
 }

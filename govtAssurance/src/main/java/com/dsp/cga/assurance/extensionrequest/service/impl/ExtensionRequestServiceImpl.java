@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.entity.Departments;
 import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestResponseDTO;
@@ -34,9 +35,11 @@ import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
+import com.dsp.cga.assurance.repository.DepartmentRepository;
 import com.dsp.cga.assurance.repository.MasterLSSRepository;
 import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
+import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.mapper.ExtensionRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.response.GenericResponse;
@@ -65,6 +68,12 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	
 	@Autowired
 	private MinistryRepository ministryRepository;
+	
+	@Autowired
+	private DepartmentRepository departmentRepository;
+	
+	@Autowired
+	private PersonalDetailsRepository personalDetailsRepository;
 	
 	@Autowired
 	private MasterLSSRepository lssRepo;
@@ -323,13 +332,33 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	    if (er == null) return null;
 
 	    Assurance assurance = null;
+	    String memberName = null;
+	    String departmentName = null;
+	    String ministryName = null;
 	    if (er.getAssuranceId() != null) {
 	        assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
+	        if (assurance != null && assurance.getMemberId() != null) {
+	            memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
+	            
+	        }
+	        if (assurance.getDepartmentId() != null) {
+                departmentName = departmentRepository.findById(assurance.getDepartmentId())
+                    .map(Departments::getDepartmentName)
+                    .orElse(null);
+            }
+	        if (assurance.getMinistryId() != null) {
+                ministryName = ministryRepository.findById(assurance.getDepartmentId())
+                    .map(Ministries::getMinistryName)
+                    .orElse(null);
+            }
 	    }
 
 	    return ExtensionRequestResponseDTO.builder()
 	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
 	            .extensionNo(er.getExtensionNo())
+	            .questionNo(assurance.getQuestionNo())
+	            .subject(assurance.getSubject())
+	            .questionNo(assurance.getQuestionNo())
 	            .status(codeRepository.findCodeById(assurance != null ? assurance.getStatusId() : null))
 	            .lokSabhaSessionNo(assurance != null
 	                    ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
@@ -344,6 +373,9 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	            .extGrantedTillDate(er.getExtGrantedTillDate())
 	            .extRequestedTillDate(er.getExtRequestedTillDate())
 	            .ministryRefDate(er.getMinistryRefDate())
+	            .memberName(memberName)
+	            .departmentName(departmentName)
+	            .ministryName(ministryName)
 	            .id(er.getId())
 	            .ministryRefNo(er.getMinistryRefNo())
 	            .build();

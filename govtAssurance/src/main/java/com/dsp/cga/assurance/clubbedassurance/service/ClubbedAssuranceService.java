@@ -21,6 +21,8 @@ public interface ClubbedAssuranceService {
 	ClubbedAssuranceDTO createClubbedAssurance(ClubbedAssuranceDTO dto);
 
 	AssuranceResponseDTO getClubbedAssuranceById(Long id);
+
+	AssuranceResponseDTO updateClubbedAssuranceById(Long id, ClubbedAssuranceDTO dto);
 	
 	
 

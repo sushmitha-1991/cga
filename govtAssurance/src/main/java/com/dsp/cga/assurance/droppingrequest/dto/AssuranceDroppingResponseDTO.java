@@ -19,6 +19,9 @@ public class AssuranceDroppingResponseDTO {
     private String rajyaSabhaSessionNo;
     private String partId;
     private String supplementaryId;
+    private String memberName;
+    private String departmentName;
+    private String ministryName;
     private String droppingType;
     private LocalDate dropRequestDate;
     private LocalDate actualDropDate;
@@ -26,6 +29,7 @@ public class AssuranceDroppingResponseDTO {
     private String status;
     private String remarks;
     private String ministryRefNo;
-
+private String questionNo;
+private String subject;
 	private LocalDate ministryRefDate;
 }

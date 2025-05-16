@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -163,5 +164,25 @@ public class ClubbedAssuranceController {
 	     );
 	 }
 
+	 @PutMapping("/clubbedAssurance/{id}")
+	 @Operation(summary = "Update Clubbed Assurance by ID")
+	 @ApiResponses(value = {
+	     @ApiResponse(responseCode = "200", description = "Updated successfully"),
+	     @ApiResponse(responseCode = "404", description = "Clubbed Assurance not found")
+	 })
+	 public ResponseEntity<GenericResponse<AssuranceResponseDTO>> updateClubbedAssuranceById(
+	         @PathVariable Long id,
+	         @RequestBody ClubbedAssuranceDTO dto) {
+
+	     AssuranceResponseDTO updated = clubbedAssuranceService.updateClubbedAssuranceById(id, dto);
+
+	     if (updated == null) {
+	         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	             .body(new GenericResponse<>(404, false, "Clubbed Assurance not found", null));
+	     }
+
+	     return ResponseEntity.ok(
+	         new GenericResponse<>(200, true, "Clubbed Assurance updated successfully", updated));
+	 }
 
 }

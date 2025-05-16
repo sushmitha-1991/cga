@@ -20,12 +20,15 @@ import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceReposit
 import com.dsp.cga.assurance.clubbedassurance.service.ClubbedAssuranceService;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.entity.Departments;
 import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
+import com.dsp.cga.assurance.repository.DepartmentRepository;
 import com.dsp.cga.assurance.repository.MasterLSSRepository;
 import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
+import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.mapper.ClubbedAssuranceMapper;
 import com.dsp.cga.response.GenericResponse;
 
@@ -45,6 +48,12 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 
 	@Autowired
 	private MasterLSSRepository lssRepo;
+	
+	@Autowired
+	private PersonalDetailsRepository personalDetailsRepository;
+	
+	@Autowired
+	private DepartmentRepository departmentRepository;
 
 	@Autowired
 	private MastersRSSRepository rssRepo;
@@ -189,6 +198,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	                    : List.of();
 
 	            return AssuranceResponseDTO.builder()
+	            		.id(clubbed.getId())
 	                    .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
 	                    .lokSabhaSessionNo(assurance != null && assurance.getLokSabhaSessionNo() != null
 	                            ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()) : null)
@@ -244,7 +254,27 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	    if (clubbed == null) return null;
 
 	    Assurance assurance = assuranceRepository.findById(clubbed.getAssuranceId()).orElse(null);
+	    
+	    String memberName = null;
+	    String departmentName = null;
+	    String ministryName = null;
+	    
+	    if (assurance != null && assurance.getMemberId() != null) {
+            memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
+            
+        }
+        if (assurance.getDepartmentId() != null) {
+            departmentName = departmentRepository.findById(assurance.getDepartmentId())
+                .map(Departments::getDepartmentName)
+                .orElse(null);
+        }
+        if (assurance.getMinistryId() != null) {
+            ministryName = ministryRepository.findById(assurance.getDepartmentId())
+                .map(Ministries::getMinistryName)
+                .orElse(null);
+        }
 	    if (assurance == null) return null;
+	  
 
 	    List<Long> clubbedIds = clubbed.getClubbedAssuranceIds() != null
 	            ? clubbed.getClubbedAssuranceIds().stream().distinct().toList()
@@ -252,6 +282,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 
 	    return AssuranceResponseDTO.builder()
 	            .assuranceNo(assurance.getAssuranceNo())
+	            
 	            .lokSabhaSessionNo(assurance.getLokSabhaSessionNo() != null
 	                    ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()) : null)
 	            .lokSabhaNo(assurance.getLokSabhaNo() != null
@@ -262,8 +293,51 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	            .questionNo(assurance.getQuestionNo())
 	            .status(codeRepository.findCodeById(assurance.getStatusId()))
 	            .clubbedAssuranceIds(clubbedIds)
+	            .memberName(memberName)
+	            .departmentName(departmentName)
+	            .ministryName(ministryName)
+	            .subject(assurance.getSubject())
 	            .build();
 	}
 
+	@Override
+	public AssuranceResponseDTO updateClubbedAssuranceById(Long id, ClubbedAssuranceDTO dto) {
+		// TODO Auto-generated method stub
+		 ClubbedAssurance clubbed = clubbedAssuranceRepository.findById(id).orElse(null);
+		    if (clubbed == null) return null;
+
+		    if (dto.getAssuranceId() != null) {
+		        clubbed.setAssuranceId(dto.getAssuranceId());
+		    }
+		    
+		    if (dto.getDate() != null) {
+		        clubbed.setDate(dto.getDate());
+		    }
+		    if (dto.getClubbedAssuranceIds() != null) {
+		        clubbed.setClubbedAssuranceIds(dto.getClubbedAssuranceIds());
+		    }
+
+		    clubbedAssuranceRepository.save(clubbed);
+
+		    Assurance assurance = assuranceRepository.findById(clubbed.getAssuranceId()).orElse(null);
+		    List<Long> clubbedIds = clubbed.getClubbedAssuranceIds() != null
+		            ? clubbed.getClubbedAssuranceIds().stream().distinct().toList()
+		            : List.of();
+
+		    return AssuranceResponseDTO.builder()
+		            .id(clubbed.getId())
+		            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
+		            .lokSabhaSessionNo(assurance != null && assurance.getLokSabhaSessionNo() != null
+		                    ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()) : null)
+		            .lokSabhaNo(assurance != null && assurance.getLokSabhaNo() != null
+		                    ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()) : null)
+		            .rajyaSabhaSessionNo(assurance != null && assurance.getRajyaSabhaSessionNo() != null
+		                    ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()) : null)
+		            .assuranceDate(assurance != null ? assurance.getAssuranceDate() : null)
+		            .questionNo(assurance != null ? assurance.getQuestionNo() : null)
+		            .status(assurance != null ? codeRepository.findCodeById(assurance.getStatusId()) : null)
+		            .clubbedAssuranceIds(clubbedIds)
+		            .build();
+		}
 
 }

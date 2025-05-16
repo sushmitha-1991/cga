@@ -18,8 +18,9 @@ public class OtherRequestDTO {
 	private Long id;
 
 	private String assuranceNo;
-    private String lokSabhaNo;
-    private Long sessionNo;
+	 private String lokSabhaNumber;
+	    private String lokSabhaSessionNumber;
+	    private String rajyaSabhaSessionNumber;
     private String extensionNo;
     private String status;
 	private Long assuranceId;

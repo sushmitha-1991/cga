@@ -1,6 +1,7 @@
 package com.dsp.cga.assurance.otherRequests.controller;
 
 import java.time.LocalDate;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +20,6 @@ import com.dsp.cga.assurance.otherRequests.service.OtherRequestService;
 import com.dsp.cga.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
@@ -35,6 +36,7 @@ public class OtherRequestController {
 //            @ApiResponse(responseCode = "400", description = "Invalid input")
 //    })
     public ResponseEntity<GenericResponse<OtherRequestDTO>> create(@RequestBody OtherRequestDTO dto) {
+		System.out.println(dto);
         OtherRequestDTO created = otherRequestService.createOtherRequest(dto);
         GenericResponse<OtherRequestDTO> response = new GenericResponse<>(
                 HttpStatus.CREATED.value(),
@@ -45,7 +47,7 @@ public class OtherRequestController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-	@GetMapping
+	@GetMapping("/fillter")
 	public List<OtherRequestDTO> getOtherRequests(
 	        @RequestParam(required = false) Long sessionNo,
 	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedDate,

@@ -30,13 +30,16 @@ import com.dsp.cga.assurance.dto.DroppingTypeDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.entity.Departments;
 import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.implementationrequest.service.impl.ImplemantationRequestServiceImpl;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
+import com.dsp.cga.assurance.repository.DepartmentRepository;
 import com.dsp.cga.assurance.repository.MasterLSSRepository;
 import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
+import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.mapper.DroppingRequestMapper;
 import com.dsp.cga.response.GenericResponse;
 
@@ -58,6 +61,12 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 
 	@Autowired
 	private MinistryRepository ministryRepository;
+	
+	@Autowired
+	private DepartmentRepository departmentRepository;
+	
+	@Autowired
+	private PersonalDetailsRepository personalDetailsRepository;
 	
 	@Autowired
 	private MasterLSSRepository lssRepo;
@@ -327,7 +336,27 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		    DroppingRequest dr = droppingRequestRepository.findById(id).orElse(null);
 		    if (dr == null || dr.getAssuranceId() == null) return null;
 
+		 //   if (assurance == null) return null;
+		    
+		    String memberName = null;
+		    String departmentName = null;
+		    String ministryName = null;
+
 		    Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
+		    if (assurance != null && assurance.getMemberId() != null) {
+	            memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
+	            
+	        }
+	        if (assurance.getDepartmentId() != null) {
+	            departmentName = departmentRepository.findById(assurance.getDepartmentId())
+	                .map(Departments::getDepartmentName)
+	                .orElse(null);
+	        }
+	        if (assurance.getMinistryId() != null) {
+	            ministryName = ministryRepository.findById(assurance.getDepartmentId())
+	                .map(Ministries::getMinistryName)
+	                .orElse(null);
+	        }
 		    if (assurance == null) return null;
 
 		    return AssuranceDroppingResponseDTO.builder()
@@ -341,6 +370,8 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		                    ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
 		                    : null)
 		            .assuranceNo(assurance.getAssuranceNo())
+		            .subject(assurance.getSubject())
+		            .questionNo(assurance.getQuestionNo())
 		            .partId(dr.getPartId())
 		            .supplementaryId(dr.getSupplementaryId())
 		            .droppingType(codeRepository.findCodeById(dr.getDroppingType()))
@@ -348,6 +379,9 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		            .actualDropDate(dr.getActualDropDate())
 		            .id(dr.getId())
 		            .ministryRefDate(dr.getMinistryRefDate())
+		            .memberName(memberName)
+		            .ministryName(ministryName)
+		            .departmentName(departmentName)
 		            .ministryRefNo(dr.getMinistryRefNo())
 		            .status(codeRepository.findCodeById(assurance.getStatusId()))
 		            .remarks(dr.getRemarks())

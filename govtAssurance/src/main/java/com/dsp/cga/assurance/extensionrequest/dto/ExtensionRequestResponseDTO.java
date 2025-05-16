@@ -25,10 +25,12 @@ public class ExtensionRequestResponseDTO {
     private LocalDate extRequestedTillDate;
     private String ministryRefNo;
     private String questionNo;
-
+    private String memberName;
+    private String ministryName;
 	private LocalDate ministryRefDate;
 	private String lokSabhaSessionNo;
-
+    private String subject;
+    private String departmentName;
 	private String rajyaSabhaSessionNumber;
     
 }

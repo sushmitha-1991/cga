@@ -18,6 +18,11 @@ public class AssuranceResponseDTO {
     private LocalDate assuranceDate;
     private String questionNo;
     private LocalDate date;
+    private String memberName;
+    private String departmentName;
+    private String ministryName;
+    private String subject;
+    
     private String status;
     private List<Long> clubbedAssuranceIds;
 }

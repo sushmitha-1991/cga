@@ -28,6 +28,7 @@ import com.dsp.cga.assurance.dto.MemberDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.entity.Departments;
 import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceImplementationDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
@@ -36,9 +37,11 @@ import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequ
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
+import com.dsp.cga.assurance.repository.DepartmentRepository;
 import com.dsp.cga.assurance.repository.MasterLSSRepository;
 import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
+import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.assurance.service.impl.AssuranceServiceImpl;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
@@ -70,6 +73,12 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	
 	@Autowired
 	private MasterLSSRepository lssRepo;
+	
+	@Autowired
+	private DepartmentRepository departmentRepository;
+	
+	@Autowired
+	private PersonalDetailsRepository personalDetailsRepository;
 	
 	@Autowired
 	private MastersRSSRepository rssRepo;
@@ -230,73 +239,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 
 
-//	@Override
-//	public List<AssuranceImplementationDTO> getAssuranceImplementations(Long sessionNo, LocalDate layingDate,
-//	        Long implementationTypeId, Long statusId, Integer ministryCode) {
-//		
-//		 Long ministryId = null;
-//		    if (ministryCode != null) {
-//		        Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
-//		        if (ministry != null) {
-//		            ministryId = ministry.getId();
-//		        } else {
-//		            return List.of(); // No such ministry code
-//		        }
-//		    }
-//
-//		    Long houseId = getHouseId();
-//		    if (sessionNo == null) {
-//		        if (houseId == 1) {
-//		            sessionNo = rssRepo.findLatestByCreatedAt();
-//		        } else if (houseId == 2) {
-//		            sessionNo = lssRepo.findLatestByCreatedAt();
-//		        }
-//		    }
-//
-//		    
-//	    Specification<ImplementationRequest> spec = ImplementationRequestSpecification.filterByCriteria(
-//	            sessionNo, layingDate, implementationTypeId, statusId, ministryId, houseId
-//	    );
-//
-//	    List<ImplementationRequest> implementationRequests = implementationRequestRepository.findAll(spec);
-//
-//	    if (CollectionUtils.isEmpty(implementationRequests)) {
-//	        return List.of();
-//	    }
-//	    
-//	    
-//	    return implementationRequests.stream()
-//	            .map(implementationRequest -> {
-//	                Assurance assurance = assuranceRepository.findById(implementationRequest.getAssuranceId())
-//	                        .orElse(null);
-//
-//	                if (assurance == null) {
-//	                    return null;
-//	                }
-//	            
-//	                if ((houseId == 1 && assurance.getRajyaSabhaSessionNo() == null)
-//	                        || (houseId == 2 &&
-//	                            (assurance.getLokSabhaNo() == null || assurance.getLokSabhaSessionNo() == null))) {
-//	                        return null;
-//	                    }
-//	                
-//	                return AssuranceImplementationDTO.builder()
-//	                        .assuranceNo(assurance.getAssuranceNo())
-//	                     //   .lokSabhaNo(assurance.getLokSabhaNo())
-//	                     //   .lokSabhaSessionNo(assurance.getLokSabhaSessionNo())
-//	                      //  .statusId(assurance.getStatusId())
-//	                       .status(codeRepository.findCodeById(assurance.getStatusId()))
-//	                       .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
-//	                       .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaNo()))
-//	    	                .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()))
-//	                        .dueDateOfImplementation(assurance.getDueDateOfImplementation())
-//	                        .detailsOfImplementation(assurance.getDetailsOfImplementation())
-//	                        .dateOfImplementation(assurance.getDateOfImplementation())
-//	                        .build();
-//	            })
-//	            .filter(Objects::nonNull)
-//	            .collect(Collectors.toList());
-//	}
 	
 	@Override
 	public List<AssuranceImplementationDTO> getAssuranceImplementations(Long sessionNo, LocalDate layingDate,
@@ -417,17 +359,41 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    if (optionalRequest.isEmpty()) return null;
 
 	    ImplementationRequest implementationRequest = optionalRequest.get();
+	   // Assurance assurance = null;
+	    String memberName = null;
+	    String departmentName = null;
+	    String ministryName = null;
 
 	    Assurance assurance = assuranceRepository.findById(implementationRequest.getAssuranceId()).orElse(null);
+	    if (assurance != null && assurance.getMemberId() != null) {
+            memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
+            
+        }
+        if (assurance.getDepartmentId() != null) {
+            departmentName = departmentRepository.findById(assurance.getDepartmentId())
+                .map(Departments::getDepartmentName)
+                .orElse(null);
+        }
+        if (assurance.getMinistryId() != null) {
+            ministryName = ministryRepository.findById(assurance.getDepartmentId())
+                .map(Ministries::getMinistryName)
+                .orElse(null);
+        }
 	    if (assurance == null) return null;
+	    
 
 	    Long houseId = getHouseId();
 
 	    AssuranceImplementationDTO.AssuranceImplementationDTOBuilder builder = AssuranceImplementationDTO.builder()
 	            .assuranceNo(assurance.getAssuranceNo())
+	            .memberName(memberName)
+	            .ministryName(ministryName)
+	            .departmentName(departmentName)
 	            .status(codeRepository.findCodeById(assurance.getStatusId()))
 	            .dueDateOfImplementation(assurance.getDueDateOfImplementation())
 	            .detailsOfImplementation(assurance.getDetailsOfImplementation())
+	            .subject(assurance.getSubject())
+	            .questionNo(assurance.getQuestionNo())
 	            .dateOfImplementation(assurance.getDateOfImplementation())
 	            .supplementaryId(implementationRequest.getSupplementaryId())
 	            .partId(implementationRequest.getPartId())
@@ -476,7 +442,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        implReq.setImplementationTypeId(dto.getImplementationTypeId());
 	    }
 
-//	    // Update Assurance fields if provided
+	    // Update Assurance fields if provided
 //	    if (dto.getStatusId() != null) {
 //	        assurance.setStatusId(dto.getStatusId());
 //	    }

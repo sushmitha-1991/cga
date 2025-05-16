@@ -34,7 +34,7 @@ public class OtherRequests extends Auditable{
 	@SequenceGenerator(name = "other_req_seq", sequenceName = "cga.other_req_seq", allocationSize = 1)
 	private Long id;
 
-	@Column(name = "assurance_id", nullable = false)
+	@Column(name = "assurance_id")
 	private Long assuranceId;
 	
 	@Column(name = "requested_date")
