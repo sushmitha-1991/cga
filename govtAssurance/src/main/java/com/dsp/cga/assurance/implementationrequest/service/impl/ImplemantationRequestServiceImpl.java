@@ -293,6 +293,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        return assurances.stream()
 	                .map(assurance -> AssuranceImplementationDTO.builder()
 	                        .assuranceNo(assurance.getAssuranceNo())
+	                        .id(assurance.getId())
 	                        .status(codeRepository.findCodeById(assurance.getStatusId()))
 	                        .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
 	                        .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()))
