@@ -39,7 +39,7 @@ public class ImplementationRequest extends Auditable {
 	@Column(name = "committee_decision_id")
 	private Long committeeDecisionId;
 
-	@Column(name = "laying_date", nullable = false)
+	@Column(name = "laying_date")
 	private LocalDate layingDate;
 
 	@Column(name = "statement_no", length = 50)

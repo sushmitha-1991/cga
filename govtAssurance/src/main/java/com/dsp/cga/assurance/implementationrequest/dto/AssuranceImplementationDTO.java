@@ -34,6 +34,8 @@ public class AssuranceImplementationDTO {
 	    private String partId;
 	    private String implementationTypeId;
 		private String reason;
+		private String remarks;
+	//	private String detailsOfImplementation;
 		private String ministryName;
 		private String departmentName;
 		private String memberName;

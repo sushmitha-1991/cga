@@ -35,11 +35,13 @@ public interface PersonalDetailsRepository extends JpaRepository<PersonalDetails
 	List<Object[]> findMembersSummary();
 
 	@Query(value = """
-		    SELECT CONCAT(bu.first_name, ' ', 
-		                  COALESCE(bu.middle_name, ''), ' ', 
-		                  bu.last_name)
-		    FROM authentication.base_user bu
-		    WHERE bu.id = :memberId
+		    SELECT TRIM(CONCAT(
+		        COALESCE(pd.first_name, ''), ' ', 
+		        COALESCE(pd.middle_name, ''), ' ', 
+		        COALESCE(pd.last_name, '')
+		    )) 
+		    FROM members.personal_details pd
+		    WHERE pd.id = :memberId
 		    """, nativeQuery = true)
 		String findMemberNameByMemberId(@Param("memberId") Long memberId);
 
