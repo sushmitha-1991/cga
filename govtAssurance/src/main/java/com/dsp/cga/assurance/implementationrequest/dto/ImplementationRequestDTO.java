@@ -30,6 +30,11 @@ public class ImplementationRequestDTO {
 	    private String assuranceNo;
 	    private Long implementationTypeId;
 	    private Long session;
+	    private LocalDate dueDateOfImplementation;
+	    private String detailsOfImplementation;
+	    private LocalDate dateOfImplementation;
+	    private String status;
+	    private String remarks;
 	    private CommitteeDecisionDTO committeeDecisionDTO;
 	    private ImplementationTypeDTO implementationTypeDTO;
 	    private List<Map<String, Object>> implementationReportFiles;

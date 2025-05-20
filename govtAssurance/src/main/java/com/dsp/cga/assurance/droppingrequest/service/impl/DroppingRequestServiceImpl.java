@@ -297,6 +297,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	                                : null)
 	                        .assuranceNo(assurance.getAssuranceNo())
 	                        .partId(dr.getPartId())
+	                        .questionNo(assurance.getQuestionNo())
 	                        .supplementaryId(dr.getSupplementaryId())
 	                      
 	                        .droppingType(assurance != null

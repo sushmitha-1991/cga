@@ -155,6 +155,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .id(or.getId())
 	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
 	            .status(codeRepository.findCodeById(or.getStatusId()))
+	            .questionNo(assurance.getQuestionNo())
 	            .requestedDate(or.getRequestedDate())
 	            .remarks(or.getRemarks())
 	            .lokSabhaSessionNumber(assurance != null

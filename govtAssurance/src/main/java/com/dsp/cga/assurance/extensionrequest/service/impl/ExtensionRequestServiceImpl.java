@@ -292,7 +292,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	        Assurance assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
 	        return ExtensionRequestResponseDTO.builder()
 	                .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
-	                
+	                .questionNo(assurance.getQuestionNo())
 	                .extensionNo(er.getExtensionNo())
 	                .status(codeRepository.findCodeById(
 	                        assurance != null ? assurance.getStatusId() : null))
