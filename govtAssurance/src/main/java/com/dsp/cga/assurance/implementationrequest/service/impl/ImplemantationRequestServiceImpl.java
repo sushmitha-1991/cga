@@ -2,7 +2,9 @@ package com.dsp.cga.assurance.implementationrequest.service.impl;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
+import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.CommitteeDecisionDTO;
 import com.dsp.cga.assurance.dto.ImplementationTypeDTO;
@@ -30,11 +34,13 @@ import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.entity.Departments;
 import com.dsp.cga.assurance.entity.Ministries;
+import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceImplementationDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
+import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
 import com.dsp.cga.assurance.repository.DepartmentRepository;
@@ -76,6 +82,20 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	
 	@Autowired
 	private DepartmentRepository departmentRepository;
+	
+	@Autowired
+	private ExtensionRequestRepository extensionRepo;
+	
+	@Autowired
+	private DroppingRequestRepositiry droppingRepo;
+	
+	@Autowired 
+	private ClubbedAssuranceRepository clubbedRepo;
+	
+	@Autowired
+	private OtherRequestRepository otherRequestRepo;
+	
+	
 	
 	@Autowired
 	private PersonalDetailsRepository personalDetailsRepository;
@@ -638,6 +658,84 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        return getImplementationDetailById(id); // use ImplementationRequest ID
 	    }
 	}
+
+	@Override
+	public Map<String, Object> getRequestCounts(Integer ministryCode, Long houseId) {
+	    Long ministryId = null;
+
+	    // Convert ministryCode to ministryId
+	    if (ministryCode != null) {
+	        Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
+	        if (ministry != null) {
+	            ministryId = ministry.getId();
+	        } else {
+	            throw new ResourceNotFoundException("Ministry not found for code: " + ministryCode);
+	        }
+	    }
+
+	    if (houseId == null || (houseId != 1 && houseId != 2)) {
+	        throw new IllegalArgumentException("Invalid houseId. Use 1 (Rajya Sabha) or 2 (Lok Sabha).");
+	    }
+
+	    Map<String, Long> requestCounts = new HashMap<>();
+
+	    if (houseId == 1) {
+	        requestCounts.put("implementationRequest", implementationRequestRepository.countByMinistryIdAndRajyaSabha(ministryId));
+	        requestCounts.put("extensionRequest", extensionRepo.countByMinistryIdAndRajyaSabha(ministryId));
+	        requestCounts.put("droppingRequest", droppingRepo.countByMinistryIdAndRajyaSabha(ministryId));
+	        requestCounts.put("clubbedRequest", clubbedRepo.countByMinistryIdAndRajyaSabha(ministryId));
+	        requestCounts.put("otherRequest", otherRequestRepo.countByMinistryIdAndRajyaSabha(ministryId));
+
+	    } else {
+	        requestCounts.put("implementationRequest", implementationRequestRepository.countByMinistryIdAndLokSabha(ministryId));
+	        requestCounts.put("extensionRequest", extensionRepo.countByMinistryIdAndLokSabha(ministryId));
+	        requestCounts.put("droppingRequest", droppingRepo.countByMinistryIdAndLokSabha(ministryId));
+	        requestCounts.put("clubbedRequest", clubbedRepo.countByMinistryIdAndLokSabha(ministryId));
+	        requestCounts.put("otherRequest", otherRequestRepo.countByMinistryIdAndLokSabha(ministryId));
+
+	    }
+
+	    //requestCounts.put("otherRequest", 0L); // placeholder for future use
+
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("ministryId", ministryId);
+	    result.put("ministryCode", ministryCode);
+	    result.put("houseId", houseId);
+	    result.put("requestCounts", requestCounts);
+
+	    return result;
+	}
+
+
+//	@Override
+//	public Map<String, Object> getRequestCounts(Integer ministryCode) {
+//	    Long ministryId = null;
+//
+//	    // Convert ministryCode to ministryId
+//	    if (ministryCode != null) {
+//	        Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
+//	        if (ministry != null) {
+//	            ministryId = ministry.getId();
+//	        } else {
+//	            throw new ResourceNotFoundException("Ministry not found for code: " + ministryCode);
+//	        }
+//	    }
+//
+//	    Map<String, Long> requestCounts = new HashMap<>();
+//
+//	    requestCounts.put("implementationRequest", implementationRequestRepository.countByMinistryId(ministryId));
+//	    requestCounts.put("extensionRequest", extensionRepo.countByMinistryId(ministryId));
+//	    requestCounts.put("droppingRequest", droppingRepo.countByMinistryId(ministryId));
+//	    requestCounts.put("clubbedRequest", clubbedRepo.countByMinistryId(ministryId));
+//	    requestCounts.put("otherRequest", 0L); // placeholder if needed later
+//
+//	    Map<String, Object> result = new HashMap<>();
+//	    result.put("ministryId", ministryId);
+//	    result.put("ministryCode", ministryCode);
+//	    result.put("requestCounts", requestCounts);
+//
+//	    return result;
+//	}
 
 
 }

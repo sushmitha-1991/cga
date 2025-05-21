@@ -17,15 +17,35 @@ public interface DroppingRequestRepositiry extends JpaRepository<DroppingRequest
 
 	Optional<DroppingRequest> findByAssuranceId(Long id);
 
-//	@Query("SELECT COUNT(a) FROM AssuranceDropping a WHERE " +
-//	           "(:ministryId IS NULL OR a.ministry.id = :ministryId) AND " +
-//	           "(:houseId IS NULL OR a.houseTypeId = :houseId) AND " +
-//	           "(:sessionNo IS NULL OR " +
-//	           "( :houseId = 1 AND a.rajyaSabhaSessionNo = :sessionNo ) OR " +
-//	           "( :houseId = 2 AND a.lokSabhaSessionNo = :sessionNo ))")
-//	    Long countByFilters(@Param("sessionNo") Long sessionNo,
-//	                        @Param("ministryId") Long ministryId,
-//	                        @Param("houseId") Long houseId);
+	
+	@Query(value = """
+		    SELECT COUNT(*) FROM cga.dropping_requests d
+		    JOIN cga.assurance a ON d.assurance_id = a.id
+		    WHERE a.ministry_id = :ministryId
+		      AND a.rajya_sabha_session_no IS NOT NULL
+		    """, nativeQuery = true)
+		Long countByMinistryIdAndRajyaSabha(@Param("ministryId") Long ministryId);
+
+		@Query(value = """
+		    SELECT COUNT(*) FROM cga.dropping_requests d
+		    JOIN cga.assurance a ON d.assurance_id = a.id
+		    WHERE a.ministry_id = :ministryId
+		      AND a.lok_sabha_session_no IS NOT NULL
+		    """, nativeQuery = true)
+		Long countByMinistryIdAndLokSabha(@Param("ministryId") Long ministryId);
+
+
+		@Query(value = """
+			    SELECT COUNT(*) 
+			    FROM cga.dropping_requests dr
+			    JOIN cga.assurance a ON dr.assurance_id = a.id
+			    WHERE a.ministry_id = :ministryId
+			    """, nativeQuery = true)
+			Long countByMinistryId(@Param("ministryId") Long ministryId);
+
+
+
+
 
 
 

@@ -2,6 +2,7 @@ package com.dsp.cga.assurance.implementationrequest.controller;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -162,4 +163,11 @@ public class ImplementationRequestController {
 	             HttpStatus.OK.value(), true, "Implementation detail updated successfully", updatedDto));
 	 }
 
+	 
+	 @GetMapping("/count")
+	    public ResponseEntity<Map<String, Object>> getRequestCounts(
+	            @RequestParam Integer ministryCode,
+	            @RequestParam Long houseId) {
+	        return ResponseEntity.ok(implementationRequestService.getRequestCounts(ministryCode, houseId));
+	    }
 }

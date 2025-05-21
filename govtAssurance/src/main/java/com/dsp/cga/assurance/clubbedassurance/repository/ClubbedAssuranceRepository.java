@@ -22,4 +22,33 @@ public interface ClubbedAssuranceRepository extends JpaRepository<ClubbedAssuran
 
 	List<ClubbedAssurance> findAllByAssuranceId(Long id);
 
+	@Query(value = """
+		    SELECT COUNT(*) 
+		    FROM cga.clubbed_assurances ca
+		    JOIN cga.assurance a ON ca.assurance_id = a.id
+		    WHERE a.ministry_id = :ministryId
+		      AND a.rajya_sabha_session_no IS NOT NULL
+		    """, nativeQuery = true)
+		Long countByMinistryIdAndRajyaSabha(@Param("ministryId") Long ministryId);
+
+		@Query(value = """
+		    SELECT COUNT(*) 
+		    FROM cga.clubbed_assurances ca
+		    JOIN cga.assurance a ON ca.assurance_id = a.id
+		    WHERE a.ministry_id = :ministryId
+		      AND a.lok_sabha_session_no IS NOT NULL
+		    """, nativeQuery = true)
+		Long countByMinistryIdAndLokSabha(@Param("ministryId") Long ministryId);
+
+		@Query(value = """
+			    SELECT COUNT(*) 
+			    FROM cga.clubbed_assurances ca
+			    JOIN cga.assurance a ON ca.assurance_id = a.id
+			    WHERE a.ministry_id = :ministryId
+			    """, nativeQuery = true)
+			Long countByMinistryId(@Param("ministryId") Long ministryId);
+
+  
+
+
 }

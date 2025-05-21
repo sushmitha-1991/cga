@@ -20,15 +20,35 @@ public interface ExtensionRequestRepository extends JpaRepository<ExtensionReque
 
 	Optional<ExtensionRequest> findByAssuranceIdAndExtensionNo(Long assuranceId, String extensionNo);
 
-//	 @Query("SELECT COUNT(e) FROM ExtensionRequest e WHERE " +
-//	           "(:ministryId IS NULL OR e.ministry.id = :ministryId) AND " +
-//	           "(:houseId IS NULL OR e.houseTypeId = :houseId) AND " +
-//	           "(:sessionNo IS NULL OR " +
-//	           "( :houseId = 1 AND e.rajyaSabhaSessionNo = :sessionNo ) OR " +
-//	           "( :houseId = 2 AND e.lokSabhaSessionNo = :sessionNo ))")
-//	    Long countByFilters(@Param("sessionNo") Long sessionNo,
-//	                        @Param("ministryId") Long ministryId,
-//	                        @Param("houseId") Long houseId);
+
+
+	@Query(value = """
+		    SELECT COUNT(*) FROM cga.extension_requests e
+		    JOIN cga.assurance a ON e.assurance_id = a.id
+		    WHERE a.ministry_id = :ministryId
+		      AND a.rajya_sabha_session_no IS NOT NULL
+		    """, nativeQuery = true)
+		Long countByMinistryIdAndRajyaSabha(@Param("ministryId") Long ministryId);
+
+		@Query(value = """
+		    SELECT COUNT(*) FROM cga.extension_requests e
+		    JOIN cga.assurance a ON e.assurance_id = a.id
+		    WHERE a.ministry_id = :ministryId
+		      AND a.lok_sabha_session_no IS NOT NULL
+		    """, nativeQuery = true)
+		Long countByMinistryIdAndLokSabha(@Param("ministryId") Long ministryId);
+
+		@Query(value = """
+			    SELECT COUNT(*) FROM (
+			        SELECT e.id
+			        FROM cga.extension_requests e
+			        JOIN cga.assurance a ON e.assurance_id = a.id
+			        WHERE a.ministry_id = :ministryId
+			    ) AS sub
+			    """, nativeQuery = true)
+			Long countByMinistryId(@Param("ministryId") Long ministryId);
+
+
 
 
 	

@@ -16,15 +16,34 @@ public interface ImplementationRequestRepository extends JpaRepository<Implement
 
 	Optional<ImplementationRequest> findByAssuranceId(Long assuranceId);
 
-//	@Query("SELECT COUNT(i) FROM ImplementationRequest i WHERE " +
-//	           "(:ministryId IS NULL OR i.ministry.id = :ministryId) AND " +
-//	           "(:houseId IS NULL OR i.houseTypeId = :houseId) AND " +
-//	           "(:sessionNo IS NULL OR " +
-//	           "( :houseId = 1 AND i.rajyaSabhaSessionNo = :sessionNo ) OR " +
-//	           "( :houseId = 2 AND i.lokSabhaSessionNo = :sessionNo ))")
-//	    Long countByFilters(@Param("sessionNo") Long sessionNo,
-//	                        @Param("ministryId") Long ministryId,
-//	                        @Param("houseId") Long houseId);
+
+	@Query(value = """
+		    SELECT COUNT(*) FROM cga.implementation_requests i
+		    JOIN cga.assurance a ON i.assurance_id = a.id
+		    WHERE a.ministry_id = :ministryId
+		      AND a.rajya_sabha_session_no IS NOT NULL
+		    """, nativeQuery = true)
+		Long countByMinistryIdAndRajyaSabha(@Param("ministryId") Long ministryId);
+
+		@Query(value = """
+		    SELECT COUNT(*) FROM cga.implementation_requests i
+		    JOIN cga.assurance a ON i.assurance_id = a.id
+		    WHERE a.ministry_id = :ministryId
+		      AND a.lok_sabha_session_no IS NOT NULL
+		    """, nativeQuery = true)
+		Long countByMinistryIdAndLokSabha(@Param("ministryId") Long ministryId);
+
+
+		@Query(value = """
+			    SELECT COUNT(*) 
+			    FROM cga.implementation_requests i
+			    JOIN cga.assurance a ON i.assurance_id = a.id
+			    WHERE a.ministry_id = :ministryId
+			    """, nativeQuery = true)
+			Long countByMinistryId(@Param("ministryId") Long ministryId);
+
+
+
 
 
 	

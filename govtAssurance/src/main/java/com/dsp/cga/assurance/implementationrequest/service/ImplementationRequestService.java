@@ -1,7 +1,9 @@
 package com.dsp.cga.assurance.implementationrequest.service;
 
 import java.time.LocalDate;
+
 import java.util.List;
+import java.util.Map;
 
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceImplementationDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
@@ -22,5 +24,11 @@ public interface ImplementationRequestService {
 	AssuranceImplementationDTO getImplementationDetailById(Long id);
 
 	AssuranceImplementationDTO updateImplementationRequest(Long id, ImplementationRequestDTO dto);
+
+//	Object getRequestCounts(Integer ministryCode, Long houseId);
+
+	Map<String, Object> getRequestCounts(Integer ministryCode, Long houseId);
+
+//	Map<String, Object> getRequestCounts(Integer ministryCode);
 
 }

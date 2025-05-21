@@ -71,6 +71,11 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 	Optional<Assurance> findByAssuranceNo(String assuranceNo);
 
 
+	@Query("SELECT COUNT(a) FROM Assurance a WHERE a.ministryId = :ministryId AND a.lokSabhaSessionNo IS NOT NULL AND a.dueDateOfImplementation IS NOT NULL")
+
+	Long countByMinistryIdWithDueDate(Long ministryId);
+
+
 
 	//List<Assurance> findAll(Object example);
 
