@@ -170,4 +170,19 @@ public class ImplementationRequestController {
 	            @RequestParam Long houseId) {
 	        return ResponseEntity.ok(implementationRequestService.getRequestCounts(ministryCode, houseId));
 	    }
+	 
+	 @GetMapping("/getAll")
+	 @Operation(summary = "Get all Implementation Details")
+	 @ApiResponses(value = {
+	     @ApiResponse(responseCode = "200", description = "Implementation details fetched successfully"),
+	     @ApiResponse(responseCode = "500", description = "Internal server error")
+	 })
+	 public ResponseEntity<GenericResponse<List<AssuranceImplementationDTO>>> getAllImplementationDetails() {
+	     List<AssuranceImplementationDTO> list = implementationRequestService.getAllImplementationDetails();
+
+	     return ResponseEntity.ok(
+	         new GenericResponse<>(HttpStatus.OK.value(), true, "Implementation details fetched successfully", list)
+	     );
+	 }
+
 }

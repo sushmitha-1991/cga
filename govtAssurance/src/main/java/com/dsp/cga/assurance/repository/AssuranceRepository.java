@@ -77,6 +77,10 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 
 
 
+	List<Assurance> findByDueDateOfImplementationNotNull();
+
+
+
 	//List<Assurance> findAll(Object example);
 
 	

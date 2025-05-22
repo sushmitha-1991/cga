@@ -40,6 +40,7 @@ public class AssuranceImplementationDTO {
 		private String departmentName;
 		private String memberName;
 		private LocalDate layingDate;
+		private String house;
 		private String questionNo;
 		private String subject;
 		  private Long committeeDecisionId;

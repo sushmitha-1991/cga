@@ -29,6 +29,8 @@ public interface ImplementationRequestService {
 
 	Map<String, Object> getRequestCounts(Integer ministryCode, Long houseId);
 
+	List<AssuranceImplementationDTO> getAllImplementationDetails();
+
 //	Map<String, Object> getRequestCounts(Integer ministryCode);
 
 }
