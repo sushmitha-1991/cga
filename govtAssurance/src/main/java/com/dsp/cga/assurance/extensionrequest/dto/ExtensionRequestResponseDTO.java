@@ -32,5 +32,5 @@ public class ExtensionRequestResponseDTO {
     private String subject;
     private String departmentName;
 	private String rajyaSabhaSessionNumber;
-    
+    private String statusForMinistry;
 }

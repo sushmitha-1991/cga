@@ -32,4 +32,5 @@ public class AssuranceDroppingResponseDTO {
 private String questionNo;
 private String subject;
 	private LocalDate ministryRefDate;
+	private String statusForMinistry;
 }

@@ -49,10 +49,12 @@ import com.dsp.cga.assurance.dto.SupplementDTO;
 import com.dsp.cga.assurance.dto.SupplementaryDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
+import com.dsp.cga.assurance.entity.Departments;
 import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
 import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceWithImplementationRequestDTO;
+import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.implementationrequest.repository.ApplicationInstanceRepository;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
@@ -61,9 +63,12 @@ import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 //import com.dsp.cga.assurance.external.service.ExternalService;
 import com.dsp.cga.assurance.partdetails.repository.PartDetailsRepository;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
+import com.dsp.cga.assurance.repository.CodeRepository;
+import com.dsp.cga.assurance.repository.DepartmentRepository;
 import com.dsp.cga.assurance.repository.MasterLSSRepository;
 import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
+import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
@@ -71,6 +76,7 @@ import com.dsp.cga.assurance.supplementry.repository.SupplementaryRepository;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.AssuranceListMapper;
 import com.dsp.cga.mapper.AssuranceMapper;
+import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.mapper.PartDetailsMapper;
 import com.dsp.cga.mapper.SupplementaryMapper;
 import com.dsp.cga.response.GenericResponse;
@@ -135,12 +141,24 @@ public class AssuranceServiceImpl implements AssuranceService {
 	private AssuranceMapper assuranceMapper;
 	
 	@Autowired
+	private ImplementationRequestMapper implementationRequestMapper;
+	
+	@Autowired
 	private MasterLSSRepository lssRepo;
 	@Autowired
 	private MastersRSSRepository rssRepo;
 	
 	@Autowired
+	private CodeRepository codeRepo;
+	
+	@Autowired
+	private PersonalDetailsRepository personalDetailsRepository;
+	
+	@Autowired
 	private MinistryRepository ministryRepo;
+	
+	@Autowired
+	private DepartmentRepository departmentRepo;
 	
 	@Autowired
 	private ImplementationRequestRepository implementationRepo;
@@ -216,7 +234,11 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 		
 		// Save Assurance entity
-		Assurance savedAssurance = assuranceRepository.save(assurance); // Save once, to make it effectively final
+		Assurance savedAssurance = assuranceRepository.save(assurance);
+		
+//		ImplementationRequest implementation = ImplementationRequestMapper.toImplementationRequest(assuranceDTO);
+//		implementation.setAssuranceId(assurance.getId()); // Set foreign key reference
+//		implementationRequestRepository.save(implementation);// Save once, to make it effectively final
 
 		// Map entity back to DTO to return response
 		AssuranceDTO savedAssuranceDTO = assuranceMapper.toDTO(assurance);
@@ -1102,6 +1124,57 @@ public class AssuranceServiceImpl implements AssuranceService {
 //        return assuranceMapper.toDTO(assurance);
 //    }
 
+//	@Override
+//	public AssuranceDTO getByAssuranceNo(String assuranceNo) {
+//	    Assurance assurance = assuranceRepository.findByAssuranceNo(assuranceNo)
+//	            .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with assuranceNo: " + assuranceNo));
+//
+//	    AssuranceDTO dto = assuranceMapper.toDTO(assurance);
+//
+//	    // Populate additional data
+//	    if (assurance.getMemberId() != null) {
+//	        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
+//	    }
+//	    if (assurance.getSourceId() != null) {
+//	        dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+//	    }
+//	    if (assurance.getMinistryId() != null) {
+//	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+//	    }
+//	    
+//	    if (assurance.getMinistryId() != null) {
+//	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
+//	    }
+//	    if (assurance.getDepartmentId() != null) {
+//	        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
+//	    }
+//	    if (assurance.getAssuranceTypeId() != null) {
+//	        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
+//	    }
+//	    if (assurance.getRajyaSabhaSessionNo() != null) {
+//	        dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
+//	    }
+//	    if (assurance.getPendingDueTo() != null) {
+//	        dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
+//	    }
+//	    if (assurance.getStatusId() != null) {
+//	        dto.setStatusDTO(fetchStatusData(assurance.getStatusId()));
+//	    }
+//	    
+//	    if (assurance.getLokSabhaNo() != null) {
+//			dto.setLokSabhaNoDTO(fetchLokSabhaData(assurance.getLokSabhaNo()));
+//		}
+//	    
+//	    if (assurance.getLokSabhaSessionNo() != null) {
+//            dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
+//        }
+//
+//	    List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+//	    dto.setClubbedMembersData(clubbedMembersData);
+//
+//	    return dto;
+//	}
+	
 	@Override
 	public AssuranceDTO getByAssuranceNo(String assuranceNo) {
 	    Assurance assurance = assuranceRepository.findByAssuranceNo(assuranceNo)
@@ -1109,37 +1182,54 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	    AssuranceDTO dto = assuranceMapper.toDTO(assurance);
 
-	    // Populate additional data
-	    if (assurance.getMemberId() != null) {
-	        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
-	    }
-	    if (assurance.getSourceId() != null) {
-	        dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
-	    }
-	    if (assurance.getMinistryId() != null) {
-	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
-	    }
-	    if (assurance.getDepartmentId() != null) {
-	        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
-	    }
-	    if (assurance.getAssuranceTypeId() != null) {
-	        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
-	    }
-	    if (assurance.getRajyaSabhaSessionNo() != null) {
-	        dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
-	    }
-	    if (assurance.getPendingDueTo() != null) {
-	        dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
-	    }
-	    if (assurance.getStatusId() != null) {
-	        dto.setStatusDTO(fetchStatusData(assurance.getStatusId()));
+	    // Set values using sure repository-based method
+	    dto.setStatus(codeRepo.findCodeById(
+	            assurance != null ? assurance.getStatusId() : null));
+
+	    dto.setLokSabhaSessionNumber(assurance != null
+	            ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
+	            : null);
+
+	    dto.setLokSabhaNumber(assurance != null
+	            ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo())
+	            : null);
+
+	    dto.setRajyaSabhaSessionNumber(assurance != null
+	            ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
+	            : null);
+
+	    // Fetch names from repository for member, department, and ministry
+	    String memberName = null;
+	    String departmentName = null;
+	    String ministryName = null;
+
+	    if (assurance != null) {
+	        if (assurance.getMemberId() != null) {
+	            memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
+	        }
+	        if (assurance.getDepartmentId() != null) {
+	            departmentName = departmentRepo.findById(assurance.getDepartmentId())
+	                    .map(Departments::getDepartmentName)
+	                    .orElse(null);
+	        }
+	        if (assurance.getMinistryId() != null) {
+	            ministryName = ministryRepository.findById(assurance.getMinistryId())
+	                    .map(Ministries::getMinistryName)
+	                    .orElse(null);
+	        }
 	    }
 
-	    List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
-	    dto.setClubbedMembersData(clubbedMembersData);
+	    dto.setMemberName(memberName);
+	    dto.setDepartmentName(departmentName);
+	    dto.setMinistryName(ministryName);
+
+	    // Clubbed members
+//	    List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+//	    dto.setClubbedMembersData(clubbedMembersData);
 
 	    return dto;
 	}
+
 
 	@Override
 	public void createAssuranceWithImplementation(AssuranceWithImplementationRequestDTO dto) {

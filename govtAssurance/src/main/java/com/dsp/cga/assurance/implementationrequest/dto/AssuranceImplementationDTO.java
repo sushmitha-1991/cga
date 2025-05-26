@@ -44,7 +44,7 @@ public class AssuranceImplementationDTO {
 		private String questionNo;
 		private String subject;
 		  private Long committeeDecisionId;
-		   
+		   private String statusForMinistry;
 		    private String statementNo;
 		 
 		   

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dsp.cga.assurance.dto.CommonRequestResponseDTO;
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestResponseDTO;
 import com.dsp.cga.assurance.extensionrequest.service.ExtensionRequestService;
@@ -165,5 +166,9 @@ public class ExtensionRequestController {
 	    return ResponseEntity.ok(response);
 	}
 
+	 @GetMapping("getAllRequests")
+	    public ResponseEntity<List<CommonRequestResponseDTO>> getAllRequests() {
+	        return ResponseEntity.ok(extensionRequestService.getAllRequests());
+	    }
 
 }

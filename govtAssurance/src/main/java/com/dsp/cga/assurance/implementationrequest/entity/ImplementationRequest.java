@@ -75,6 +75,25 @@ public class ImplementationRequest extends Auditable {
 	@Column(name = "session")
 	private Long session;
 	
+	@Column(name = "due_date_of_implementation")
+	private LocalDate dueDateOfImplementation;
+	
+	@Column(name = "remarks", columnDefinition = "TEXT")
+	private String remarks;
+
+	@Column(name = "date_of_implementation")
+	private LocalDate dateOfImplementation;
+
+	@Column(name = "details_of_implementation", columnDefinition = "TEXT")
+	private String detailsOfImplementation;
+	
+	@Column(name = "from_ministry")
+	private Boolean fromMinistry; 
+	
+	@Column(name = "status_for_ministry")
+    private String statusForMinistry;
+	
+	
 //	@ManyToOne
 //    @JoinColumn(name = "assurance_id", nullable = false)
 //    private Assurance assurance;

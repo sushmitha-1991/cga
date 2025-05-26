@@ -35,6 +35,10 @@ public class AssuranceDTO {
 	private Long statusId;
 	private Long pendingDueTo;
 	private LocalDate mpaRefDate;
+	private String status;
+	private String lokSabhaNumber;
+	private String lokSabhaSessionNumber;
+	private String rajyaSabhaSessionNumber;
 	private String mpaRefNo;
 	private String reportNo;
 	private String remarks;

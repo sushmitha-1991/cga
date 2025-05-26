@@ -299,7 +299,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	                        .partId(dr.getPartId())
 	                        .questionNo(assurance.getQuestionNo())
 	                        .supplementaryId(dr.getSupplementaryId())
-	                      
+	                      .statusForMinistry(dr.getStatusForMinistry())
 	                        .droppingType(assurance != null
 	                                ? codeRepository.findCodeById(dr.getDroppingType())
 	                                : null)

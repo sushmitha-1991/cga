@@ -3,6 +3,7 @@ package com.dsp.cga.assurance.extensionrequest.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.dsp.cga.assurance.dto.CommonRequestResponseDTO;
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestResponseDTO;
 import com.dsp.cga.response.GenericResponse;
@@ -24,5 +25,7 @@ public interface ExtensionRequestService {
 	ExtensionRequestResponseDTO getExtensionRequestById(Long id);
 
 	ExtensionRequestResponseDTO updateExtensionRequest(Long id, ExtensionRequestDTO requestDTO);
+
+	 List<CommonRequestResponseDTO> getAllRequests();
 
 }

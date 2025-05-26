@@ -67,11 +67,19 @@ public class ExtensionRequest extends Auditable {
 	@Column(name = "statusId")
 	private Long statusId;
 
+	
+	@Column(name = "status_for_ministry")
+    private String statusForMinistry;
+	
+	
 	@Column(name = "extension_files", columnDefinition = "jsonb")
 	@Convert(converter = JsonMapConverter.class)
 	private List<Map<String, Object>> extensionFiles;
 
 	@Column(name = "draft_status")
 	private Boolean draftStatus = false;
+	
+	@Column(name = "from_ministry")
+	private Boolean fromMinistry; 
 
 }

@@ -67,6 +67,8 @@ public class OtherRequestServiceImpl implements OtherRequestService {
                 .statusId(dto.getStatusId())
                 .remarks(dto.getRemarks())
                 .fileUrl(dto.getFileUrl())
+                .fromMinistry(true)
+	             .statusForMinistry("Submitted")
                 .build();
 
         OtherRequests saved = otherRequestRepo.save(entity);
@@ -158,6 +160,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .questionNo(assurance.getQuestionNo())
 	            .requestedDate(or.getRequestedDate())
 	            .remarks(or.getRemarks())
+	            .statusForMinistry(or.getStatusForMinistry())
 	            .lokSabhaSessionNumber(assurance != null
 	                ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
 	                : null)

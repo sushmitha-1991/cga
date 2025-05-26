@@ -29,7 +29,7 @@ public class OtherRequestDTO {
 	private String ministryName;
 	private String memberName;
 	private String questionNo;
-	
+	private String statusForMinistry;
 	 private LocalDate requestedDate;
 	
 	    private Long statusId; 

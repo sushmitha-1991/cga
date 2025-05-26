@@ -438,6 +438,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                    .dueDateOfImplementation(assurance.getDueDateOfImplementation())
 	                    .detailsOfImplementation(assurance.getDetailsOfImplementation())
 	                    .questionNo(assurance.getQuestionNo())
+	                  //  .statusForMinistry(impl.get)
 	                    .house("Rajya Sabha")
 	                    .subject(assurance.getSubject())
 	                    .dateOfImplementation(assurance.getDateOfImplementation())
@@ -498,7 +499,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                .partId(impl.getPartId())
 	                .reason(impl.getReason())
 	                .layingDate(impl.getLayingDate())
-	                
+	                .statusForMinistry(impl.getStatusForMinistry())
 	                .subject(assurance.getSubject())
 	                .implementationTypeId(codeRepository.findCodeById(impl.getImplementationTypeId()))
 	                .memberName(memberName)
@@ -836,6 +837,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .memberName(memberName)
 	        .ministryName(ministryName)
 	        .departmentName(departmentName)
+	        .subject(assurance.getSubject())
+	        
 	        .status(codeRepository.findCodeById(assurance.getStatusId()))
 	        .dueDateOfImplementation(assurance.getDueDateOfImplementation())
 	        .subject(assurance.getSubject())
@@ -849,6 +852,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	            .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()))
 	            .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
 	            .dateOfImplementation(assurance.getDateOfImplementation())
+	            .house("Lok Sabha")
 	            .detailsOfImplementation(assurance.getDetailsOfImplementation())
 	            .dueDateOfImplementation(assurance.getDueDateOfImplementation())
 	            .id(assurance.getId());
@@ -858,6 +862,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	            .layingDate(impl.getLayingDate())
 	            .implementationTypeId(codeRepository.findCodeById(impl.getImplementationTypeId()))
 	            .supplementaryId(impl.getSupplementaryId())
+	            .house("Rajya Sabha")
 	            .partId(impl.getPartId())
 	            .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()))
 	            .id(impl.getId());

@@ -20,6 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
+import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
+import com.dsp.cga.assurance.dto.CommonRequestResponseDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
@@ -33,6 +36,7 @@ import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestReposit
 import com.dsp.cga.assurance.extensionrequest.service.ExtensionRequestService;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
+import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
 import com.dsp.cga.assurance.repository.DepartmentRepository;
@@ -84,7 +88,14 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	@Autowired
 	private CodeRepository codeRepository;
 	
+    @Autowired
+    private OtherRequestRepository otherRequestRepository;
 
+@Autowired
+private DroppingRequestRepositiry droppingRequestRepository;
+
+@Autowired
+private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 	@Override
 	public ExtensionRequestDTO createExtensionRequest(ExtensionRequestDTO extensionRequestDTO) {
@@ -311,6 +322,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	                .extRequestedTillDate(er.getExtRequestedTillDate())
 	                .ministryRefDate(er.getMinistryRefDate())
 	                .ministryRefNo(er.getMinistryRefNo())
+	                .statusForMinistry(er.getStatusForMinistry())
 	                .build();
 	    }).collect(Collectors.toList());
 	}
@@ -421,6 +433,131 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 
 		    return getExtensionRequestById(id); // Reuse existing method to return DTO
 		}
+
+	@Override
+	public List<CommonRequestResponseDTO> getAllRequests() {
+	    List<CommonRequestResponseDTO> response = new ArrayList<>();
+
+	    // ExtensionRequest
+	    extenionRequestRepository.findAll().forEach(req -> {
+	        if (Boolean.TRUE.equals(req.getFromMinistry()) &&
+	                ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
+	                 "Returned".equalsIgnoreCase(req.getStatusForMinistry()))) {
+
+	            Assurance assurance = getAssurance(req.getAssuranceId());
+	            response.add(buildDTO(
+	                    req.getId(), "ExtensionRequest", req.getAssuranceId(),
+	                    req.getSubject(), req.getRemarks(), req.getFromMinistry(),
+	                    req.getStatusForMinistry(), assurance,
+	                    req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
+	            ));
+	        }
+	    });
+
+	    // OtherRequests
+	    otherRequestRepository.findAll().forEach(req -> {
+	        if (Boolean.TRUE.equals(req.getFromMinistry()) &&
+	                ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
+	                 "Returned".equalsIgnoreCase(req.getStatusForMinistry()))) {
+
+	            Assurance assurance = getAssurance(req.getAssuranceId());
+	            response.add(buildDTO(
+	                    req.getId(), "OtherRequests", req.getAssuranceId(),
+	                    req.getSubject(), req.getRemarks(), req.getFromMinistry(),
+	                    req.getStatusForMinistry(), assurance,
+	                    req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
+	            ));
+	        }
+	    });
+
+	    // ClubbedAssurance
+	    clubbedAssuranceRepository.findAll().forEach(req -> {
+	        if (Boolean.TRUE.equals(req.getFromMinistry()) &&
+	                ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
+	                 "Returned".equalsIgnoreCase(req.getStatusForMinistry()))) {
+
+	            Assurance assurance = getAssurance(req.getAssuranceId());
+	            response.add(buildDTO(
+	                    req.getId(), "ClubbedAssurance", req.getAssuranceId(),
+	                    null, null, req.getFromMinistry(),
+	                    req.getStatusForMinistry(), assurance,
+	                    req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
+	            ));
+	        }
+	    });
+
+	    // DroppingRequest
+	    droppingRequestRepository.findAll().forEach(req -> {
+	        if (Boolean.TRUE.equals(req.getFromMinistry()) &&
+	                ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
+	                 "Returned".equalsIgnoreCase(req.getStatusForMinistry()))) {
+
+	            Assurance assurance = getAssurance(req.getAssuranceId());
+	            response.add(buildDTO(
+	                    req.getId(), "DroppingRequest", req.getAssuranceId(),
+	                    req.getSubject(), req.getRemarks(), req.getFromMinistry(),
+	                    req.getStatusForMinistry(), assurance,
+	                    req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
+	            ));
+	        }
+	    });
+
+	    return response;
+	}
+
+
+
+	    private Assurance getAssurance(Long assuranceId) {
+	        return assuranceId != null ? assuranceRepository.findById(assuranceId).orElse(null) : null;
+	    }
+
+	    private CommonRequestResponseDTO buildDTO(Long id, String requestType, Long assuranceId,
+	                                              String subject, String remarks, Boolean fromMinistry,
+	                                              String statusForMinistry, Assurance assurance, LocalDate createdDate) {
+
+	        String status = codeRepository.findCodeById(assurance != null ? assurance.getStatusId() : null);
+	        String lokSabhaSessionNumber = assurance != null ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()) : null;
+	        String lokSabhaNumber = assurance != null ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()) : null;
+	        String rajyasabhaSessionNumber = assurance != null ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()) : null;
+
+	        String memberName = null;
+	        String departmentName = null;
+	        String ministryName = null;
+
+	        if (assurance != null) {
+	            if (assurance.getMemberId() != null) {
+	                memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
+	            }
+	            if (assurance.getDepartmentId() != null) {
+	                departmentName = departmentRepository.findById(assurance.getDepartmentId())
+	                        .map(Departments::getDepartmentName)
+	                        .orElse(null);
+	            }
+	            if (assurance.getMinistryId() != null) {
+	                ministryName = ministryRepository.findById(assurance.getMinistryId())
+	                        .map(Ministries::getMinistryName)
+	                        .orElse(null);
+	            }
+	        }
+
+	        return CommonRequestResponseDTO.builder()
+	                .id(id)
+	                .requestType(requestType)
+	                .assuranceId(assuranceId)
+	                .subject(subject)
+	                .remarks(remarks)
+	                .fromMinistry(fromMinistry)
+	                .statusForMinistry("Submitted".equalsIgnoreCase(statusForMinistry) ? "Received" : statusForMinistry)
+	                .date(createdDate)
+	                .status(status)
+	                .lokSabhaSessionNumber(lokSabhaSessionNumber)
+	                .lokSabhaNumber(lokSabhaNumber)
+	                .rajyaSabhaSessionNumber(rajyasabhaSessionNumber)
+	                .memberName(memberName)
+	                .departmentName(departmentName)
+	                .ministryName(ministryName)
+	                .build();
+	    }
 
 
 }

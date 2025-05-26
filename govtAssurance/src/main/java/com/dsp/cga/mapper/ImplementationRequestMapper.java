@@ -1,8 +1,12 @@
 package com.dsp.cga.mapper;
 
+import org.springframework.stereotype.Component;
+
+import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 
+@Component
 public class ImplementationRequestMapper {
 	
 	public static ImplementationRequestDTO toDTO(ImplementationRequest entity) {
@@ -22,6 +26,10 @@ public class ImplementationRequestMapper {
                 .draftStatus(entity.getDraftStatus())
                .implementationReportFiles(entity.getImplementationReportFiles())
                 .partReportFiles(entity.getPartReportFiles())
+                .dueDateOfImplementation(entity.getDueDateOfImplementation())
+                .dateOfImplementation(entity.getDateOfImplementation())
+                .detailsOfImplementation(entity.getDetailsOfImplementation())
+                .remarks(entity.getRemarks())
                .otherFiles(entity.getOtherFiles())
               .implementationTypeId(entity.getImplementationTypeId())
                .session(entity.getSession())
@@ -42,12 +50,18 @@ public class ImplementationRequestMapper {
                 .supplementaryId(dto.getSupplementaryId())
                 .partId(dto.getPartId())
                 .reason(dto.getReason())
+                .dueDateOfImplementation(dto.getDueDateOfImplementation())
+                .detailsOfImplementation(dto.getDetailsOfImplementation())
+                .dateOfImplementation(dto.getDateOfImplementation())
+                .remarks(dto.getRemarks())
                 .draftStatus(dto.getDraftStatus())
                 .implementationReportFiles(dto.getImplementationReportFiles())
                 .partReportFiles(dto.getPartReportFiles())
                 .otherFiles(dto.getOtherFiles())
                 .implementationTypeId(dto.getImplementationTypeId())
                 .session(dto.getSession())
+                .fromMinistry(true)
+	             .statusForMinistry("Submitted")
                 .build();
     }
     
@@ -69,8 +83,26 @@ public class ImplementationRequestMapper {
         entity.setSession(dto.getSession());
         entity.setImplementationTypeId(dto.getImplementationTypeId());
         entity.setOtherFiles(dto.getOtherFiles());
+        entity.setDateOfImplementation(dto.getDateOfImplementation());
+        entity.setDetailsOfImplementation(dto.getDetailsOfImplementation());
+        entity.setDueDateOfImplementation(dto.getDueDateOfImplementation());
+        entity.setRemarks(dto.getRemarks());
+        
         
         // Note: createdBy and createdDate will remain unchanged as per JPA logic
+    }
+    
+    public static ImplementationRequest toImplementationRequest(AssuranceDTO dto) {
+        if (dto == null) return null;
+
+        return ImplementationRequest.builder()
+            // assuranceId will be set later after saving Assurance entity
+            .dueDateOfImplementation(dto.getDueDateOfImplementation())
+            .dateOfImplementation(dto.getDateOfImplementation())
+            .detailsOfImplementation(dto.getDetailsOfImplementation())
+            .remarks(dto.getRemarks())
+            .draftStatus(false) // or use dto.getDraftStatus() if needed
+            .build();
     }
 
 }

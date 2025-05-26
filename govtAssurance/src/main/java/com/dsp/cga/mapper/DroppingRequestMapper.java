@@ -33,7 +33,8 @@ public class DroppingRequestMapper {
 	                .type(dto.getType())
 	                .issueLetterMinistry(dto.getIssueLetterMinistry())
 	                .communicationDate(dto.getCommunicationDate())
-	             
+	             .fromMinistry(true)
+	             .statusForMinistry("Submitted")
 	                .session(dto.getSession())
 	                .build();
 	    }

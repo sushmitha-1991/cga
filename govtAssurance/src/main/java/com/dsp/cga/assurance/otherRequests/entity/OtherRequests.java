@@ -34,20 +34,27 @@ public class OtherRequests extends Auditable{
 	@SequenceGenerator(name = "other_req_seq", sequenceName = "cga.other_req_seq", allocationSize = 1)
 	private Long id;
 
-	@Column(name = "assurance_id")
-	private Long assuranceId;
+	  @Column(name = "assurance_id")
+	  private Long assuranceId;
 	
-	@Column(name = "requested_date")
-	 private LocalDate requestedDate;
+	  @Column(name = "requested_date")
+	   private LocalDate requestedDate;
 
-	@Column(name = "status_id")
-	    private Long statusId; // maps to status code table if needed
+	    @Column(name = "status_id")
+	    private Long statusId; 
 
 	    @Column(name = "remarks", columnDefinition = "TEXT")
 	    private String remarks;
 	    
 	    @Column(name = "subject")
 	    private String subject;
+	    
+	    @Column(name = "from_ministry")
+		private Boolean fromMinistry;
+	    
+	    @Column(name = "status_for_ministry")
+	    private String statusForMinistry;
+		
 
 	    @Column(name = "other_files", columnDefinition = "jsonb")
 		@Convert(converter = JsonMapConverter.class)

@@ -41,6 +41,13 @@ public class ClubbedAssurance extends Auditable{
 	
 	@Column(name = "date")
 	private LocalDate date;
+	
+	@Column(name = "from_ministry")
+	private Boolean fromMinistry; 
+	
+	@Column(name = "status_for_ministry")
+    private String statusForMinistry;
+	
 
 	@ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "clubbed_assurance_mapping", schema = "cga", 
