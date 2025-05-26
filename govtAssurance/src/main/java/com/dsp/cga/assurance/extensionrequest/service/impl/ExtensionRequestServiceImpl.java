@@ -437,6 +437,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	@Override
 	public List<CommonRequestResponseDTO> getAllRequests() {
 	    List<CommonRequestResponseDTO> response = new ArrayList<>();
+	    Long houseId = getHouseId(); // Assume this fetches current houseId
 
 	    // ExtensionRequest
 	    extenionRequestRepository.findAll().forEach(req -> {
@@ -445,12 +446,14 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                 "Returned".equalsIgnoreCase(req.getStatusForMinistry()))) {
 
 	            Assurance assurance = getAssurance(req.getAssuranceId());
-	            response.add(buildDTO(
-	                    req.getId(), "ExtensionRequest", req.getAssuranceId(),
-	                    req.getSubject(), req.getRemarks(), req.getFromMinistry(),
-	                    req.getStatusForMinistry(), assurance,
-	                    req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
-	            ));
+	            if (isValidForHouse(houseId, assurance)) {
+	                response.add(buildDTO(
+	                        req.getId(), "ExtensionRequest", req.getAssuranceId(),
+	                        req.getSubject(), req.getRemarks(), req.getFromMinistry(),
+	                        req.getStatusForMinistry(), assurance,
+	                        req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
+	                ));
+	            }
 	        }
 	    });
 
@@ -461,12 +464,14 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                 "Returned".equalsIgnoreCase(req.getStatusForMinistry()))) {
 
 	            Assurance assurance = getAssurance(req.getAssuranceId());
-	            response.add(buildDTO(
-	                    req.getId(), "OtherRequests", req.getAssuranceId(),
-	                    req.getSubject(), req.getRemarks(), req.getFromMinistry(),
-	                    req.getStatusForMinistry(), assurance,
-	                    req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
-	            ));
+	            if (isValidForHouse(houseId, assurance)) {
+	                response.add(buildDTO(
+	                        req.getId(), "OtherRequests", req.getAssuranceId(),
+	                        req.getSubject(), req.getRemarks(), req.getFromMinistry(),
+	                        req.getStatusForMinistry(), assurance,
+	                        req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
+	                ));
+	            }
 	        }
 	    });
 
@@ -477,12 +482,14 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                 "Returned".equalsIgnoreCase(req.getStatusForMinistry()))) {
 
 	            Assurance assurance = getAssurance(req.getAssuranceId());
-	            response.add(buildDTO(
-	                    req.getId(), "ClubbedAssurance", req.getAssuranceId(),
-	                    null, null, req.getFromMinistry(),
-	                    req.getStatusForMinistry(), assurance,
-	                    req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
-	            ));
+	            if (isValidForHouse(houseId, assurance)) {
+	                response.add(buildDTO(
+	                        req.getId(), "ClubbedAssurance", req.getAssuranceId(),
+	                        null, null, req.getFromMinistry(),
+	                        req.getStatusForMinistry(), assurance,
+	                        req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
+	                ));
+	            }
 	        }
 	    });
 
@@ -493,16 +500,30 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                 "Returned".equalsIgnoreCase(req.getStatusForMinistry()))) {
 
 	            Assurance assurance = getAssurance(req.getAssuranceId());
-	            response.add(buildDTO(
-	                    req.getId(), "DroppingRequest", req.getAssuranceId(),
-	                    req.getSubject(), req.getRemarks(), req.getFromMinistry(),
-	                    req.getStatusForMinistry(), assurance,
-	                    req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
-	            ));
+	            if (isValidForHouse(houseId, assurance)) {
+	                response.add(buildDTO(
+	                        req.getId(), "DroppingRequest", req.getAssuranceId(),
+	                        req.getSubject(), req.getRemarks(), req.getFromMinistry(),
+	                        req.getStatusForMinistry(), assurance,
+	                        req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
+	                ));
+	            }
 	        }
 	    });
 
 	    return response;
+	}
+
+	private boolean isValidForHouse(Long houseId, Assurance assurance) {
+	    if (assurance == null) return false;
+
+	    if (houseId == 1) {
+	        return assurance.getRajyaSabhaSessionNo() != null;
+	    } else if (houseId == 2) {
+	        return assurance.getLokSabhaSessionNo() != null;
+	    }
+
+	    return true; // If houseId is null or not 1/2, allow all.
 	}
 
 
