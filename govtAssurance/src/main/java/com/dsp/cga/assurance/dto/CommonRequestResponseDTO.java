@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Map;
 
 import com.dsp.cga.assurance.clubbedassurance.dto.AssuranceIdNoPairDTO;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommonRequestResponseDTO {
 	private Long id;
 	private String requestType;
@@ -27,7 +29,7 @@ public class CommonRequestResponseDTO {
 
 	private Long statusId;
 
-	private Long droppingType; // Code is a reference to the 'master' microservice
+	private String droppingType; // Code is a reference to the 'master' microservice
 
 	private String supplementaryId;
 
