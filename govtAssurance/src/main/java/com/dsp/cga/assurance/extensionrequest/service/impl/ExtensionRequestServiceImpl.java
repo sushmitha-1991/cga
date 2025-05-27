@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -579,6 +580,90 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                .ministryName(ministryName)
 	                .build();
 	    }
+
+
+	    @Override
+	    public CommonRequestResponseDTO getRequestById(Long id, String requestType) {
+	        Long houseId = getHouseId(); // current house ID
+
+	        switch (requestType) {
+	            case "ExtensionRequest":
+	                return extenionRequestRepository.findById(id)
+	                    .filter(req -> Boolean.TRUE.equals(req.getFromMinistry()) &&
+	                            ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
+	                             "Returned".equalsIgnoreCase(req.getStatusForMinistry())))
+	                    .flatMap(req -> {
+	                        Assurance assurance = getAssurance(req.getAssuranceId());
+	                        if (isValidForHouse(houseId, assurance)) {
+	                            return Optional.of(buildDTO(
+	                                req.getId(), "ExtensionRequest", req.getAssuranceId(),
+	                                req.getSubject(), req.getRemarks(), req.getFromMinistry(),
+	                                req.getStatusForMinistry(), assurance,
+	                                req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
+	                            ));
+	                        }
+	                        return Optional.empty();
+	                    }).orElse(null);
+
+	            case "OtherRequests":
+	                return otherRequestRepository.findById(id)
+	                    .filter(req -> Boolean.TRUE.equals(req.getFromMinistry()) &&
+	                            ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
+	                             "Returned".equalsIgnoreCase(req.getStatusForMinistry())))
+	                    .flatMap(req -> {
+	                        Assurance assurance = getAssurance(req.getAssuranceId());
+	                        if (isValidForHouse(houseId, assurance)) {
+	                            return Optional.of(buildDTO(
+	                                req.getId(), "OtherRequests", req.getAssuranceId(),
+	                                req.getSubject(), req.getRemarks(), req.getFromMinistry(),
+	                                req.getStatusForMinistry(), assurance,
+	                                req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
+	                            ));
+	                        }
+	                        return Optional.empty();
+	                    }).orElse(null);
+
+	            case "DroppingRequest":
+	                return droppingRequestRepository.findById(id)
+	                    .filter(req -> Boolean.TRUE.equals(req.getFromMinistry()) &&
+	                            ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
+	                             "Returned".equalsIgnoreCase(req.getStatusForMinistry())))
+	                    .flatMap(req -> {
+	                        Assurance assurance = getAssurance(req.getAssuranceId());
+	                        if (isValidForHouse(houseId, assurance)) {
+	                            return Optional.of(buildDTO(
+	                                req.getId(), "DroppingRequest", req.getAssuranceId(),
+	                                req.getSubject(), req.getRemarks(), req.getFromMinistry(),
+	                                req.getStatusForMinistry(), assurance,
+	                                req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
+	                            ));
+	                        }
+	                        return Optional.empty();
+	                    }).orElse(null);
+
+	            case "ClubbedAssurance":
+	                return clubbedAssuranceRepository.findById(id)
+	                    .filter(req -> Boolean.TRUE.equals(req.getFromMinistry()) &&
+	                            ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
+	                             "Returned".equalsIgnoreCase(req.getStatusForMinistry())))
+	                    .flatMap(req -> {
+	                        Assurance assurance = getAssurance(req.getAssuranceId());
+	                        if (isValidForHouse(houseId, assurance)) {
+	                            return Optional.of(buildDTO(
+	                                req.getId(), "ClubbedAssurance", req.getAssuranceId(),
+	                                null, null, req.getFromMinistry(),
+	                                req.getStatusForMinistry(), assurance,
+	                                req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
+	                            ));
+	                        }
+	                        return Optional.empty();
+	                    }).orElse(null);
+
+	            default:
+	                throw new IllegalArgumentException("Invalid request type: " + requestType);
+	        }
+	    }
+
 
 
 }

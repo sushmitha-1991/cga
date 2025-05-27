@@ -166,9 +166,50 @@ public class ExtensionRequestController {
 	    return ResponseEntity.ok(response);
 	}
 
-	 @GetMapping("getAllRequests")
-	    public ResponseEntity<List<CommonRequestResponseDTO>> getAllRequests() {
-	        return ResponseEntity.ok(extensionRequestService.getAllRequests());
+	@GetMapping("getAllRequests")
+	@Operation(summary = "Get all requests")
+	@ApiResponses(value = {
+	    @ApiResponse(responseCode = "200", description = "Requests fetched successfully"),
+	    @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<GenericResponse<List<CommonRequestResponseDTO>>> getAllRequests() {
+	    List<CommonRequestResponseDTO> responseList = extensionRequestService.getAllRequests();
+	    GenericResponse<List<CommonRequestResponseDTO>> response = new GenericResponse<>(
+	            HttpStatus.OK.value(),
+	            true,
+	            "Requests fetched successfully",
+	            responseList
+	    );
+	    return ResponseEntity.ok(response);
+	}
+
+
+	@GetMapping("getRequestById")
+	@Operation(summary = "Get request by ID and type")
+	@ApiResponses(value = {
+	    @ApiResponse(responseCode = "200", description = "Request fetched successfully"),
+	    @ApiResponse(responseCode = "404", description = "Request not found"),
+	    @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<GenericResponse<CommonRequestResponseDTO>> getRequestById(
+	        @RequestParam("id") Long id,
+	        @RequestParam("type") String requestType) {
+
+	    CommonRequestResponseDTO dto = extensionRequestService.getRequestById(id, requestType);
+
+	    if (dto == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                .body(new GenericResponse<>(HttpStatus.NOT_FOUND.value(), false, "Request not found", null));
 	    }
+
+	    GenericResponse<CommonRequestResponseDTO> response = new GenericResponse<>(
+	            HttpStatus.OK.value(),
+	            true,
+	            "Request fetched successfully",
+	            dto
+	    );
+
+	    return ResponseEntity.ok(response);
+	}
 
 }

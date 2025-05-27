@@ -28,4 +28,6 @@ public interface ExtensionRequestService {
 
 	 List<CommonRequestResponseDTO> getAllRequests();
 
+	 CommonRequestResponseDTO getRequestById(Long id, String requestType);
+
 }
