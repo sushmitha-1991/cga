@@ -782,6 +782,166 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	        }
 	    }
 
+	    @Override
+	    public CommonRequestResponseDTO updateRequest(Long id, String requestType, CommonRequestResponseDTO updateDto) {
+	        switch (requestType) {
+	            case "ExtensionRequest":
+	                return extenionRequestRepository.findById(id)
+	                        .map(entity -> {
+	                            if (updateDto.getSubject() != null) {
+	                                entity.setSubject(updateDto.getSubject());
+	                            }
+	                            if (updateDto.getRemarks() != null) {
+	                                entity.setRemarks(updateDto.getRemarks());
+	                            }
+	                            if (updateDto.getExtensionNo() != null) {
+	                                entity.setExtensionNo(updateDto.getExtensionNo());
+	                            }
+	                            if (updateDto.getExtRequestedTillDate() != null) {
+	                                entity.setExtRequestedTillDate(updateDto.getExtRequestedTillDate());
+	                            }
+	                            if (updateDto.getExtGrantedTillDate() != null) {
+	                                entity.setExtGrantedTillDate(updateDto.getExtGrantedTillDate());
+	                            }
+	                            if (updateDto.getMinistryRefNo() != null) {
+	                                entity.setMinistryRefNo(updateDto.getMinistryRefNo());
+	                            }
+	                            if (updateDto.getMinistryRefDate() != null) {
+	                                entity.setMinistryRefDate(updateDto.getMinistryRefDate());
+	                            }
+	                            if (updateDto.getStatusId() != null) {
+	                                entity.setStatusId(updateDto.getStatusId());
+	                            }
+	                            if (updateDto.getStatusForMinistry() != null) {
+	                                entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                            }
+	                            if (updateDto.getDraftStatus() != null) {
+	                                entity.setDraftStatus(updateDto.getDraftStatus());
+	                            }
+	                            if (updateDto.getFromMinistry() != null) {
+	                                entity.setFromMinistry(updateDto.getFromMinistry());
+	                            }
+	                            extenionRequestRepository.save(entity);
+	                            return getRequestById(id, requestType);
+	                        }).orElse(null);
+
+	            case "OtherRequests":
+	                return otherRequestRepository.findById(id)
+	                        .map(entity -> {
+	                            if (updateDto.getSubject() != null) {
+	                                entity.setSubject(updateDto.getSubject());
+	                            }
+	                            if (updateDto.getRemarks() != null) {
+	                                entity.setRemarks(updateDto.getRemarks());
+	                            }
+	                            if (updateDto.getRequestedDate() != null) {
+	                                entity.setRequestedDate(updateDto.getRequestedDate());
+	                            }
+	                            if (updateDto.getStatusId() != null) {
+	                                entity.setStatusId(updateDto.getStatusId());
+	                            }
+	                            if (updateDto.getStatusForMinistry() != null) {
+	                                entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                            }
+	                            if (updateDto.getFileUrl() != null) {
+	                                entity.setFileUrl(updateDto.getFileUrl());
+	                            }
+	                            if (updateDto.getFromMinistry() != null) {
+	                                entity.setFromMinistry(updateDto.getFromMinistry());
+	                            }
+	                            otherRequestRepository.save(entity);
+	                            return getRequestById(id, requestType);
+	                        }).orElse(null);
+
+	            case "DroppingRequest":
+	                return droppingRequestRepository.findById(id)
+	                        .map(entity -> {
+	                            if (updateDto.getSubject() != null) {
+	                                entity.setSubject(updateDto.getSubject());
+	                            }
+	                            // Uncomment and adjust if you implement droppingType conversion:
+	                            // if (updateDto.getDroppingType() != null) {
+	                            //     entity.setDroppingType(codeRepository.findCodeIdByName(updateDto.getDroppingType()));
+	                            // }
+	                            if (updateDto.getSupplementaryId() != null) {
+	                                entity.setSupplementaryId(updateDto.getSupplementaryId());
+	                            }
+	                            if (updateDto.getPartId() != null) {
+	                                entity.setPartId(updateDto.getPartId());
+	                            }
+	                            if (updateDto.getDropRequestDate() != null) {
+	                                entity.setDropRequestDate(updateDto.getDropRequestDate());
+	                            }
+	                            if (updateDto.getActualDropDate() != null) {
+	                                entity.setActualDropDate(updateDto.getActualDropDate());
+	                            }
+	                            if (updateDto.getMinistryRefNo() != null) {
+	                                entity.setMinistryRefNo(updateDto.getMinistryRefNo());
+	                            }
+	                            if (updateDto.getMinistryRefDate() != null) {
+	                                entity.setMinistryRefDate(updateDto.getMinistryRefDate());
+	                            }
+	                            if (updateDto.getAcceptedId() != null) {
+	                                entity.setAcceptedId(updateDto.getAcceptedId());
+	                            }
+	                            if (updateDto.getType() != null) {
+	                                entity.setType(updateDto.getType());
+	                            }
+	                            if (updateDto.getCommunicationDate() != null) {
+	                                entity.setCommunicationDate(updateDto.getCommunicationDate());
+	                            }
+	                            if (updateDto.getSession() != null) {
+	                                entity.setSession(updateDto.getSession());
+	                            }
+	                            if (updateDto.getMeetingNo() != null) {
+	                                entity.setMeetingNo(updateDto.getMeetingNo());
+	                            }
+	                            if (updateDto.getMeetingDate() != null) {
+	                                entity.setMeetingDate(updateDto.getMeetingDate());
+	                            }
+	                            if (updateDto.getRemarks() != null) {
+	                                entity.setRemarks(updateDto.getRemarks());
+	                            }
+	                            if (updateDto.getStatusForMinistry() != null) {
+	                                entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                            }
+	                            if (updateDto.getDroppingFiles() != null) {
+	                                entity.setDroppingFiles(updateDto.getDroppingFiles());
+	                            }
+	                            if (updateDto.getDraftStatus() != null) {
+	                                entity.setDraftStatus(updateDto.getDraftStatus());
+	                            }
+	                            if (updateDto.getFromMinistry() != null) {
+	                                entity.setFromMinistry(updateDto.getFromMinistry());
+	                            }
+	                            droppingRequestRepository.save(entity);
+	                            return getRequestById(id, requestType);
+	                        }).orElse(null);
+
+	            case "ClubbedAssurance":
+	                return clubbedAssuranceRepository.findById(id)
+	                        .map(entity -> {
+	                            // Uncomment if you want to update these fields optionally:
+	                            // if (updateDto.getClubbedAssuranceIds() != null) {
+	                            //     entity.setClubbedAssuranceIds(updateDto.getClubbedAssuranceIds());
+	                            // }
+	                            // if (updateDto.getFromMinistry() != null) {
+	                            //     entity.setFromMinistry(updateDto.getFromMinistry());
+	                            // }
+	                            if (updateDto.getStatusForMinistry() != null) {
+	                                entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                            }
+	                            clubbedAssuranceRepository.save(entity);
+	                            return getRequestById(id, requestType);
+	                        }).orElse(null);
+
+	            default:
+	                throw new IllegalArgumentException("Invalid request type: " + requestType);
+	        }
+	    }
+
+
+
 
 
 

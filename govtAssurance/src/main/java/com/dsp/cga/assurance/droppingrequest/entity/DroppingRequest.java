@@ -81,6 +81,7 @@ public class DroppingRequest extends Auditable {
 
 	@Column(name = "remarks", length = 512)
 	private String remarks;
+	
 	@Column(name = "meeting_no")
 	private String meetingNo;
 	@Column(name = "meeting_date")

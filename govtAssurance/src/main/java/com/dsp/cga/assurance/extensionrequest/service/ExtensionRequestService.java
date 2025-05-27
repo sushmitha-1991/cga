@@ -30,4 +30,6 @@ public interface ExtensionRequestService {
 
 	 CommonRequestResponseDTO getRequestById(Long id, String requestType);
 
+	CommonRequestResponseDTO updateRequest(Long id, String requestType, CommonRequestResponseDTO updateDto);
+
 }

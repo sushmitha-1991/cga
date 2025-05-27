@@ -212,4 +212,16 @@ public class ExtensionRequestController {
 	    return ResponseEntity.ok(response);
 	}
 
+	 @PutMapping("/{requestType}/{id}")
+	    public ResponseEntity<CommonRequestResponseDTO> updateRequest(
+	            @PathVariable String requestType,
+	            @PathVariable Long id,
+	            @RequestBody CommonRequestResponseDTO updateDto
+	    ) {
+	        CommonRequestResponseDTO updatedRequest = extensionRequestService.updateRequest(id, requestType, updateDto);
+	        if (updatedRequest == null) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+	        }
+	        return ResponseEntity.ok(updatedRequest);
+	    }
 }
