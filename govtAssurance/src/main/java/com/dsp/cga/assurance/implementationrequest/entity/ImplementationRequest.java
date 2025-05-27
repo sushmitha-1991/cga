@@ -19,19 +19,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "implementation_requests", schema = "cga")
-public class ImplementationRequest extends Auditable {
+public class ImplementationRequest extends ApplicationInstance {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "implementation_req_seq")
-	@SequenceGenerator(name = "implementation_req_seq", sequenceName = "cga.implementation_req_seq", allocationSize = 1)
-	private Long id;
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "implementation_req_seq")
+//	@SequenceGenerator(name = "implementation_req_seq", sequenceName = "cga.implementation_req_seq", allocationSize = 1)
+//	private Long id;
 
 	@Column(name = "assurance_id", nullable = false)
 	private Long assuranceId;

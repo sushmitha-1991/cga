@@ -1,6 +1,10 @@
 package com.dsp.cga.assurance.implementationrequest.service.impl;
 
 import java.time.LocalDate;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+
+import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,12 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
@@ -29,6 +37,8 @@ import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.CommitteeDecisionDTO;
 import com.dsp.cga.assurance.dto.ImplementationTypeDTO;
 import com.dsp.cga.assurance.dto.MemberDTO;
+import com.dsp.cga.assurance.dto.SerialNumberRequest;
+import com.dsp.cga.assurance.dto.SerialNumberResponse;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
@@ -38,6 +48,7 @@ import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestReposit
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceImplementationDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
+import com.dsp.cga.assurance.implementationrequest.repository.ApplicationInstanceRepository;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
 import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
@@ -49,6 +60,8 @@ import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.assurance.service.impl.AssuranceServiceImpl;
+import com.dsp.cga.entity.MastersLokSabhaSession;
+import com.dsp.cga.entity.MastersRajyaSabha;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.response.GenericResponse;
@@ -57,6 +70,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 @Service
@@ -95,6 +109,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	@Autowired
 	private OtherRequestRepository otherRequestRepo;
 	
+	@Autowired
+	private ApplicationInstanceRepository applicationInstanceRepository;
 	
 	
 	@Autowired
@@ -103,24 +119,157 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	@Autowired
 	private MastersRSSRepository rssRepo;
 	
+	@Value("${master.service.url}")
+	private String masterServiceUrl;
+	@Value("${workflow.service.url}")
+	private String draftedServiceUrl;
+	@Autowired
+	private HttpServletRequest httpRequest;
+	
 	@Autowired
 	private CodeRepository codeRepository;
 
+//	@Override
+//	public ImplementationRequestDTO createImplementationRequest(ImplementationRequestDTO implementationRequestDTO) {
+//		ImplementationRequest implementationRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
+//
+//		// Save Assurance entity
+//		ImplementationRequest savedimplementationRequest = implementationRequestRepository.save(implementationRequest); // Save
+//																														// once,
+//
+//		// Map entity back to DTO to return response
+//		ImplementationRequestDTO savedImplementationRequestDTO = ImplementationRequestMapper
+//				.toDTO(savedimplementationRequest);
+//
+//		return savedImplementationRequestDTO;
+//	}
+	
 	@Override
 	public ImplementationRequestDTO createImplementationRequest(ImplementationRequestDTO implementationRequestDTO) {
-		ImplementationRequest implementationRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
+	    // Convert DTO to Entity
+	    ImplementationRequest implementationRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
 
-		// Save Assurance entity
-		ImplementationRequest savedimplementationRequest = implementationRequestRepository.save(implementationRequest); // Save
-																														// once,
+	    // Get house ID (Lok Sabha or Rajya Sabha)
+	    Long houseId = getHouseId();
+	    SerialNumberRequest serialNumberRequest = new SerialNumberRequest();
+	    serialNumberRequest.setAppId(implementationRequestDTO.getApplicationId());
 
-		// Map entity back to DTO to return response
-		ImplementationRequestDTO savedImplementationRequestDTO = ImplementationRequestMapper
-				.toDTO(savedimplementationRequest);
+	    // ✅ Get Assurance entity by ID
+	    Optional<Assurance> optionalAssurance = assuranceRepository.findById(implementationRequest.getAssuranceId());
+	    if (optionalAssurance.isPresent()) {
+	        Assurance assurance = optionalAssurance.get();
 
-		return savedImplementationRequestDTO;
+	        if (houseId == 1) { // Rajya Sabha
+	            Long rajyaSabhaSessionId = assurance.getRajyaSabhaSessionNo();
+	            serialNumberRequest.setSessionId(rajyaSabhaSessionId);
+
+	            Optional<MastersRajyaSabha> optionalSession = rssRepo.findById(rajyaSabhaSessionId);
+	            optionalSession.ifPresent(session -> {
+	                implementationRequest.setRajyaSabhaSession(session.getSessionNumber());
+	            });
+
+	        } else if (houseId == 2) { // Lok Sabha
+	            Long lokSabhaSessionId = assurance.getLokSabhaSessionNo();
+	            serialNumberRequest.setSessionId(lokSabhaSessionId);
+
+	            Optional<MastersLokSabhaSession> optionalSession = lssRepo.findById(lokSabhaSessionId);
+	            optionalSession.ifPresent(session -> {
+	                implementationRequest.setLokSabhaSessionNumber(session.getSessionNumber());
+	                implementationRequest.setLokSabhaSession(session.getLokSabha().getLokSabhaNumber());
+	            });
+	        }
+
+	        // Generate serial number if blank
+	        if (StringUtils.isBlank(implementationRequestDTO.getApplicationNo())) {
+	            SerialNumberResponse serialNumberResponse = generateSerialNumber(serialNumberRequest);
+	            implementationRequest.setApplicationNo(serialNumberResponse.getId());
+	        }
+
+	    } else {
+	        throw new ResourceNotFoundException("Assurance not found with ID: " + implementationRequest.getAssuranceId());
+	    }
+
+	    // Set content fields
+	    if (implementationRequest.getLayingDate() != null) {
+	        implementationRequest.setDocumentDate(implementationRequest.getLayingDate());
+	    } else if (implementationRequest.getDateOfImplementation() != null) {
+	        implementationRequest.setDocumentDate(implementationRequest.getDateOfImplementation());
+	    }
+	    implementationRequest.setCurrentStatus(implementationRequest.getStatusForMinistry());
+
+	    // Save to DB
+	    ImplementationRequest saved = implementationRequestRepository.save(implementationRequest);
+
+	    return ImplementationRequestMapper.toDTO(saved);
 	}
 
+
+
+	
+	public SerialNumberResponse generateSerialNumber(SerialNumberRequest request) {
+	    String url = masterServiceUrl + "/serial-number";
+	    log.debug("Calling Serial Number API at URL: {}", url);
+
+	    try {
+	        SerialNumberResponse response = restTemplate.postForObject(url, request, SerialNumberResponse.class);
+
+	        if (response == null) {
+	            log.error("Serial Number API returned null response");
+	            throw new RuntimeException("Failed to generate serial number, response is null");
+	        }
+
+	        log.debug("Received SerialNumberResponse: {}", response);
+	        return response;
+
+	    } catch (Exception e) {
+	        log.error("Error during Serial Number API call", e);
+	        throw new RuntimeException("Failed to generate serial number", e);
+	    }
+	}
+
+
+
+
+	public String getTokenFromRequest() {
+		String authorizationHeader = httpRequest.getHeader("Authorization");
+		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+			return authorizationHeader.substring(7);
+		}
+		return null;
+	}
+
+	public String deleteDraftEntry(String applicationNo) {
+		String url = draftedServiceUrl + "/delete-save-as-draft?applicationNo=" + applicationNo;
+		String token = getTokenFromRequest();
+
+		if (token == null) {
+			throw new IllegalStateException("Authorization token is missing");
+		}
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", "Bearer " + token);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<Void> entity = new HttpEntity<>(headers); // No body needed for DELETE request
+
+		try {
+			ResponseEntity<GenericResponse> response = restTemplate.exchange(url, HttpMethod.DELETE, entity,
+					GenericResponse.class);
+
+			System.out.println("@@@");
+			System.out.println(response);
+			if (response.getBody() != null && response.getBody().isSuccess()) {
+				return response.getBody().getMessage(); // Return success message
+			} else {
+				return "Failed to delete draft entry";
+			}
+		} catch (Exception e) {
+			System.err.println("Error during API call: " + e.getMessage());
+			throw new RuntimeException("Failed to delete draft entry", e);
+		}
+	}
+
+	
 
 	
 	@Override

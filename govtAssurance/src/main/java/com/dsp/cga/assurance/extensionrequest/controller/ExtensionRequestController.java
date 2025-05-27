@@ -212,16 +212,29 @@ public class ExtensionRequestController {
 	    return ResponseEntity.ok(response);
 	}
 
-	 @PutMapping("/{requestType}/{id}")
-	    public ResponseEntity<CommonRequestResponseDTO> updateRequest(
-	            @PathVariable String requestType,
-	            @PathVariable Long id,
-	            @RequestBody CommonRequestResponseDTO updateDto
-	    ) {
-	        CommonRequestResponseDTO updatedRequest = extensionRequestService.updateRequest(id, requestType, updateDto);
-	        if (updatedRequest == null) {
-	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-	        }
-	        return ResponseEntity.ok(updatedRequest);
-	    }
+	@PutMapping("/{requestType}/{id}")
+	@Operation(summary = "Update request by ID and type")
+	@ApiResponses(value = {
+	    @ApiResponse(responseCode = "200", description = "Request updated successfully"),
+	    @ApiResponse(responseCode = "404", description = "Request not found"),
+	    @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<GenericResponse<CommonRequestResponseDTO>> updateRequest(
+	        @PathVariable String requestType,
+	        @PathVariable Long id,
+	        @RequestBody CommonRequestResponseDTO updateDto
+	) {
+	    CommonRequestResponseDTO updatedRequest = extensionRequestService.updateRequest(id, requestType, updateDto);
+
+
+	    return ResponseEntity.ok(
+	            new GenericResponse<>(
+	                    HttpStatus.OK.value(),
+	                    true,
+	                    "Request updated successfully",
+	                    updatedRequest
+	            )
+	    );
+	}
+
 }

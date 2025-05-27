@@ -60,8 +60,9 @@ public class ImplementationRequestMapper {
                 .otherFiles(dto.getOtherFiles())
                 .implementationTypeId(dto.getImplementationTypeId())
                 .session(dto.getSession())
+                .applicationId(dto.getApplicationId())
                 .fromMinistry(true)
-	             .statusForMinistry("Submitted")
+	            .statusForMinistry("Submitted")
                 .build();
     }
     

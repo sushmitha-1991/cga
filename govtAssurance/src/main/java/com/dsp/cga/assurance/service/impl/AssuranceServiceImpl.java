@@ -1117,63 +1117,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 		return houseId;
 	}
 
-//	@Override
-//	public AssuranceDTO getByAssuranceNo(String assuranceNo) {
-//		Assurance assurance = assuranceRepository.findByAssuranceNo(assuranceNo)
-//                .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with assuranceNo: " + assuranceNo));
-//        return assuranceMapper.toDTO(assurance);
-//    }
 
-//	@Override
-//	public AssuranceDTO getByAssuranceNo(String assuranceNo) {
-//	    Assurance assurance = assuranceRepository.findByAssuranceNo(assuranceNo)
-//	            .orElseThrow(() -> new ResourceNotFoundException("Assurance not found with assuranceNo: " + assuranceNo));
-//
-//	    AssuranceDTO dto = assuranceMapper.toDTO(assurance);
-//
-//	    // Populate additional data
-//	    if (assurance.getMemberId() != null) {
-//	        dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
-//	    }
-//	    if (assurance.getSourceId() != null) {
-//	        dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
-//	    }
-//	    if (assurance.getMinistryId() != null) {
-//	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
-//	    }
-//	    
-//	    if (assurance.getMinistryId() != null) {
-//	        dto.setMinistryDTO(fetchMinistryData(assurance.getMinistryId()));
-//	    }
-//	    if (assurance.getDepartmentId() != null) {
-//	        dto.setDepartmentDTO(fetchDepartmentData(assurance.getDepartmentId()));
-//	    }
-//	    if (assurance.getAssuranceTypeId() != null) {
-//	        dto.setAssuranceTypeDTO(fetchAssuranceTypeData(assurance.getAssuranceTypeId()));
-//	    }
-//	    if (assurance.getRajyaSabhaSessionNo() != null) {
-//	        dto.setRajyaSabhaSessionNoDTO(fetchRajyaSabhaSessionData(assurance.getRajyaSabhaSessionNo()));
-//	    }
-//	    if (assurance.getPendingDueTo() != null) {
-//	        dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
-//	    }
-//	    if (assurance.getStatusId() != null) {
-//	        dto.setStatusDTO(fetchStatusData(assurance.getStatusId()));
-//	    }
-//	    
-//	    if (assurance.getLokSabhaNo() != null) {
-//			dto.setLokSabhaNoDTO(fetchLokSabhaData(assurance.getLokSabhaNo()));
-//		}
-//	    
-//	    if (assurance.getLokSabhaSessionNo() != null) {
-//            dto.setLokSabhaSessionNoDTO(fetchLoksabhaSessionData(assurance.getLokSabhaSessionNo()));
-//        }
-//
-//	    List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
-//	    dto.setClubbedMembersData(clubbedMembersData);
-//
-//	    return dto;
-//	}
 	
 	@Override
 	public AssuranceDTO getByAssuranceNo(String assuranceNo) {

@@ -35,6 +35,8 @@ public class ImplementationRequestDTO {
 	    private LocalDate dateOfImplementation;
 	    private String status;
 	    private String remarks;
+	    private Long applicationId;
+	    private String applicationNo;
 	    private CommitteeDecisionDTO committeeDecisionDTO;
 	    private ImplementationTypeDTO implementationTypeDTO;
 	    private List<Map<String, Object>> implementationReportFiles;

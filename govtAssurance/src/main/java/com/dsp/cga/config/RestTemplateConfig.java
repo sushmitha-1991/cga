@@ -69,4 +69,9 @@ public class RestTemplateConfig {
         // Create and return the request factory with the custom HttpClient
         return new HttpComponentsClientHttpRequestFactory(httpClient);
     }
+    
+//    @Bean
+//	public RestTemplate restTemplate() {
+//		return new RestTemplate();
+//	}
 }
