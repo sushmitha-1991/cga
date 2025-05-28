@@ -62,6 +62,7 @@ public class ImplementationRequestMapper {
                 .session(dto.getSession())
                 .applicationId(dto.getApplicationId())
                 .fromMinistry(true)
+                .remarks(dto.getRemarks())
 	            .statusForMinistry("Submitted")
                 .build();
     }
@@ -88,23 +89,12 @@ public class ImplementationRequestMapper {
         entity.setDetailsOfImplementation(dto.getDetailsOfImplementation());
         entity.setDueDateOfImplementation(dto.getDueDateOfImplementation());
         entity.setRemarks(dto.getRemarks());
+      
         
         
-        // Note: createdBy and createdDate will remain unchanged as per JPA logic
     }
     
-    public static ImplementationRequest toImplementationRequest(AssuranceDTO dto) {
-        if (dto == null) return null;
-
-        return ImplementationRequest.builder()
-            // assuranceId will be set later after saving Assurance entity
-            .dueDateOfImplementation(dto.getDueDateOfImplementation())
-            .dateOfImplementation(dto.getDateOfImplementation())
-            .detailsOfImplementation(dto.getDetailsOfImplementation())
-            .remarks(dto.getRemarks())
-            .draftStatus(false) // or use dto.getDraftStatus() if needed
-            .build();
-    }
+    
 
 }
 

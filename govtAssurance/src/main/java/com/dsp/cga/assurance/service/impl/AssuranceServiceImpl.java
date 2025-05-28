@@ -236,9 +236,6 @@ public class AssuranceServiceImpl implements AssuranceService {
 		// Save Assurance entity
 		Assurance savedAssurance = assuranceRepository.save(assurance);
 		
-//		ImplementationRequest implementation = ImplementationRequestMapper.toImplementationRequest(assuranceDTO);
-//		implementation.setAssuranceId(assurance.getId()); // Set foreign key reference
-//		implementationRequestRepository.save(implementation);// Save once, to make it effectively final
 
 		// Map entity back to DTO to return response
 		AssuranceDTO savedAssuranceDTO = assuranceMapper.toDTO(assurance);

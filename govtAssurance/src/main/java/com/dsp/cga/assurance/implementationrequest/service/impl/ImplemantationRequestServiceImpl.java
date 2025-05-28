@@ -409,109 +409,9 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 
 	
-//	@Override
-//	public List<AssuranceImplementationDTO> getAssuranceImplementations(Long sessionNo, LocalDate layingDate,
-//	        Long implementationTypeId, Long statusId, Integer ministryCode) {
-//
-//	    // Initialize ministryId
-//	    final Long ministryId;
-//	    
-//	    // If ministryCode is not null, get ministryId
-//	    if (ministryCode != null) {
-//	        Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
-//	        if (ministry != null) {
-//	            ministryId = ministry.getId();
-//	        } else {
-//	            return List.of(); // No such ministry code
-//	        }
-//	    } else {
-//	        ministryId = null;
-//	    }
-//
-//	    Long houseId = getHouseId();
-//	    if (sessionNo == null) {
-//	        sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
-//	    }
-//
-//	    // Making sessionNo final for usage inside the lambda
-//	    final Long finalSessionNo = sessionNo;
-//
-//	    // ✅ Lok Sabha Logic
-//	    if (houseId == 2) {
-//	        // Define the Specification for Lok Sabha
-//	        Specification<Assurance> lokSabhaSpecification = (root, query, cb) -> {
-//	            List<Predicate> predicates = new ArrayList<>();
-//	            predicates.add(cb.isNotNull(root.get("dateOfImplementation")));
-//	            predicates.add(cb.equal(root.get("lokSabhaSessionNo"), finalSessionNo));
-//
-//	            if (layingDate != null) {
-//	                predicates.add(cb.equal(root.get("layingDate"), layingDate));
-//	            }
-//	            if (statusId != null) {
-//	                predicates.add(cb.equal(root.get("statusId"), statusId));
-//	            }
-//	            if (ministryId != null) {
-//	                predicates.add(cb.equal(root.get("ministryId"), ministryId));
-//	            }
-//
-//	            return cb.and(predicates.toArray(new Predicate[0]));
-//	        };
-//
-//	        List<Assurance> assurances = assuranceRepository.findAll(lokSabhaSpecification);
-//
-//	        
-//	        return assurances.stream()
-//	                .map(assurance -> AssuranceImplementationDTO.builder()
-//	                        .assuranceNo(assurance.getAssuranceNo())
-//	                        .id(assurance.getId())
-//	                        .questionNo(assurance.getQuestionNo())
-//	                        .status(codeRepository.findCodeById(assurance.getStatusId()))
-//	                        .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
-//	                        .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()))
-//	                        .dueDateOfImplementation(assurance.getDueDateOfImplementation())
-//	                        .detailsOfImplementation(assurance.getDetailsOfImplementation())
-//	                        .questionNo(assurance.getQuestionNo())
-//	                        .dateOfImplementation(assurance.getDateOfImplementation())
-//	                        .build())
-//	                .collect(Collectors.toList());
-//	    }
-//
-//	    // ✅ Rajya Sabha Logic
-//	    Specification<ImplementationRequest> rajyaSabhaSpecification = ImplementationRequestSpecification.filterByCriteria(
-//	            finalSessionNo, layingDate, implementationTypeId, statusId, ministryId, houseId
-//	    );
-//
-//	    List<ImplementationRequest> implementationRequests = implementationRequestRepository.findAll(rajyaSabhaSpecification);
-//	    if (CollectionUtils.isEmpty(implementationRequests)) {
-//	        return List.of();
-//	    }
-//
-//	    return implementationRequests.stream()
-//	            .map(implementationRequest -> {
-//	                Assurance assurance = assuranceRepository.findById(implementationRequest.getAssuranceId()).orElse(null);
-//	                if (assurance == null || (houseId == 1 && assurance.getRajyaSabhaSessionNo() == null)) {
-//	                    return null;
-//	                }
-//
-//	                return AssuranceImplementationDTO.builder()
-//	                        .assuranceNo(assurance.getAssuranceNo())
-//	                        .status(codeRepository.findCodeById(assurance.getStatusId()))
-//	                        .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()))
-//	                        .dueDateOfImplementation(assurance.getDueDateOfImplementation())
-//	                        .detailsOfImplementation(assurance.getDetailsOfImplementation())
-//	                        .questionNo(assurance.getQuestionNo())
-//	                        .dateOfImplementation(assurance.getDateOfImplementation())
-//	                        .supplementaryId(implementationRequest.getSupplementaryId())
-//	                        .id(implementationRequest.getId())
-//	                        .partId(implementationRequest.getPartId())
-//	                        .reason(implementationRequest.getReason())
-//	                        .layingDate(implementationRequest.getLayingDate())
-//	                        .implementationTypeId(codeRepository.findCodeById(implementationRequest.getImplementationTypeId()))
-//	                        .build();
-//	            })
-//	            .filter(Objects::nonNull)
-//	            .collect(Collectors.toList());
-//	}
+
+
+
 
 
 	@Override
@@ -531,78 +431,18 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        ministryId = null;
 	    }
 
-	    Long houseId = getHouseId();
+	    Long houseId = getHouseId(); // 1 = Rajya Sabha, 2 = Lok Sabha
 	    if (sessionNo == null) {
 	        sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
 	    }
 
 	    final Long finalSessionNo = sessionNo;
 
-	    // ✅ Lok Sabha
-	    if (houseId == 2) {
-	        Specification<Assurance> lokSabhaSpec = (root, query, cb) -> {
-	            List<Predicate> predicates = new ArrayList<>();
-	            predicates.add(cb.isNotNull(root.get("dateOfImplementation")));
-	            predicates.add(cb.equal(root.get("lokSabhaSessionNo"), finalSessionNo));
-
-	            if (layingDate != null)
-	                predicates.add(cb.equal(root.get("layingDate"), layingDate));
-	            if (statusId != null)
-	                predicates.add(cb.equal(root.get("statusId"), statusId));
-	            if (ministryId != null)
-	                predicates.add(cb.equal(root.get("ministryId"), ministryId));
-
-	            return cb.and(predicates.toArray(new Predicate[0]));
-	        };
-
-	        List<Assurance> assurances = assuranceRepository.findAll(lokSabhaSpec);
-
-	        return assurances.stream().map(assurance -> {
-	            // Common values
-	            String memberName = null;
-	            String departmentName = null;
-	            String ministryName = null;
-
-	            if (assurance.getMemberId() != null) {
-	                memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
-	            }
-
-	            if (assurance.getDepartmentId() != null) {
-	                departmentName = departmentRepository.findById(assurance.getDepartmentId())
-	                        .map(Departments::getDepartmentName).orElse(null);
-	            }
-
-	            if (assurance.getMinistryId() != null) {
-	                ministryName = ministryRepository.findById(assurance.getMinistryId())
-	                        .map(Ministries::getMinistryName).orElse(null);
-	            }
-
-	            return AssuranceImplementationDTO.builder()
-	                    .assuranceNo(assurance.getAssuranceNo())
-	                    .id(assurance.getId())
-	                    .questionNo(assurance.getQuestionNo())
-	                    .status(codeRepository.findCodeById(assurance.getStatusId()))
-	                    .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
-	                    .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()))
-	                    .dueDateOfImplementation(assurance.getDueDateOfImplementation())
-	                    .detailsOfImplementation(assurance.getDetailsOfImplementation())
-	                    .questionNo(assurance.getQuestionNo())
-	                  //  .statusForMinistry(impl.get)
-	                    .house("Rajya Sabha")
-	                    .subject(assurance.getSubject())
-	                    .dateOfImplementation(assurance.getDateOfImplementation())
-	                    .memberName(memberName)
-	                    .departmentName(departmentName)
-	                    .ministryName(ministryName)
-	                    .build();
-	        }).collect(Collectors.toList());
-	    }
-
-	    // ✅ Rajya Sabha
-	    Specification<ImplementationRequest> rajyaSabhaSpec =
+	    // ✅ Common Specification using ImplementationRequest
+	    Specification<ImplementationRequest> spec =
 	            ImplementationRequestSpecification.filterByCriteria(finalSessionNo, layingDate, implementationTypeId, statusId, ministryId, houseId);
 
-	    List<ImplementationRequest> implementationRequests = implementationRequestRepository.findAll(rajyaSabhaSpec);
+	    List<ImplementationRequest> implementationRequests = implementationRequestRepository.findAll(spec);
 
 	    if (CollectionUtils.isEmpty(implementationRequests)) {
 	        return List.of();
@@ -610,7 +450,17 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	    return implementationRequests.stream().map(impl -> {
 	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
-	        if (assurance == null || (houseId == 1 && assurance.getRajyaSabhaSessionNo() == null)) {
+	        if (assurance == null) {
+	            return null;
+	        }
+
+	        // ✅ House check: skip if Rajya Sabha selected but RS session null
+	        if (houseId == 1 && assurance.getRajyaSabhaSessionNo() == null) {
+	            return null;
+	        }
+
+	        // ✅ House check: skip if Lok Sabha selected but LS session null
+	        if (houseId == 2 && assurance.getLokSabhaSessionNo() == null) {
 	            return null;
 	        }
 
@@ -633,18 +483,15 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                    .map(Ministries::getMinistryName).orElse(null);
 	        }
 
-	        return AssuranceImplementationDTO.builder()
+	        AssuranceImplementationDTO.AssuranceImplementationDTOBuilder builder = AssuranceImplementationDTO.builder()
 	                .assuranceNo(assurance.getAssuranceNo())
 	                .id(impl.getId())
 	                .questionNo(assurance.getQuestionNo())
 	                .status(codeRepository.findCodeById(assurance.getStatusId()))
-	                .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()))
-	                .dueDateOfImplementation(assurance.getDueDateOfImplementation())
-	                .detailsOfImplementation(assurance.getDetailsOfImplementation())
-	                .questionNo(assurance.getQuestionNo())
-	                .dateOfImplementation(assurance.getDateOfImplementation())
+	                .dueDateOfImplementation(impl.getDueDateOfImplementation())
+	                .detailsOfImplementation(impl.getDetailsOfImplementation())
+	                .dateOfImplementation(impl.getDateOfImplementation())
 	                .supplementaryId(impl.getSupplementaryId())
-	                .house("Lok Sabha")
 	                .partId(impl.getPartId())
 	                .reason(impl.getReason())
 	                .layingDate(impl.getLayingDate())
@@ -653,11 +500,21 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                .implementationTypeId(codeRepository.findCodeById(impl.getImplementationTypeId()))
 	                .memberName(memberName)
 	                .departmentName(departmentName)
-	                .ministryName(ministryName)
-	                .build();
+	                .ministryName(ministryName);
+
+	        if (houseId == 1) {
+	            builder.house("Rajya Sabha");
+	            builder.rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()));
+	        } else {
+	            builder.house("Lok Sabha");
+	            builder.lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()));
+	            builder.lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()));
+	        }
+
+	        return builder.build();
+
 	    }).filter(Objects::nonNull).collect(Collectors.toList());
 	}
-
 
 
 	private Long getHouseId() {
@@ -673,26 +530,19 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 
 	
+
+
 	@Override
 	public AssuranceImplementationDTO getImplementationDetailById(Long id) {
 	    Long houseId = getHouseId();
 
-	    Assurance assurance;
-	    ImplementationRequest implementationRequest = null;
+	    Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(id);
+	    if (optionalRequest.isEmpty()) return null;
 
-	    if (houseId == 2) {
-	        // Lok Sabha: ID is from Assurance table
-	        assurance = assuranceRepository.findById(id).orElse(null);
-	        if (assurance == null) return null;
-	    } else {
-	        // Rajya Sabha: ID is from ImplementationRequest table
-	        Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(id);
-	        if (optionalRequest.isEmpty()) return null;
-	        implementationRequest = optionalRequest.get();
+	    ImplementationRequest implementationRequest = optionalRequest.get();
 
-	        assurance = assuranceRepository.findById(implementationRequest.getAssuranceId()).orElse(null);
-	        if (assurance == null) return null;
-	    }
+	    Assurance assurance = assuranceRepository.findById(implementationRequest.getAssuranceId()).orElse(null);
+	    if (assurance == null) return null;
 
 	    // Common values
 	    String memberName = null;
@@ -710,7 +560,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    }
 
 	    if (assurance.getMinistryId() != null) {
-	        ministryName = ministryRepository.findById(assurance.getDepartmentId())
+	        ministryName = ministryRepository.findById(assurance.getMinistryId())
 	            .map(Ministries::getMinistryName)
 	            .orElse(null);
 	    }
@@ -721,29 +571,31 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .ministryName(ministryName)
 	        .departmentName(departmentName)
 	        .status(codeRepository.findCodeById(assurance.getStatusId()))
-	        .dueDateOfImplementation(assurance.getDueDateOfImplementation())
+	        .dueDateOfImplementation(implementationRequest.getDueDateOfImplementation())
 	        .subject(assurance.getSubject())
 	        .questionNo(assurance.getQuestionNo())
-	        .dateOfImplementation(assurance.getDateOfImplementation())
-	        .detailsOfImplementation(assurance.getDetailsOfImplementation());
+	        .dateOfImplementation(implementationRequest.getDateOfImplementation())
+	        .detailsOfImplementation(implementationRequest.getDetailsOfImplementation())
+	        .remarks(assurance.getRemarks())
+	        .reason(implementationRequest.getReason())
+	        .implementationReportFiles(implementationRequest.getImplementationReportFiles())
+	        .partReportFiles(implementationRequest.getPartReportFiles())
+	        .layingDate(implementationRequest.getLayingDate())
+	        .implementationTypeId(codeRepository.findCodeById(implementationRequest.getImplementationTypeId()))
+	        .supplementaryId(implementationRequest.getSupplementaryId())
+	        .partId(implementationRequest.getPartId())
+	        .id(implementationRequest.getId()); // Unified ID (ImplementationRequest)
 
+	    // Set session number based on house
 	    if (houseId == 2) {
-	        // Lok Sabha: direct from Assurance
 	        builder
-	            .remarks(assurance.getRemarks())
 	            .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()))
 	            .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
-	            .id(assurance.getId()); // using assuranceId
+	            .house("Lok Sabha");
 	    } else {
-	        // Rajya Sabha: from ImplementationRequest
 	        builder
-	            .reason(implementationRequest.getReason())
-	            .layingDate(implementationRequest.getLayingDate())
-	            .implementationTypeId(codeRepository.findCodeById(implementationRequest.getImplementationTypeId()))
-	            .supplementaryId(implementationRequest.getSupplementaryId())
-	            .partId(implementationRequest.getPartId())
 	            .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()))
-	            .id(implementationRequest.getId());
+	            .house("Rajya Sabha");
 	    }
 
 	    return builder.build();
@@ -752,147 +604,63 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 
 
-//	@Override
-//	public AssuranceImplementationDTO updateImplementationRequest(Long id, ImplementationRequestDTO dto) {
-//	    Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(id);
-//	    if (optionalRequest.isEmpty()) return null;
-//
-//	    ImplementationRequest implReq = optionalRequest.get();
-//
-//	    Assurance assurance = assuranceRepository.findById(implReq.getAssuranceId()).orElse(null);
-//	    if (assurance == null) return null;
-//
-//	    // Update ImplementationRequest fields if provided
-//	    if (dto.getPartId() != null) {
-//	        implReq.setPartId(dto.getPartId());
-//	    }
-//	    if (dto.getSupplementaryId() != null) {
-//	        implReq.setSupplementaryId(dto.getSupplementaryId());
-//	    }
-//	    if (dto.getReason() != null) {
-//	        implReq.setReason(dto.getReason());
-//	    }
-//	    if (dto.getLayingDate() != null) {
-//	        implReq.setLayingDate(dto.getLayingDate());
-//	    }
-//	    if (dto.getImplementationTypeId() != null) {
-//	        implReq.setImplementationTypeId(dto.getImplementationTypeId());
-//	    }
-//	    
-//	    if (dto.getImplementationReportFiles() != null) {
-//	        implReq.setImplementationReportFiles(dto.getImplementationReportFiles());
-//	    }
-//	    
-//	    if (dto.getPartReportFiles() != null) {
-//	        implReq.setPartReportFiles(dto.getPartReportFiles());
-//	    }
-//
-//	    // Update Assurance fields if provided
-////	    if (dto.getStatusId() != null) {
-////	        assurance.setStatusId(dto.getStatusId());
-////	    }
-////	    if (dto.getDueDateOfImplementation() != null) {
-////	        assurance.setDueDateOfImplementation(dto.getDueDateOfImplementation());
-////	    }
-////	    if (dto.getDetailsOfImplementation() != null) {
-////	        assurance.setDetailsOfImplementation(dto.getDetailsOfImplementation());
-////	    }
-////	    if (dto.getDateOfImplementation() != null) {
-////	        assurance.setDateOfImplementation(dto.getDateOfImplementation());
-////	    }
-//
-//	    // Save updated entities
-//	    implementationRequestRepository.save(implReq);
-//	    assuranceRepository.save(assurance);
-//
-//	    return getImplementationDetailById(id); // Reuse existing method for response DTO
-//	}
 	
 	@Override
 	public AssuranceImplementationDTO updateImplementationRequest(Long id, ImplementationRequestDTO dto) {
 	    Long houseId = getHouseId();
 
-	    Assurance assurance;
-	    ImplementationRequest implReq = null;
+	    Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(id);
+	    if (optionalRequest.isEmpty()) return null;
 
-	    if (houseId == 2) {
-	        // Lok Sabha: ID is Assurance ID
-	        assurance = assuranceRepository.findById(id).orElse(null);
-	        if (assurance == null) return null;
+	    ImplementationRequest implReq = optionalRequest.get();
 
-	        // Update only Assurance fields
-//	        if (dto.getStatusId() != null) {
-//	            assurance.setStatusId(dto.getStatusId());
-//	        }
-	        if (dto.getDueDateOfImplementation() != null) {
-	            assurance.setDueDateOfImplementation(dto.getDueDateOfImplementation());
-	        }
-	        if (dto.getDetailsOfImplementation() != null) {
-	            assurance.setDetailsOfImplementation(dto.getDetailsOfImplementation());
-	        }
-	        if (dto.getDateOfImplementation() != null) {
-	            assurance.setDateOfImplementation(dto.getDateOfImplementation());
-	        }
-	        if (dto.getRemarks() != null) {
-	            assurance.setRemarks(dto.getRemarks());
-	        }
+	    Assurance assurance = assuranceRepository.findById(implReq.getAssuranceId()).orElse(null);
+	    if (assurance == null) return null;
 
-	        assuranceRepository.save(assurance);
-	        return getImplementationDetailById(id); // use Assurance ID
-	    } else {
-	        // Rajya Sabha: ID is ImplementationRequest ID
-	        Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(id);
-	        if (optionalRequest.isEmpty()) return null;
-
-	        implReq = optionalRequest.get();
-
-	        assurance = assuranceRepository.findById(implReq.getAssuranceId()).orElse(null);
-	        if (assurance == null) return null;
-
-	        // Update ImplementationRequest
-	        if (dto.getPartId() != null) {
-	            implReq.setPartId(dto.getPartId());
-	        }
-	        if (dto.getSupplementaryId() != null) {
-	            implReq.setSupplementaryId(dto.getSupplementaryId());
-	        }
-	        if (dto.getReason() != null) {
-	            implReq.setReason(dto.getReason());
-	        }
-	        if (dto.getLayingDate() != null) {
-	            implReq.setLayingDate(dto.getLayingDate());
-	        }
-	        if (dto.getImplementationTypeId() != null) {
-	            implReq.setImplementationTypeId(dto.getImplementationTypeId());
-	        }
-	        if (dto.getImplementationReportFiles() != null) {
-	            implReq.setImplementationReportFiles(dto.getImplementationReportFiles());
-	        }
-	        if (dto.getPartReportFiles() != null) {
-	            implReq.setPartReportFiles(dto.getPartReportFiles());
-	        }
-
-	        // Update Assurance (shared fields)
-//	        if (dto.getStatusId() != null) {
-//	            assurance.setStatusId(dto.getStatusId());
-//	        }
-//	        if (dto.getDueDateOfImplementation() != null) {
-//	            assurance.setDueDateOfImplementation(dto.getDueDateOfImplementation());
-//	        }
-//	        if (dto.getDetailsOfImplementation() != null) {
-//	            assurance.setDetailsOfImplementation(dto.getDetailsOfImplementation());
-//	        }
-//	        if (dto.getDateOfImplementation() != null) {
-//	            assurance.setDateOfImplementation(dto.getDateOfImplementation());
-//	        }
-
-	        implementationRequestRepository.save(implReq);
-	        assuranceRepository.save(assurance);
-
-	        return getImplementationDetailById(id); // use ImplementationRequest ID
+	    // Update fields in ImplementationRequest
+	    if (dto.getPartId() != null) {
+	        implReq.setPartId(dto.getPartId());
 	    }
+	    if (dto.getSupplementaryId() != null) {
+	        implReq.setSupplementaryId(dto.getSupplementaryId());
+	    }
+	    if (dto.getReason() != null) {
+	        implReq.setReason(dto.getReason());
+	    }
+	    if (dto.getLayingDate() != null) {
+	        implReq.setLayingDate(dto.getLayingDate());
+	    }
+	    if (dto.getImplementationTypeId() != null) {
+	        implReq.setImplementationTypeId(dto.getImplementationTypeId());
+	    }
+	    if (dto.getImplementationReportFiles() != null) {
+	        implReq.setImplementationReportFiles(dto.getImplementationReportFiles());
+	    }
+	    if (dto.getPartReportFiles() != null) {
+	        implReq.setPartReportFiles(dto.getPartReportFiles());
+	    }
+
+	    // Implementation-related shared fields — saved in Assurance earlier, now save in ImplementationRequest
+	    if (dto.getDueDateOfImplementation() != null) {
+	        implReq.setDueDateOfImplementation(dto.getDueDateOfImplementation());
+	    }
+	    if (dto.getDetailsOfImplementation() != null) {
+	        implReq.setDetailsOfImplementation(dto.getDetailsOfImplementation());
+	    }
+	    if (dto.getDateOfImplementation() != null) {
+	        implReq.setDateOfImplementation(dto.getDateOfImplementation());
+	    }
+	    if (dto.getRemarks() != null) {
+	    	implReq.setRemarks(dto.getRemarks()); // still updating remarks in Assurance (if required)
+	    }
+
+	    implementationRequestRepository.save(implReq);
+	    assuranceRepository.save(assurance); // only if remarks changed
+
+	    return getImplementationDetailById(id);
 	}
 
+	
 	@Override
 	public Map<String, Object> getRequestCounts(Integer ministryCode, Long houseId) {
 	    Long ministryId = null;
@@ -942,29 +710,54 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 
 
+
 	@Override
-	public List<AssuranceImplementationDTO> getAllImplementationDetails() {
+	public List<AssuranceImplementationDTO> getAllImplementationDetails(String houseAbbr) {
 	    List<AssuranceImplementationDTO> dtoList = new ArrayList<>();
 
-	    // Rajya Sabha: from implementation_request table
-	    List<ImplementationRequest> rajyaList = implementationRequestRepository.findAll();
-	    for (ImplementationRequest impl : rajyaList) {
-	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
-	        if (assurance != null) {
-	            dtoList.add(buildImplementationDTO(assurance, impl, false)); // Rajya Sabha
+	    // Fetch all ImplementationRequests (could optimize with filtering in DB later)
+	    List<ImplementationRequest> implRequests = implementationRequestRepository.findAll();
+
+	    // Determine houseId filter if houseAbbr provided
+	    Integer filterHouseId = null;
+	    if (houseAbbr != null) {
+	        if (houseAbbr.equalsIgnoreCase("LS")) {
+	            filterHouseId = 2; // Lok Sabha
+	        } else if (houseAbbr.equalsIgnoreCase("RS")) {
+	            filterHouseId = 1; // Rajya Sabha
 	        }
 	    }
 
-	    // Lok Sabha: from assurance table where dueDateOfImplementation is not null
-	    List<Assurance> lokSabhaList = assuranceRepository.findByDueDateOfImplementationNotNull();
-	    for (Assurance assurance : lokSabhaList) {
-	        dtoList.add(buildImplementationDTO(assurance, null, true)); // Lok Sabha
+	    for (ImplementationRequest impl : implRequests) {
+	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
+	        if (assurance != null) {
+	            Integer houseId = getHouseIdFromAssurance(assurance);
+
+	            // If house filter is present, skip non-matching records
+	            if (filterHouseId != null && !filterHouseId.equals(houseId)) {
+	                continue;
+	            }
+
+	            dtoList.add(buildImplementationDTO(assurance, impl));
+	        }
 	    }
 
 	    return dtoList;
 	}
 
-	private AssuranceImplementationDTO buildImplementationDTO(Assurance assurance, ImplementationRequest impl, boolean isLokSabha) {
+
+	private Integer getHouseIdFromAssurance(Assurance assurance) {
+	    if (assurance.getLokSabhaNo() != null || assurance.getLokSabhaSessionNo() != null) {
+	        return 2; // Lok Sabha
+	    } else if (assurance.getRajyaSabhaSessionNo() != null) {
+	        return 1; // Rajya Sabha
+	    }
+	    return null; // Unknown / no house info
+	}
+
+
+	
+	private AssuranceImplementationDTO buildImplementationDTO(Assurance assurance, ImplementationRequest impl) {
 	    String memberName = null, departmentName = null, ministryName = null;
 
 	    if (assurance.getMemberId() != null) {
@@ -981,46 +774,116 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	            .map(Ministries::getMinistryName).orElse(null);
 	    }
 
+	    Integer houseId = getHouseIdFromAssurance(assurance);
+	    boolean isLokSabha = (houseId != null && houseId == 2);
+
 	    AssuranceImplementationDTO.AssuranceImplementationDTOBuilder builder = AssuranceImplementationDTO.builder()
+	        .id(impl.getId())
 	        .assuranceNo(assurance.getAssuranceNo())
 	        .memberName(memberName)
 	        .ministryName(ministryName)
 	        .departmentName(departmentName)
 	        .subject(assurance.getSubject())
-	        
-	        .status(codeRepository.findCodeById(assurance.getStatusId()))
-	        .dueDateOfImplementation(assurance.getDueDateOfImplementation())
-	        .subject(assurance.getSubject())
 	        .questionNo(assurance.getQuestionNo())
-	        .dateOfImplementation(assurance.getDateOfImplementation())
-	        .detailsOfImplementation(assurance.getDetailsOfImplementation());
+	        .status(codeRepository.findCodeById(assurance.getStatusId()))
+	        .dueDateOfImplementation(impl.getDueDateOfImplementation())
+	        .dateOfImplementation(impl.getDateOfImplementation())
+	        .detailsOfImplementation(impl.getDetailsOfImplementation())
+	        .remarks(assurance.getRemarks())
+	        .reason(impl.getReason())
+	        .layingDate(impl.getLayingDate())
+	        .implementationTypeId(codeRepository.findCodeById(impl.getImplementationTypeId()))
+	        .supplementaryId(impl.getSupplementaryId())
+	        .partId(impl.getPartId())
+	        .house(isLokSabha ? "Lok Sabha" : "Rajya Sabha");
 
 	    if (isLokSabha) {
 	        builder
-	            .remarks(assurance.getRemarks())
-	            .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()))
 	            .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
-	            .dateOfImplementation(assurance.getDateOfImplementation())
-	            .house("Lok Sabha")
-	            .detailsOfImplementation(assurance.getDetailsOfImplementation())
-	            .dueDateOfImplementation(assurance.getDueDateOfImplementation())
-	            .id(assurance.getId());
+	            .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()));
 	    } else {
 	        builder
-	            .reason(impl.getReason())
-	            .layingDate(impl.getLayingDate())
-	            .implementationTypeId(codeRepository.findCodeById(impl.getImplementationTypeId()))
-	            .supplementaryId(impl.getSupplementaryId())
-	            .house("Rajya Sabha")
-	            .partId(impl.getPartId())
-	            .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()))
-	            .id(impl.getId());
+	            .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()));
 	    }
 
 	    return builder.build();
 	}
 
 
+
+
+	
+
+
+
+
+//	@Override
+//	public List<AssuranceImplementationDTO> getAllImplementationDetails() {
+//	    List<AssuranceImplementationDTO> dtoList = new ArrayList<>();
+//
+//	    // Now both Lok Sabha & Rajya Sabha come from ImplementationRequest table
+//	    List<ImplementationRequest> implRequests = implementationRequestRepository.findAll();
+//
+//	    for (ImplementationRequest impl : implRequests) {
+//	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
+//	        if (assurance != null) {
+//	            dtoList.add(buildImplementationDTO(assurance, impl));
+//	        }
+//	    }
+//
+//	    return dtoList;
+//	}
+//
+//	private AssuranceImplementationDTO buildImplementationDTO(Assurance assurance, ImplementationRequest impl) {
+//	    String memberName = null, departmentName = null, ministryName = null;
+//
+//	    if (assurance.getMemberId() != null) {
+//	        memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
+//	    }
+//
+//	    if (assurance.getDepartmentId() != null) {
+//	        departmentName = departmentRepository.findById(assurance.getDepartmentId())
+//	            .map(Departments::getDepartmentName).orElse(null);
+//	    }
+//
+//	    if (assurance.getMinistryId() != null) {
+//	        ministryName = ministryRepository.findById(assurance.getMinistryId())
+//	            .map(Ministries::getMinistryName).orElse(null);
+//	    }
+//
+//	    boolean isLokSabha = (getHouseId() == 2); // Or you can add a field in impl/assurance for this
+//
+//	    AssuranceImplementationDTO.AssuranceImplementationDTOBuilder builder = AssuranceImplementationDTO.builder()
+//	        .id(impl.getId())
+//	        .assuranceNo(assurance.getAssuranceNo())
+//	        .memberName(memberName)
+//	        .ministryName(ministryName)
+//	        .departmentName(departmentName)
+//	        .subject(assurance.getSubject())
+//	        .questionNo(assurance.getQuestionNo())
+//	        .status(codeRepository.findCodeById(assurance.getStatusId()))
+//	        .dueDateOfImplementation(impl.getDueDateOfImplementation())
+//	        .dateOfImplementation(impl.getDateOfImplementation())
+//	        .detailsOfImplementation(impl.getDetailsOfImplementation())
+//	        .remarks(assurance.getRemarks()) // Only if remarks are still stored in Assurance
+//	        .reason(impl.getReason())
+//	        .layingDate(impl.getLayingDate())
+//	        .implementationTypeId(codeRepository.findCodeById(impl.getImplementationTypeId()))
+//	        .supplementaryId(impl.getSupplementaryId())
+//	        .partId(impl.getPartId())
+//	        .house(isLokSabha ? "Lok Sabha" : "Rajya Sabha");
+//
+//	    if (isLokSabha) {
+//	        builder
+//	            .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
+//	            .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()));
+//	    } else {
+//	        builder
+//	            .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()));
+//	    }
+//
+//	    return builder.build();
+//	}
 
 
 
