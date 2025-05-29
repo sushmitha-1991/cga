@@ -162,6 +162,29 @@ public class ImplementationRequestController {
 	     return ResponseEntity.ok(new GenericResponse<>(
 	             HttpStatus.OK.value(), true, "Implementation detail updated successfully", updatedDto));
 	 }
+	 
+	 @PutMapping("/updateMinistryStatus/{id}")
+	 @Operation(summary = "Update Implementation Detail by ID")
+	 @ApiResponses(value = {
+	     @ApiResponse(responseCode = "200", description = "Implementation detail updated successfully"),
+	     @ApiResponse(responseCode = "404", description = "Implementation detail not found"),
+	     @ApiResponse(responseCode = "500", description = "Internal server error")
+	 })
+	 public ResponseEntity<GenericResponse<AssuranceImplementationDTO>> updateImplementationRequestforMinistryStatusById(
+	         @PathVariable Long id,
+	         @RequestBody ImplementationRequestDTO dto) {
+
+	     AssuranceImplementationDTO updatedDto = implementationRequestService.updateImplementationRequestforMinistryStatusById(id, dto);
+	     System.out.println("@@@@@@@@@@@"+ dto);
+
+	     if (updatedDto == null) {
+	         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                 .body(new GenericResponse<>(HttpStatus.NOT_FOUND.value(), false, "Implementation detail not found", null));
+	     }
+
+	     return ResponseEntity.ok(new GenericResponse<>(
+	             HttpStatus.OK.value(), true, "Implementation detail updated successfully", updatedDto));
+	 }
 
 	 
 	 @GetMapping("/count")

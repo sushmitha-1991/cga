@@ -35,6 +35,7 @@ public class ImplementationRequestDTO {
 	    private LocalDate dateOfImplementation;
 	    private String status;
 	    private String remarks;
+	    private String statusForMinistry;
 	    private Long applicationId;
 	    private String applicationNo;
 	    private CommitteeDecisionDTO committeeDecisionDTO;

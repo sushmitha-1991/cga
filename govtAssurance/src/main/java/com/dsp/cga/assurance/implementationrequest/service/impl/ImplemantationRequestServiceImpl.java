@@ -588,6 +588,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .layingDate(implementationRequest.getLayingDate())
 	        .implementationTypeId(codeRepository.findCodeById(implementationRequest.getImplementationTypeId()))
 	        .supplementaryId(implementationRequest.getSupplementaryId())
+	        .statusForMinistry(implementationRequest.getStatusForMinistry())
 	        .partId(implementationRequest.getPartId())
 	        .id(implementationRequest.getId()); // Unified ID (ImplementationRequest)
 
@@ -667,6 +668,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    	implReq.setRemarks(dto.getRemarks()); // still updating remarks in Assurance (if required)
 	    }
 
+	   
+	    
 	    implementationRequestRepository.save(implReq);
 	    assuranceRepository.save(assurance); // only if remarks changed
 
@@ -805,6 +808,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .remarks(assurance.getRemarks())
 	        .reason(impl.getReason())
 	        .layingDate(impl.getLayingDate())
+	        .statusForMinistry(impl.getStatusForMinistry())
 	        .implementationTypeId(codeRepository.findCodeById(impl.getImplementationTypeId()))
 	        .supplementaryId(impl.getSupplementaryId())
 	        .partId(impl.getPartId())
@@ -820,6 +824,41 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    }
 
 	    return builder.build();
+	}
+
+
+
+
+	@Override
+	public AssuranceImplementationDTO updateImplementationRequestforMinistryStatusById(Long id,
+			ImplementationRequestDTO dto) {
+		  Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(id);
+		    if (optionalRequest.isEmpty()) return null;
+
+		    ImplementationRequest implReq = optionalRequest.get();
+		    
+		  
+
+
+//		    Assurance assurance = assuranceRepository.findById(implReq.getAssuranceId()).orElse(null);
+//		    if (assurance == null) return null;
+
+		   
+		    if (dto.getRemarks() != null) {
+		    	implReq.setRemarks(dto.getRemarks()); // still updating remarks in Assurance (if required)
+		    }
+
+		    if (dto.getStatusForMinistry() != null) {
+		    	System.out.println(dto.getStatusForMinistry());
+		    	implReq.setStatusForMinistry(dto.getStatusForMinistry()); // still updating remarks in Assurance (if required)
+		    }
+
+		    
+		    implementationRequestRepository.save(implReq);
+		    //assuranceRepository.save(assurance); // only if remarks changed
+
+		    return getImplementationDetailById(id);
+		}
 	}
 
 
@@ -900,4 +939,4 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 
 
-}
+

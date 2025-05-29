@@ -33,6 +33,8 @@ public interface ImplementationRequestService {
 
 	List<AssuranceImplementationDTO> getAllImplementationDetails(String houseAbbr);
 
+	AssuranceImplementationDTO updateImplementationRequestforMinistryStatusById(Long id, ImplementationRequestDTO dto);
+
 	//List<AssuranceImplementationDTO> getAllImplementationDetails();
 
 //	Map<String, Object> getRequestCounts(Integer ministryCode);

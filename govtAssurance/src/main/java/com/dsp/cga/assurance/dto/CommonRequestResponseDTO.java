@@ -7,11 +7,15 @@ import java.util.Map;
 import com.dsp.cga.assurance.clubbedassurance.dto.AssuranceIdNoPairDTO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommonRequestResponseDTO {
 	private Long id;

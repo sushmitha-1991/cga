@@ -38,6 +38,7 @@ import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestReposit
 import com.dsp.cga.assurance.extensionrequest.service.ExtensionRequestService;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
+import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
@@ -46,6 +47,7 @@ import com.dsp.cga.assurance.repository.MasterLSSRepository;
 import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
+import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ExtensionRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.response.GenericResponse;
@@ -92,6 +94,9 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	
     @Autowired
     private OtherRequestRepository otherRequestRepository;
+    
+    @Autowired
+    private ImplementationRequestRepository implementationRequestRepository;
 
 @Autowired
 private DroppingRequestRepositiry droppingRequestRepository;
@@ -786,6 +791,36 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                        return null;
 	                    })
 	                    .orElse(null);
+	                
+	            case "ImplementationRequest":
+	                return implementationRequestRepository.findById(id)
+	                    .filter(req -> Boolean.TRUE.equals(req.getFromMinistry()) &&
+	                            ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
+	                             "Returned".equalsIgnoreCase(req.getStatusForMinistry())))
+	                    .map(req -> {
+	                        Assurance assurance = getAssurance(req.getAssuranceId());
+	                        if (isValidForHouse(houseId, assurance)) {
+	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
+	                            return CommonRequestResponseDTO.builder()
+	                                    .id(req.getId())
+	                                    .requestType("ImplementationRequest")
+	                                    .assuranceId(req.getAssuranceId())
+	                                    .fromMinistry(req.getFromMinistry())
+	                                    .statusForMinistry(req.getStatusForMinistry())
+	                                    .date(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null)
+	                                    .status(assuranceDetails != null ? assuranceDetails.getStatus() : null)
+	                                    .lokSabhaNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaNumber() : null)
+	                                    .lokSabhaSessionNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaSessionNumber() : null)
+	                                    .rajyaSabhaSessionNumber(assuranceDetails != null ? assuranceDetails.getRajyaSabhaSessionNumber() : null)
+	                                    .memberName(assuranceDetails != null ? assuranceDetails.getMemberName() : null)
+	                                    .departmentName(assuranceDetails != null ? assuranceDetails.getDepartmentName() : null)
+	                                    .ministryName(assuranceDetails != null ? assuranceDetails.getMinistryName() : null)
+	                                    .build();
+	                        }
+	                        return null;
+	                    })
+	                    .orElse(null);
+
 
 	            default:
 	                throw new IllegalArgumentException("Invalid request type: " + requestType);
@@ -794,61 +829,33 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 	    @Override
 	    public CommonRequestResponseDTO updateRequest(Long id, String requestType, CommonRequestResponseDTO updateDto) {
+	    	System.out.println(requestType);
 	        switch (requestType) {
-
 	            case "ExtensionRequest":
 	                return extenionRequestRepository.findById(id).map(entity -> {
-	                    if (updateDto.getSubject() != null) entity.setSubject(updateDto.getSubject());
 	                    if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
-	                    if (updateDto.getExtensionNo() != null) entity.setExtensionNo(updateDto.getExtensionNo());
-	                    if (updateDto.getExtRequestedTillDate() != null) entity.setExtRequestedTillDate(updateDto.getExtRequestedTillDate());
-	                    if (updateDto.getExtGrantedTillDate() != null) entity.setExtGrantedTillDate(updateDto.getExtGrantedTillDate());
-	                    if (updateDto.getMinistryRefNo() != null) entity.setMinistryRefNo(updateDto.getMinistryRefNo());
-	                    if (updateDto.getMinistryRefDate() != null) entity.setMinistryRefDate(updateDto.getMinistryRefDate());
-	                    if (updateDto.getStatusId() != null) entity.setStatusId(updateDto.getStatusId());
+	                  
 	                    if (updateDto.getStatusForMinistry() != null) entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    if (updateDto.getDraftStatus() != null) entity.setDraftStatus(updateDto.getDraftStatus());
-	                    if (updateDto.getFromMinistry() != null) entity.setFromMinistry(updateDto.getFromMinistry());
-
+	                  
 	                    extenionRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
 
 	            case "OtherRequests":
 	                return otherRequestRepository.findById(id).map(entity -> {
-	                    if (updateDto.getSubject() != null) entity.setSubject(updateDto.getSubject());
 	                    if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
-	                    if (updateDto.getRequestedDate() != null) entity.setRequestedDate(updateDto.getRequestedDate());
-	                    if (updateDto.getStatusId() != null) entity.setStatusId(updateDto.getStatusId());
 	                    if (updateDto.getStatusForMinistry() != null) entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    if (updateDto.getFileUrl() != null) entity.setFileUrl(updateDto.getFileUrl());
-	                    if (updateDto.getFromMinistry() != null) entity.setFromMinistry(updateDto.getFromMinistry());
-
+	                    
 	                    otherRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
 
 	            case "DroppingRequest":
 	                return droppingRequestRepository.findById(id).map(entity -> {
-	                    if (updateDto.getSubject() != null) entity.setSubject(updateDto.getSubject());
-	                    if (updateDto.getSupplementaryId() != null) entity.setSupplementaryId(updateDto.getSupplementaryId());
-	                    if (updateDto.getPartId() != null) entity.setPartId(updateDto.getPartId());
-	                    if (updateDto.getDropRequestDate() != null) entity.setDropRequestDate(updateDto.getDropRequestDate());
-	                    if (updateDto.getActualDropDate() != null) entity.setActualDropDate(updateDto.getActualDropDate());
-	                    if (updateDto.getMinistryRefNo() != null) entity.setMinistryRefNo(updateDto.getMinistryRefNo());
-	                    if (updateDto.getMinistryRefDate() != null) entity.setMinistryRefDate(updateDto.getMinistryRefDate());
-	                    if (updateDto.getAcceptedId() != null) entity.setAcceptedId(updateDto.getAcceptedId());
-	                    if (updateDto.getType() != null) entity.setType(updateDto.getType());
-	                    if (updateDto.getCommunicationDate() != null) entity.setCommunicationDate(updateDto.getCommunicationDate());
-	                    if (updateDto.getSession() != null) entity.setSession(updateDto.getSession());
-	                    if (updateDto.getMeetingNo() != null) entity.setMeetingNo(updateDto.getMeetingNo());
-	                    if (updateDto.getMeetingDate() != null) entity.setMeetingDate(updateDto.getMeetingDate());
+	                    
 	                    if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
 	                    if (updateDto.getStatusForMinistry() != null) entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    if (updateDto.getDroppingFiles() != null) entity.setDroppingFiles(updateDto.getDroppingFiles());
-	                    if (updateDto.getDraftStatus() != null) entity.setDraftStatus(updateDto.getDraftStatus());
-	                    if (updateDto.getFromMinistry() != null) entity.setFromMinistry(updateDto.getFromMinistry());
-
+	                   
 	                    droppingRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
@@ -860,16 +867,25 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                    clubbedAssuranceRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
+	                
+	            case "ImplementationRequest":  // New case added
+	                return implementationRequestRepository.findById(id).map(entity -> {
+	                    if (updateDto.getStatusForMinistry() != null) entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                    implementationRequestRepository.save(entity);
+	                    return getRequestById(id, requestType);
+	                }).orElse(null);
 
 	            default:
 	                throw new IllegalArgumentException("Invalid request type: " + requestType);
+
+	           
 	        }
+	        
+	        
 	    }
 
 
-
-
-
+	   
 
 
 }
