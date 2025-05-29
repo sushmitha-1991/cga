@@ -2,6 +2,7 @@ package com.dsp.cga.assurance.otherRequests.service.impl;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -62,7 +63,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 		System.out.println(dto.getAssuranceId());
 		OtherRequests entity = OtherRequests.builder()
 				.assuranceId(dto.getAssuranceId())
-				.subject(dto.getSubject())
+				//.subject(dto.getSubject())
                 .requestedDate(dto.getRequestedDate())
                 .statusId(dto.getStatusId())
                 .remarks(dto.getRemarks())
@@ -80,6 +81,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
                 .requestedDate(saved.getRequestedDate())
                 .statusId(saved.getStatusId())
                 .remarks(saved.getRemarks())
+                .fileUrl(saved.getFileUrl())
                 .fileUrl(saved.getFileUrl())
                 .build();
     }
@@ -147,10 +149,14 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 
 	            return true;
 	        })
+	      //  .sorted(Comparator.comparing(OtherRequests::getCreatedAt).reversed()) // 🔹 Sort here
+
 	        .collect(Collectors.toList());
 
 	    // 🔹 Map to DTO
-	    return filteredList.stream().map(or -> {
+	    return filteredList.stream()
+	            .sorted(Comparator.comparing(OtherRequests::getCreatedAt).reversed()) // 🔹 Sort here
+.map(or -> {
 	        Assurance assurance = assuranceRepository.findById(or.getAssuranceId()).orElse(null);
 
 	        return OtherRequestDTO.builder()
@@ -161,6 +167,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .requestedDate(or.getRequestedDate())
 	            .remarks(or.getRemarks())
 	            .statusForMinistry(or.getStatusForMinistry())
+	            .subject(assurance.getSubject())
 	            .lokSabhaSessionNumber(assurance != null
 	                ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
 	                : null)
@@ -218,11 +225,12 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	        return OtherRequestDTO.builder()
 	            .id(or.getId())
 	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
-	            .status(codeRepository.findCodeById(assurance.getStatusId()))
+	            .status(codeRepository.findCodeById(or.getStatusId()))
 	            .memberName(memberName)
 	            .ministryName(ministryName)
 	            .departmentName(departmentName)
 	            .questionNo(assurance.getQuestionNo())
+	            .fileUrl(or.getFileUrl())
 	            .requestedDate(or.getRequestedDate())
 	            .remarks(or.getRemarks())
 	            .lokSabhaSessionNumber(assurance != null
@@ -243,6 +251,14 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	    }
 
 	    OtherRequests existing = optional.get();
+	    
+	   
+
+	    // Check statusForMinistry before allowing update
+	    if (existing.getStatusForMinistry() == null || 
+	        !existing.getStatusForMinistry().equalsIgnoreCase("Returned")) {
+	        throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
+	    }
 
 	    // Only update fields if they are not null (optional update)
 	    if (dto.getAssuranceId() != null) {

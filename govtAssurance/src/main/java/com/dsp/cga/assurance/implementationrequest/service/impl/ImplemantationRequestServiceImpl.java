@@ -6,6 +6,7 @@ import org.springframework.web.client.HttpServerErrorException;
 
 import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -448,6 +449,10 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        return List.of();
 	    }
 
+	    implementationRequests = implementationRequests.stream()
+	    	    .sorted(Comparator.comparing(ImplementationRequest::getCreatedAt).reversed())
+	    	    .collect(Collectors.toList());
+	    
 	    return implementationRequests.stream().map(impl -> {
 	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
 	        if (assurance == null) {
@@ -613,6 +618,14 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    if (optionalRequest.isEmpty()) return null;
 
 	    ImplementationRequest implReq = optionalRequest.get();
+	    
+	  
+
+	    // Check statusForMinistry before allowing update
+	    if (implReq.getStatusForMinistry() == null || 
+	        !implReq.getStatusForMinistry().equalsIgnoreCase("Returned")) {
+	        throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
+	    }
 
 	    Assurance assurance = assuranceRepository.findById(implReq.getAssuranceId()).orElse(null);
 	    if (assurance == null) return null;

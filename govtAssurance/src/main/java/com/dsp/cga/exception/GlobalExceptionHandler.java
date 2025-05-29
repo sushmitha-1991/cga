@@ -26,5 +26,11 @@ public class GlobalExceptionHandler {
 		// Return the response with HTTP 400 status
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(IllegalStateException.class)
+	public ResponseEntity<String> handleIllegalState(IllegalStateException ex) {
+	    return ResponseEntity.badRequest().body(ex.getMessage());
+	}
+
 
 }

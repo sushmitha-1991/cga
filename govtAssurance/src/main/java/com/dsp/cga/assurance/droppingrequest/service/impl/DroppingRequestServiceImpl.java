@@ -2,6 +2,7 @@ package com.dsp.cga.assurance.droppingrequest.service.impl;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -283,8 +284,30 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 
 	    // 🔹 Map to DTO
 	    return filteredList.stream()
+	    		.sorted(Comparator.comparing(DroppingRequest::getCreatedAt).reversed())
+
 	            .map(dr -> {
-	                Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
+	            	 String memberName = null;
+	     		    String departmentName = null;
+	     		    String ministryName = null;
+
+	     		    Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
+	     		    if (assurance != null && assurance.getMemberId() != null) {
+	     	            memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
+	     	            
+	     	        }
+	     	        if (assurance.getDepartmentId() != null) {
+	     	            departmentName = departmentRepository.findById(assurance.getDepartmentId())
+	     	                .map(Departments::getDepartmentName)
+	     	                .orElse(null);
+	     	        }
+	     	        if (assurance.getMinistryId() != null) {
+	     	            ministryName = ministryRepository.findById(assurance.getDepartmentId())
+	     	                .map(Ministries::getMinistryName)
+	     	                .orElse(null);
+	     	        }
+	     		    if (assurance == null) return null;
+	               // Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
 	                return AssuranceDroppingResponseDTO.builder()
 	                		.lokSabhaNo(assurance != null
 	                        ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo())
@@ -305,6 +328,9 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	                                : null)
 	                        .dropRequestDate(dr.getDropRequestDate())
 	                        .actualDropDate(dr.getActualDropDate())
+	                        .memberName(memberName)
+	                        .ministryName(ministryName)
+	                        .departmentName(departmentName)
 	                        .status(assurance != null
 	                                ? codeRepository.findCodeById(assurance.getStatusId())
 	                                : null)
@@ -312,6 +338,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	                        .id(dr.getId())
 	                        .build();
 	            })
+	            
 	            .collect(Collectors.toList());
 	}
 
@@ -393,6 +420,10 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		public AssuranceDroppingResponseDTO updateDroppingRequest(Long id, AssuranceDroppingRequestDTO requestDTO) {
 		    DroppingRequest dr = droppingRequestRepository.findById(id).orElse(null);
 		    if (dr == null || dr.getAssuranceId() == null) return null;
+		    
+		    if (dr.getStatusForMinistry() == null || !dr.getStatusForMinistry().equalsIgnoreCase("Returned")) {
+		        throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
+		    }
 
 		    Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
 		    if (assurance == null) return null;

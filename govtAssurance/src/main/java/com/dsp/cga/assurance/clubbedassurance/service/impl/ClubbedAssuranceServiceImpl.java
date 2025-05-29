@@ -2,6 +2,7 @@ package com.dsp.cga.assurance.clubbedassurance.service.impl;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -190,12 +191,25 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 
 	    // 🔹 Map to DTO
 	    return filteredClubbedList.stream()
+	    	    .sorted(Comparator.comparing(ClubbedAssurance::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
+
 	        .map(clubbed -> {
 	            Assurance assurance = assuranceRepository.findById(clubbed.getAssuranceId()).orElse(null);
 
 	            List<Long> clubbedIds = clubbed.getClubbedAssuranceIds() != null
 	                    ? clubbed.getClubbedAssuranceIds().stream().distinct().toList()
 	                    : List.of();
+	            
+	            List<String> clubbedAssuranceNos = new ArrayList<>();
+	            if (clubbed.getClubbedAssuranceIds() != null) {
+	                clubbed.getClubbedAssuranceIds().stream().distinct().forEach(id -> {
+	                    assuranceRepository.findById(id).ifPresent(ca -> {
+	                        if (ca.getAssuranceNo() != null) {
+	                            clubbedAssuranceNos.add(ca.getAssuranceNo());
+	                        }
+	                    });
+	                });
+	            }
 
 	            return AssuranceResponseDTO.builder()
 	            		.id(clubbed.getId())
@@ -206,11 +220,15 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	                            ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()) : null)
 	                    .rajyaSabhaSessionNo(assurance != null && assurance.getRajyaSabhaSessionNo() != null
 	                            ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()) : null)
-	                    .assuranceDate(assurance != null ? assurance.getAssuranceDate() : null)
+	                  //  .assuranceDate(assurance != null ? assurance.getAssuranceDate() : null)
 	                    .questionNo(assurance != null ? assurance.getQuestionNo() : null)
 	                    .status(assurance != null
 	                            ? codeRepository.findCodeById(assurance.getStatusId()) : null)
 	                    .clubbedAssuranceIds(clubbedIds)
+	                    .clubbedAssuranceNos(clubbedAssuranceNos) 
+
+	                    .subject(assurance.getSubject())
+	                    .date(clubbed.getDate())
 	                    .build();
 	        })
 	        .collect(Collectors.toList());
@@ -306,6 +324,11 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 		// TODO Auto-generated method stub
 		 ClubbedAssurance clubbed = clubbedAssuranceRepository.findById(id).orElse(null);
 		    if (clubbed == null) return null;
+		    
+		    if (clubbed.getStatusForMinistry() == null || 
+		            !clubbed.getStatusForMinistry().equalsIgnoreCase("Returned")) {
+		            throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
+		        }
 
 		    if (dto.getAssuranceId() != null) {
 		        clubbed.setAssuranceId(dto.getAssuranceId());

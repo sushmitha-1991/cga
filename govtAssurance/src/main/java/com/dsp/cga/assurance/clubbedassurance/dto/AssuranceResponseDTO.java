@@ -22,7 +22,8 @@ public class AssuranceResponseDTO {
     private String departmentName;
     private String ministryName;
     private String subject;
-    
+    private List<String> clubbedAssuranceNos;
+
     private String status;
     private List<Long> clubbedAssuranceIds;
 }

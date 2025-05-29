@@ -3,6 +3,7 @@ package com.dsp.cga.assurance.extensionrequest.service.impl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -300,7 +301,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	        .collect(Collectors.toList());
 
 	    //  Convert to DTO
-	    return filteredList.stream().map(er -> {
+	    return filteredList.stream()
+	    	    .sorted(Comparator.comparing(ExtensionRequest::getCreatedAt).reversed()) // sort before mapping
+.map(er -> {
 	        Assurance assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
 	        return ExtensionRequestResponseDTO.builder()
 	                .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
@@ -325,7 +328,8 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                .ministryRefNo(er.getMinistryRefNo())
 	                .statusForMinistry(er.getStatusForMinistry())
 	                .build();
-	    }).collect(Collectors.toList());
+	    })
+	    		.collect(Collectors.toList());
 	}
 
 
@@ -398,11 +402,17 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	public ExtensionRequestResponseDTO updateExtensionRequest(Long id, ExtensionRequestDTO requestDTO) {
 		 ExtensionRequest er = extenionRequestRepository.findById(id).orElse(null);
 		    if (er == null) return null;
+		    
+		    if (er.getStatusForMinistry() == null || !er.getStatusForMinistry().equalsIgnoreCase("Returned")) {
+		        throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
+		    }
 
 		    Assurance assurance = null;
 		    if (er.getAssuranceId() != null) {
 		        assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
 		    }
+		    
+		    
 
 		    // Update ExtensionRequest fields only if non-null
 		    if (requestDTO.getExtensionNo() != null) {
