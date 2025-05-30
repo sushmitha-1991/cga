@@ -44,6 +44,7 @@ public class ImplementationRequestController {
 				@ApiResponse(responseCode = "400", description = "Invalid input data"),
 				@ApiResponse(responseCode = "500", description = "Internal server error") })
 	 public ResponseEntity<GenericResponse<ImplementationRequestDTO>> createImplementationRequest(@RequestBody ImplementationRequestDTO implementationRequestDTO) {
+		System.out.println(implementationRequestDTO);
 		ImplementationRequestDTO createdImplementationRequest = implementationRequestService.createImplementationRequest(implementationRequestDTO);
 	        GenericResponse<ImplementationRequestDTO> response = new GenericResponse<>(HttpStatus.CREATED.value(), true,
 	                "Assurance item created successfully", createdImplementationRequest);

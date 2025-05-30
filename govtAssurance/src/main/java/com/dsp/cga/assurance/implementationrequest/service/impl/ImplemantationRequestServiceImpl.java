@@ -197,6 +197,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        implementationRequest.setDocumentDate(implementationRequest.getDateOfImplementation());
 	    }
 	    implementationRequest.setCurrentStatus(implementationRequest.getStatusForMinistry());
+	    implementationRequest.setRefId(implementationRequest.getId());
 
 	    // Save to DB
 	    ImplementationRequest saved = implementationRequestRepository.save(implementationRequest);
@@ -590,7 +591,13 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .supplementaryId(implementationRequest.getSupplementaryId())
 	        .statusForMinistry(implementationRequest.getStatusForMinistry())
 	        .partId(implementationRequest.getPartId())
-	        .id(implementationRequest.getId()); // Unified ID (ImplementationRequest)
+	        .applicationId(implementationRequest.getApplicationId())
+	        .applicationNo(implementationRequest.getApplicationNo())
+	        .taskId(implementationRequest.getTaskId())
+	       
+	        .currentStatus(implementationRequest.getCurrentStatus())
+	        .refId(implementationRequest.getRefId())
+	        .id(implementationRequest.getId());
 
 	    // Set session number based on house
 	    if (houseId == 2) {
