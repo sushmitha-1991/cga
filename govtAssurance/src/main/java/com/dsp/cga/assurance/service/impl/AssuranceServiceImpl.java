@@ -210,6 +210,21 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 		//validateAssuranceFields(assuranceDTO);
 		
+		 Optional<Assurance> existingAssurance = assuranceRepository
+			        .findByLokSabhaNoAndLokSabhaSessionNoAndSourceIdAndQuestionNoAndAssuranceTypeId(
+			            assuranceDTO.getLokSabhaNo(),
+			            assuranceDTO.getLokSabhaSessionNo(),
+			            assuranceDTO.getSourceId(),
+			            assuranceDTO.getQuestionNo(),
+			            assuranceDTO.getAssuranceTypeId()
+			        );
+
+			    if (existingAssurance.isPresent()) {
+			        throw new IllegalArgumentException("An assurance for the same question already exists.");
+			    }
+			    
+			   
+		
         // Check if both LokSabhaNo and LokSabhaSessionNo are available to generate AssuranceNo
         if (assuranceDTO.getLokSabhaNo() != null && assuranceDTO.getLokSabhaSessionNo() != null && assuranceDTO.getSourceId() != null && assuranceDTO.getQuestionNo() != null) {
             // Generate the Assurance No only when both lokSabhaNo and lokSabhaSessionNo are provided
@@ -235,14 +250,33 @@ public class AssuranceServiceImpl implements AssuranceService {
 		
 		// Save Assurance entity
 		Assurance savedAssurance = assuranceRepository.save(assurance);
-		
+		 if (assuranceDTO.getRajyaSabhaSessionNo() != null) {
+		        String rajyaSabhaAssuranceNo = generateRajyaSabhaAssuranceNo(assuranceDTO.getRajyaSabhaSessionNo());
+		        savedAssurance.setAssuranceNo(rajyaSabhaAssuranceNo);
+		        savedAssurance = assuranceRepository.save(savedAssurance);
+		    }
 
 		// Map entity back to DTO to return response
-		AssuranceDTO savedAssuranceDTO = assuranceMapper.toDTO(assurance);
+		AssuranceDTO savedAssuranceDTO = assuranceMapper.toDTO(savedAssurance);
+		
+		
 
 		return savedAssuranceDTO;
 	}
 
+	private String generateRajyaSabhaAssuranceNo(Long rajyaSabhaSessionId) {
+	    // Fetch session number using ID
+	    String sessionNumber = rssRepo.findSessionNumberById(rajyaSabhaSessionId);
+
+	    // Count how many assurances already exist for that session
+	    Long count = assuranceRepository.countByRajyaSabhaSessionNo(rajyaSabhaSessionId);
+
+	    // Increment count for the new one being created
+	    long serialNo = count + 1;
+
+	    // Concatenate to get assurance number
+	    return sessionNumber + String.valueOf(serialNo);  
+	}
 
 	
 	private String generateAssuranceNo(Long lokSabhaNo, Long lokSabhaSessionNo, Long sourceId, String questionNo, Long assuranceTypeId) {

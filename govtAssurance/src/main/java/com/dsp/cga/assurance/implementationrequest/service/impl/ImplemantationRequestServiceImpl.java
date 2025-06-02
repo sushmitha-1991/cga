@@ -540,7 +540,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	@Override
 	public AssuranceImplementationDTO getImplementationDetailById(Long id) {
-	    Long houseId = getHouseId();
+	  //  Long houseId = getHouseId();
 
 	    Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(id);
 	    if (optionalRequest.isEmpty()) return null;
@@ -571,6 +571,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	            .orElse(null);
 	    }
 
+	    Long houseId = getHouseIdFromAssurance(assurance);
+	    
 	    AssuranceImplementationDTO.AssuranceImplementationDTOBuilder builder = AssuranceImplementationDTO.builder()
 	        .assuranceNo(assurance.getAssuranceNo())
 	        .memberName(memberName)
@@ -593,11 +595,12 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .partId(implementationRequest.getPartId())
 	        .applicationId(implementationRequest.getApplicationId())
 	        .applicationNo(implementationRequest.getApplicationNo())
-	        .taskId(implementationRequest.getTaskId())
-	       
+	       // .taskId(implementationRequest.getTaskId())
+	        .houseId(houseId)
 	        .currentStatus(implementationRequest.getCurrentStatus())
 	        .refId(implementationRequest.getRefId())
-	        .id(implementationRequest.getId());
+	        .id(implementationRequest.getId())
+	    .applicationInstanceId(implementationRequest.getId());
 
 	    // Set session number based on house
 	    if (houseId == 2) {
@@ -605,6 +608,9 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	            .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()))
 	            .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
 	            .house("Lok Sabha");
+	        
+	        
+	        
 	    } else {
 	        builder
 	            .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()))
@@ -742,19 +748,19 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    List<ImplementationRequest> implRequests = implementationRequestRepository.findAll();
 
 	    // Determine houseId filter if houseAbbr provided
-	    Integer filterHouseId = null;
+	    Long filterHouseId = null;
 	    if (houseAbbr != null) {
 	        if (houseAbbr.equalsIgnoreCase("LS")) {
-	            filterHouseId = 2; // Lok Sabha
+	            filterHouseId = 2L; // Lok Sabha
 	        } else if (houseAbbr.equalsIgnoreCase("RS")) {
-	            filterHouseId = 1; // Rajya Sabha
+	            filterHouseId = 1L; // Rajya Sabha
 	        }
 	    }
 
 	    for (ImplementationRequest impl : implRequests) {
 	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
 	        if (assurance != null) {
-	            Integer houseId = getHouseIdFromAssurance(assurance);
+	            Long houseId = getHouseIdFromAssurance(assurance);
 
 	            // If house filter is present, skip non-matching records
 	            if (filterHouseId != null && !filterHouseId.equals(houseId)) {
@@ -769,11 +775,11 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	}
 
 
-	private Integer getHouseIdFromAssurance(Assurance assurance) {
+	private Long getHouseIdFromAssurance(Assurance assurance) {
 	    if (assurance.getLokSabhaNo() != null || assurance.getLokSabhaSessionNo() != null) {
-	        return 2; // Lok Sabha
+	        return 2L; // Lok Sabha
 	    } else if (assurance.getRajyaSabhaSessionNo() != null) {
-	        return 1; // Rajya Sabha
+	        return 1L; // Rajya Sabha
 	    }
 	    return null; // Unknown / no house info
 	}
@@ -797,7 +803,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	            .map(Ministries::getMinistryName).orElse(null);
 	    }
 
-	    Integer houseId = getHouseIdFromAssurance(assurance);
+	    Long houseId = getHouseIdFromAssurance(assurance);
 	    boolean isLokSabha = (houseId != null && houseId == 2);
 
 	    AssuranceImplementationDTO.AssuranceImplementationDTOBuilder builder = AssuranceImplementationDTO.builder()
@@ -819,6 +825,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .implementationTypeId(codeRepository.findCodeById(impl.getImplementationTypeId()))
 	        .supplementaryId(impl.getSupplementaryId())
 	        .partId(impl.getPartId())
+	        .houseId(houseId)
 	        .house(isLokSabha ? "Lok Sabha" : "Rajya Sabha");
 
 	    if (isLokSabha) {

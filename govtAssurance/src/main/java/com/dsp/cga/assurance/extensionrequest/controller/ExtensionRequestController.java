@@ -99,14 +99,14 @@ public class ExtensionRequestController {
 	})
 	public ResponseEntity<GenericResponse<List<ExtensionRequestResponseDTO>>> getExtensionRequests(
 	    @RequestParam(required = false) Long sessionNo,
-	    @RequestParam(required = false) Long statusId,
+	    @RequestParam(required = false) String StatusForMinistry,
 	    @RequestParam(required = false) Integer ministryCode,
 	    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate extRequestedTillDate,
 	    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate extGrantedTillDate,
 	    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ministryRefDate
 	) {
 	    List<ExtensionRequestResponseDTO> results = extensionRequestService.getFilteredExtensions(
-	        sessionNo, statusId, extRequestedTillDate, extGrantedTillDate, ministryRefDate, ministryCode
+	        sessionNo, StatusForMinistry, extRequestedTillDate, extGrantedTillDate, ministryRefDate, ministryCode
 	    );
 
 	    if (results.isEmpty()) {

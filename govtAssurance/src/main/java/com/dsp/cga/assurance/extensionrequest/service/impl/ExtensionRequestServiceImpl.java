@@ -233,7 +233,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	}
 
 	@Override
-	public List<ExtensionRequestResponseDTO> getFilteredExtensions(Long sessionNo, Long statusId,
+	public List<ExtensionRequestResponseDTO> getFilteredExtensions(Long sessionNo, String StatusForMinistry,
 	        LocalDate extRequestedTillDate, LocalDate extGrantedTillDate, LocalDate ministryRefDate,
 	        Integer ministryCode) {
 
@@ -265,8 +265,8 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	    Specification<ExtensionRequest> specification = (root, query, cb) -> {
 	        List<Predicate> predicates = new ArrayList<>();
 
-	        if (statusId != null) {
-	            predicates.add(cb.equal(root.get("statusId"), statusId));
+	        if (StatusForMinistry != null) {
+	            predicates.add(cb.equal(root.get("StatusForMinistry"), StatusForMinistry));
 	        }
 
 	        if (extRequestedTillDate != null) {

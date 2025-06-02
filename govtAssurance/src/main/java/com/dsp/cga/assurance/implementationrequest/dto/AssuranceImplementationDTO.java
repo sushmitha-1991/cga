@@ -41,13 +41,15 @@ public class AssuranceImplementationDTO {
 		private String departmentName;
 		private String memberName;
 		private LocalDate layingDate;
+		private Long applicationInstanceId;
 		private String house;
+		private Long houseId;
 		private String questionNo;
 		private String subject;
 		private String applicationNo;
 		  private Long applicationId;
 		  private Long refId;
-		  private String taskId;
+		//  private String taskId;
 		  private String currentStatus;
 		  private Long committeeDecisionId;
 		  // private String statusForMinistry;
