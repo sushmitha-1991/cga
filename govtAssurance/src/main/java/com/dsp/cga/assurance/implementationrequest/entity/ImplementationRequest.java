@@ -4,19 +4,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import com.dsp.cga.entity.Auditable;
 import com.dsp.cga.util.JsonMapConverter;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -93,6 +87,11 @@ public class ImplementationRequest extends ApplicationInstance {
 	
 	@Column(name = "status_for_ministry")
     private String statusForMinistry;
+	
+	
+	@Column(name = "return_from")
+	private String returnFrom; 
+	
 	
 	
 //	@ManyToOne

@@ -43,6 +43,9 @@ public interface ImplementationRequestRepository extends JpaRepository<Implement
 			Long countByMinistryId(@Param("ministryId") Long ministryId);
 
 
+		List<ImplementationRequest> findByStatusForMinistryAndReturnFrom(String status, String returnFrom);
+
+
 
 
 

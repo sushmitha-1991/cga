@@ -1,6 +1,7 @@
 package com.dsp.cga.assurance.implementationrequest.service.impl;
 
 import java.time.LocalDate;
+
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
@@ -48,8 +49,10 @@ import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceImplementationDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
+import com.dsp.cga.assurance.implementationrequest.entity.Application;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.implementationrequest.repository.ApplicationInstanceRepository;
+import com.dsp.cga.assurance.implementationrequest.repository.ApplicationRepository;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
 import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
@@ -96,6 +99,9 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	private MasterLSSRepository lssRepo;
 	
 	@Autowired
+	private ApplicationRepository applicationRepository;
+	
+	@Autowired
 	private DepartmentRepository departmentRepository;
 	
 	@Autowired
@@ -130,20 +136,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	@Autowired
 	private CodeRepository codeRepository;
 
-//	@Override
-//	public ImplementationRequestDTO createImplementationRequest(ImplementationRequestDTO implementationRequestDTO) {
-//		ImplementationRequest implementationRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
-//
-//		// Save Assurance entity
-//		ImplementationRequest savedimplementationRequest = implementationRequestRepository.save(implementationRequest); // Save
-//																														// once,
-//
-//		// Map entity back to DTO to return response
-//		ImplementationRequestDTO savedImplementationRequestDTO = ImplementationRequestMapper
-//				.toDTO(savedimplementationRequest);
-//
-//		return savedImplementationRequestDTO;
-//	}
+
 	
 	@Override
 	public ImplementationRequestDTO createImplementationRequest(ImplementationRequestDTO implementationRequestDTO) {
@@ -153,7 +146,15 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    // Get house ID (Lok Sabha or Rajya Sabha)
 	    Long houseId = getHouseId();
 	    SerialNumberRequest serialNumberRequest = new SerialNumberRequest();
-	    serialNumberRequest.setAppId(implementationRequestDTO.getApplicationId());
+	    Optional<Application> optionalApp = applicationRepository.findByAbbr("IRFM");
+	    System.out.println(optionalApp.get().getId());
+	  
+	    if (optionalApp.isPresent()) {
+	        serialNumberRequest.setAppId(optionalApp.get().getId());
+	    } else {
+	         throw new ResourceNotFoundException("Application with abbreviation 'IRFM' not found");
+	    }
+	   // serialNumberRequest.setAppId(implementationRequestDTO.getApplicationId());
 
 	    // ✅ Get Assurance entity by ID
 	    Optional<Assurance> optionalAssurance = assuranceRepository.findById(implementationRequest.getAssuranceId());
@@ -197,13 +198,17 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        implementationRequest.setDocumentDate(implementationRequest.getDateOfImplementation());
 	    }
 	    implementationRequest.setCurrentStatus(implementationRequest.getStatusForMinistry());
-	    implementationRequest.setRefId(implementationRequest.getId());
-
+	    implementationRequest.setRefId(implementationRequest.getRefId());
+	    implementationRequest.setApplicationId(optionalApp.get().getId());
+	  
 	    // Save to DB
 	    ImplementationRequest saved = implementationRequestRepository.save(implementationRequest);
 
 	    return ImplementationRequestMapper.toDTO(saved);
 	}
+
+
+
 
 
 
@@ -354,10 +359,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    return dto;
 	}
 
-	
-
-
-	
 	private CommitteeDecisionDTO fetchCommitteeDecisionData(Long committeeDecisionId) {
 		
 	    String serviceUrl = codeServiceUrl + committeeDecisionId;
@@ -408,14 +409,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    return implementationTypeDTO;
 	}
 
-
-
-	
-
-
-
-
-
 	@Override
 	public List<AssuranceImplementationDTO> getAssuranceImplementations(Long sessionNo, LocalDate layingDate,
 	        Long implementationTypeId, Long statusId, Integer ministryCode) {
@@ -433,7 +426,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        ministryId = null;
 	    }
 
-	    Long houseId = getHouseId(); // 1 = Rajya Sabha, 2 = Lok Sabha
+	    Long houseId = getHouseId(); 
 	    if (sessionNo == null) {
 	        sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
 	    }
@@ -532,12 +525,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		return houseId;
 	}
 
-
-
-
-	
-
-
 	@Override
 	public AssuranceImplementationDTO getImplementationDetailById(Long id) {
 	  //  Long houseId = getHouseId();
@@ -595,7 +582,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .partId(implementationRequest.getPartId())
 	        .applicationId(implementationRequest.getApplicationId())
 	        .applicationNo(implementationRequest.getApplicationNo())
-	       // .taskId(implementationRequest.getTaskId())
 	        .houseId(houseId)
 	        .currentStatus(implementationRequest.getCurrentStatus())
 	        .refId(implementationRequest.getRefId())
@@ -608,9 +594,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	            .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()))
 	            .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
 	            .house("Lok Sabha");
-	        
-	        
-	        
+	    
 	    } else {
 	        builder
 	            .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()))
@@ -620,10 +604,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    return builder.build();
 	}
 
-
-
-
-	
 	@Override
 	public AssuranceImplementationDTO updateImplementationRequest(Long id, ImplementationRequestDTO dto) {
 	    Long houseId = getHouseId();
@@ -681,8 +661,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    	implReq.setRemarks(dto.getRemarks()); // still updating remarks in Assurance (if required)
 	    }
 
-	   
-	    
 	    implementationRequestRepository.save(implReq);
 	    assuranceRepository.save(assurance); // only if remarks changed
 
@@ -851,12 +829,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 		    ImplementationRequest implReq = optionalRequest.get();
 		    
-		  
-
-
-//		    Assurance assurance = assuranceRepository.findById(implReq.getAssuranceId()).orElse(null);
-//		    if (assurance == null) return null;
-
 		   
 		    if (dto.getRemarks() != null) {
 		    	implReq.setRemarks(dto.getRemarks()); // still updating remarks in Assurance (if required)
@@ -866,6 +838,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		    	System.out.println(dto.getStatusForMinistry());
 		    	implReq.setStatusForMinistry(dto.getStatusForMinistry()); // still updating remarks in Assurance (if required)
 		    }
+		    
+		    implReq.setReturnFrom("Mopa");
 
 		    
 		    implementationRequestRepository.save(implReq);
@@ -873,7 +847,37 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 		    return getImplementationDetailById(id);
 		}
+
+
+
+
+	@Override
+	public List<AssuranceImplementationDTO> getReturnRequestsFromCGA(String houseAbbr) {
+	    List<ImplementationRequest> implRequests = implementationRequestRepository
+	        .findByStatusForMinistryAndReturnFrom("Returned", "CGA");
+
+	    List<AssuranceImplementationDTO> dtoList = new ArrayList<>();
+
+	    Long filterHouseId = null;
+	    if ("LS".equalsIgnoreCase(houseAbbr)) {
+	        filterHouseId = 2L;
+	    } else if ("RS".equalsIgnoreCase(houseAbbr)) {
+	        filterHouseId = 1L;
+	    }
+
+	    for (ImplementationRequest impl : implRequests) {
+	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
+	        if (assurance != null) {
+	            Long houseId = getHouseIdFromAssurance(assurance);
+	            if (filterHouseId != null && !filterHouseId.equals(houseId)) continue;
+
+	            dtoList.add(buildImplementationDTO(assurance, impl));
+	        }
+	    }
+
+	    return dtoList;
 	}
+}
 
 
 
@@ -883,73 +887,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 
 
-//	@Override
-//	public List<AssuranceImplementationDTO> getAllImplementationDetails() {
-//	    List<AssuranceImplementationDTO> dtoList = new ArrayList<>();
-//
-//	    // Now both Lok Sabha & Rajya Sabha come from ImplementationRequest table
-//	    List<ImplementationRequest> implRequests = implementationRequestRepository.findAll();
-//
-//	    for (ImplementationRequest impl : implRequests) {
-//	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
-//	        if (assurance != null) {
-//	            dtoList.add(buildImplementationDTO(assurance, impl));
-//	        }
-//	    }
-//
-//	    return dtoList;
-//	}
-//
-//	private AssuranceImplementationDTO buildImplementationDTO(Assurance assurance, ImplementationRequest impl) {
-//	    String memberName = null, departmentName = null, ministryName = null;
-//
-//	    if (assurance.getMemberId() != null) {
-//	        memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
-//	    }
-//
-//	    if (assurance.getDepartmentId() != null) {
-//	        departmentName = departmentRepository.findById(assurance.getDepartmentId())
-//	            .map(Departments::getDepartmentName).orElse(null);
-//	    }
-//
-//	    if (assurance.getMinistryId() != null) {
-//	        ministryName = ministryRepository.findById(assurance.getMinistryId())
-//	            .map(Ministries::getMinistryName).orElse(null);
-//	    }
-//
-//	    boolean isLokSabha = (getHouseId() == 2); // Or you can add a field in impl/assurance for this
-//
-//	    AssuranceImplementationDTO.AssuranceImplementationDTOBuilder builder = AssuranceImplementationDTO.builder()
-//	        .id(impl.getId())
-//	        .assuranceNo(assurance.getAssuranceNo())
-//	        .memberName(memberName)
-//	        .ministryName(ministryName)
-//	        .departmentName(departmentName)
-//	        .subject(assurance.getSubject())
-//	        .questionNo(assurance.getQuestionNo())
-//	        .status(codeRepository.findCodeById(assurance.getStatusId()))
-//	        .dueDateOfImplementation(impl.getDueDateOfImplementation())
-//	        .dateOfImplementation(impl.getDateOfImplementation())
-//	        .detailsOfImplementation(impl.getDetailsOfImplementation())
-//	        .remarks(assurance.getRemarks()) // Only if remarks are still stored in Assurance
-//	        .reason(impl.getReason())
-//	        .layingDate(impl.getLayingDate())
-//	        .implementationTypeId(codeRepository.findCodeById(impl.getImplementationTypeId()))
-//	        .supplementaryId(impl.getSupplementaryId())
-//	        .partId(impl.getPartId())
-//	        .house(isLokSabha ? "Lok Sabha" : "Rajya Sabha");
-//
-//	    if (isLokSabha) {
-//	        builder
-//	            .lokSabhaNumber(lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()))
-//	            .lokSabhaSessionNumber(lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()));
-//	    } else {
-//	        builder
-//	            .rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()));
-//	    }
-//
-//	    return builder.build();
-//	}
+
 
 
 

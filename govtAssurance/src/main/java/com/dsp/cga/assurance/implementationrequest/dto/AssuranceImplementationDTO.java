@@ -32,6 +32,7 @@ public class AssuranceImplementationDTO {
 	    private String rajyaSabhaSessionNumber;
 	    private String supplementaryId;
 	    private String partId;
+	    private String returnFrom; 
 	    private String implementationTypeId;
 		private String reason;
 		private String statusForMinistry;

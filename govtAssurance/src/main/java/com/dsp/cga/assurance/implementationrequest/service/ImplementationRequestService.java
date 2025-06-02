@@ -35,6 +35,8 @@ public interface ImplementationRequestService {
 
 	AssuranceImplementationDTO updateImplementationRequestforMinistryStatusById(Long id, ImplementationRequestDTO dto);
 
+	List<AssuranceImplementationDTO> getReturnRequestsFromCGA(String houseAbbr);
+
 	//List<AssuranceImplementationDTO> getAllImplementationDetails();
 
 //	Map<String, Object> getRequestCounts(Integer ministryCode);

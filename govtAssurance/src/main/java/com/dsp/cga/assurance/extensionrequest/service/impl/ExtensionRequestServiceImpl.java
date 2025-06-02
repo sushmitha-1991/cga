@@ -695,6 +695,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                                    .id(req.getId())
 	                                    .requestType("OtherRequests")
 	                                    .assuranceId(req.getAssuranceId())
+	                                    .assuranceNo(assurance.getAssuranceNo())
 	                                    .subject(req.getSubject())
 	                                    .remarks(req.getRemarks())
 	                                    .requestedDate(req.getRequestedDate())
@@ -743,6 +744,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                                    .session(req.getSession())
 	                                    .meetingNo(req.getMeetingNo())
 	                                    .meetingDate(req.getMeetingDate())
+	                                    .subject(assurance.getSubject())
+	                                    .questionNo(assurance.getQuestionNo())
+	                                    .assuranceNo(assurance.getAssuranceNo())
 	                                    .remarks(req.getRemarks())
 	                                    .statusForMinistry(req.getStatusForMinistry())
 	                                    .droppingFiles(req.getDroppingFiles())
@@ -775,9 +779,12 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                                    .id(req.getId())
 	                                    .requestType("ClubbedAssurance")
 	                                    .assuranceId(req.getAssuranceId())
+	                                    .assuranceNo(assurance.getAssuranceNo())
 	                                    .clubbedAssuranceIds(req.getClubbedAssuranceIds())
 	                                    .fromMinistry(req.getFromMinistry())
 	                                    .statusForMinistry(req.getStatusForMinistry())
+	                                    .subject(assurance.getSubject())
+	                                    .questionNo(assurance.getQuestionNo())
 	                                    .date(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null)
 	                                    .status(assuranceDetails != null ? assuranceDetails.getStatus() : null)
 	                                    .lokSabhaNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaNumber() : null)
@@ -795,8 +802,12 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	            case "ImplementationRequest":
 	                return implementationRequestRepository.findById(id)
 	                    .filter(req -> Boolean.TRUE.equals(req.getFromMinistry()) &&
-	                            ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
-	                             "Returned".equalsIgnoreCase(req.getStatusForMinistry())))
+	                    		 (
+	                    	                ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
+	                    	                "Returned".equalsIgnoreCase(req.getStatusForMinistry())) &&
+	                    	                "CGA".equalsIgnoreCase(req.getReturnFrom())
+	                    	            )
+	                    	        )
 	                    .map(req -> {
 	                        Assurance assurance = getAssurance(req.getAssuranceId());
 	                        if (isValidForHouse(houseId, assurance)) {
@@ -805,7 +816,18 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                                    .id(req.getId())
 	                                    .requestType("ImplementationRequest")
 	                                    .assuranceId(req.getAssuranceId())
+	                                    .assuranceNo(assurance.getAssuranceNo())
 	                                    .fromMinistry(req.getFromMinistry())
+	                                    .dueDateOfImplementation(req.getDueDateOfImplementation())
+	                                    .dateOfImplementation(req.getDateOfImplementation())
+	                                    .detailsOfImplementation(req.getDetailsOfImplementation())
+	                                    .layingDate(req.getLayingDate())
+	                                    .partId(req.getPartId())
+	                                    .supplementaryId(req.getSupplementaryId())
+	                                    .implementationReportFiles(req.getImplementationReportFiles())
+	                                    .partReportFiles(req.getPartReportFiles())
+	                                    .subject(assurance.getSubject())
+	                                    .questionNo(assurance.getQuestionNo())
 	                                    .statusForMinistry(req.getStatusForMinistry())
 	                                    .date(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null)
 	                                    .status(assuranceDetails != null ? assuranceDetails.getStatus() : null)
@@ -871,6 +893,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	            case "ImplementationRequest":  // New case added
 	                return implementationRequestRepository.findById(id).map(entity -> {
 	                    if (updateDto.getStatusForMinistry() != null) entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                    entity.setReturnFrom("CGA");
 	                    implementationRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);

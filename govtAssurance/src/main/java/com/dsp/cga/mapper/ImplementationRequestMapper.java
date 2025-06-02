@@ -2,12 +2,12 @@ package com.dsp.cga.mapper;
 
 import org.springframework.stereotype.Component;
 
-import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 
 @Component
 public class ImplementationRequestMapper {
+	
 	
 	public static ImplementationRequestDTO toDTO(ImplementationRequest entity) {
         if (entity == null) {
@@ -30,9 +30,12 @@ public class ImplementationRequestMapper {
                 .dateOfImplementation(entity.getDateOfImplementation())
                 .detailsOfImplementation(entity.getDetailsOfImplementation())
                 .remarks(entity.getRemarks())
-               .otherFiles(entity.getOtherFiles())
-              .implementationTypeId(entity.getImplementationTypeId())
-               .session(entity.getSession())
+                .otherFiles(entity.getOtherFiles())
+                .implementationTypeId(entity.getImplementationTypeId())
+                .session(entity.getSession())
+                .applicationId(entity.getApplicationId())
+                .applicationNo(entity.getApplicationNo())
+                
                 .build();
     }
 
@@ -40,9 +43,9 @@ public class ImplementationRequestMapper {
         if (dto == null) {
             return null;
         }
-
+        
         return ImplementationRequest.builder()
-                .id(dto.getId())
+                //.id(dto.getId())
                 .assuranceId(dto.getAssuranceId())
                 .committeeDecisionId(dto.getCommitteeDecisionId())
                 .layingDate(dto.getLayingDate())
@@ -60,7 +63,7 @@ public class ImplementationRequestMapper {
                 .otherFiles(dto.getOtherFiles())
                 .implementationTypeId(dto.getImplementationTypeId())
                 .session(dto.getSession())
-                .applicationId(dto.getApplicationId())
+               
                 .fromMinistry(true)
                 .remarks(dto.getRemarks())
 	            .statusForMinistry("Submitted")
