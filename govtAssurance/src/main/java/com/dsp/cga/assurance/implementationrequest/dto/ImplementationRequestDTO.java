@@ -38,6 +38,7 @@ public class ImplementationRequestDTO {
 	    private String statusForMinistry;
 	    private Long applicationId;
 	    private String applicationNo;
+	    private String sendTo;
 	    private CommitteeDecisionDTO committeeDecisionDTO;
 	    private ImplementationTypeDTO implementationTypeDTO;
 	    private List<Map<String, Object>> implementationReportFiles;

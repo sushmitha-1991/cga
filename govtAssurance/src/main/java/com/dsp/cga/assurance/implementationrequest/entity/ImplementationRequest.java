@@ -92,6 +92,11 @@ public class ImplementationRequest extends ApplicationInstance {
 	@Column(name = "return_from")
 	private String returnFrom; 
 	
+	@Column(name = "send_to")
+	private String sendTo; 
+	
+	
+	
 	
 	
 //	@ManyToOne

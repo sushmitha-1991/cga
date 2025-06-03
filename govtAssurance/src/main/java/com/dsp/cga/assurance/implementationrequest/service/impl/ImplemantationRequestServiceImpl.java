@@ -718,29 +718,72 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 
 
+//	@Override
+//	public List<AssuranceImplementationDTO> getAllImplementationDetails(String houseAbbr) {
+//	    List<AssuranceImplementationDTO> dtoList = new ArrayList<>();
+//
+//	    // Fetch all ImplementationRequests (could optimize with filtering in DB later)
+//	    List<ImplementationRequest> implRequests = implementationRequestRepository.findAll();
+//
+//	    // Determine houseId filter if houseAbbr provided
+//	    Long filterHouseId = null;
+//	    if (houseAbbr != null) {
+//	        if (houseAbbr.equalsIgnoreCase("LS")) {
+//	            filterHouseId = 2L; // Lok Sabha
+//	        } else if (houseAbbr.equalsIgnoreCase("RS")) {
+//	            filterHouseId = 1L; // Rajya Sabha
+//	        }
+//	    }
+//
+//	    for (ImplementationRequest impl : implRequests) {
+//	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
+//	        if (assurance != null) {
+//	            Long houseId = getHouseIdFromAssurance(assurance);
+//
+//	            // If house filter is present, skip non-matching records
+//	            if (filterHouseId != null && !filterHouseId.equals(houseId)) {
+//	                continue;
+//	            }
+//
+//	            dtoList.add(buildImplementationDTO(assurance, impl));
+//	        }
+//	    }
+//
+//	    return dtoList;
+//	}
+	
 	@Override
 	public List<AssuranceImplementationDTO> getAllImplementationDetails(String houseAbbr) {
 	    List<AssuranceImplementationDTO> dtoList = new ArrayList<>();
 
-	    // Fetch all ImplementationRequests (could optimize with filtering in DB later)
+	    // Fetch all ImplementationRequests
 	    List<ImplementationRequest> implRequests = implementationRequestRepository.findAll();
 
-	    // Determine houseId filter if houseAbbr provided
+	    // Determine houseId and sendTo filter if houseAbbr is provided
 	    Long filterHouseId = null;
+	    String expectedSendTo = null;
+
 	    if (houseAbbr != null) {
 	        if (houseAbbr.equalsIgnoreCase("LS")) {
 	            filterHouseId = 2L; // Lok Sabha
+	            expectedSendTo = "Loksabha";
 	        } else if (houseAbbr.equalsIgnoreCase("RS")) {
 	            filterHouseId = 1L; // Rajya Sabha
+	            expectedSendTo = "RajyaSabha";
 	        }
 	    }
 
 	    for (ImplementationRequest impl : implRequests) {
+	        //  Filter based on sendTo if houseAbbr is provided
+	        if (expectedSendTo != null && (impl.getSendTo() == null || !impl.getSendTo().equalsIgnoreCase(expectedSendTo))) {
+	            continue;
+	        }
+
 	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
 	        if (assurance != null) {
 	            Long houseId = getHouseIdFromAssurance(assurance);
 
-	            // If house filter is present, skip non-matching records
+	            // ✅ Filter based on houseId if applicable
 	            if (filterHouseId != null && !filterHouseId.equals(houseId)) {
 	                continue;
 	            }
@@ -751,6 +794,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	    return dtoList;
 	}
+
 
 
 	private Long getHouseIdFromAssurance(Assurance assurance) {
@@ -833,13 +877,18 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		    if (dto.getRemarks() != null) {
 		    	implReq.setRemarks(dto.getRemarks()); // still updating remarks in Assurance (if required)
 		    }
+		    
+		    if (dto.getSendTo() != null) {
+		    	implReq.setSendTo(dto.getSendTo()); 
+		    }
 
 		    if (dto.getStatusForMinistry() != null) {
 		    	System.out.println(dto.getStatusForMinistry());
-		    	implReq.setStatusForMinistry(dto.getStatusForMinistry()); // still updating remarks in Assurance (if required)
+		    	implReq.setStatusForMinistry(dto.getStatusForMinistry()); 
+		    	  implReq.setReturnFrom("Mopa");
 		    }
 		    
-		    implReq.setReturnFrom("Mopa");
+		  
 
 		    
 		    implementationRequestRepository.save(implReq);
