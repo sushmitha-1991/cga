@@ -198,11 +198,17 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        implementationRequest.setDocumentDate(implementationRequest.getDateOfImplementation());
 	    }
 	    implementationRequest.setCurrentStatus(implementationRequest.getStatusForMinistry());
-	    implementationRequest.setRefId(implementationRequest.getRefId());
+//	    implementationRequest.setRefId(implementationRequest.getId());
+//	    System.out.println("***********refId" + implementationRequest.getId());
 	    implementationRequest.setApplicationId(optionalApp.get().getId());
 	  
 	    // Save to DB
 	    ImplementationRequest saved = implementationRequestRepository.save(implementationRequest);
+
+	    saved.setRefId(saved.getId());
+
+	 // Save again to persist the refId update
+	 saved = implementationRequestRepository.save(saved);
 
 	    return ImplementationRequestMapper.toDTO(saved);
 	}
@@ -584,7 +590,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .applicationNo(implementationRequest.getApplicationNo())
 	        .houseId(houseId)
 	        .currentStatus(implementationRequest.getCurrentStatus())
-	        .refId(implementationRequest.getRefId())
+	        //.refId(implementationRequest.getRefId())
 	        .id(implementationRequest.getId())
 	    .applicationInstanceId(implementationRequest.getId());
 
@@ -757,7 +763,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    List<AssuranceImplementationDTO> dtoList = new ArrayList<>();
 
 	    // Fetch all ImplementationRequests
-	    List<ImplementationRequest> implRequests = implementationRequestRepository.findAll();
+	 //   List<ImplementationRequest> implRequests = implementationRequestRepository.findAll();
+	    List<ImplementationRequest> implRequests = implementationRequestRepository.findAllByOrderByUpdatedAtDesc();
 
 	    // Determine houseId and sendTo filter if houseAbbr is provided
 	    Long filterHouseId = null;

@@ -39,6 +39,7 @@ public class ImplementationRequestDTO {
 	    private Long applicationId;
 	    private String applicationNo;
 	    private String sendTo;
+	    private Long refId;
 	    private CommitteeDecisionDTO committeeDecisionDTO;
 	    private ImplementationTypeDTO implementationTypeDTO;
 	    private List<Map<String, Object>> implementationReportFiles;

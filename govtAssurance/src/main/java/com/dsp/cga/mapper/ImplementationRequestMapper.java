@@ -35,7 +35,7 @@ public class ImplementationRequestMapper {
                 .session(entity.getSession())
                 .applicationId(entity.getApplicationId())
                 .applicationNo(entity.getApplicationNo())
-                
+               // .refId(entity.getRefId())
                 .build();
     }
 

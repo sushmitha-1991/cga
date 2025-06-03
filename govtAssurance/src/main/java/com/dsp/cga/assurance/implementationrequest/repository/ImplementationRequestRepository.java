@@ -46,6 +46,9 @@ public interface ImplementationRequestRepository extends JpaRepository<Implement
 		List<ImplementationRequest> findByStatusForMinistryAndReturnFrom(String status, String returnFrom);
 
 
+		List<ImplementationRequest> findAllByOrderByUpdatedAtDesc();
+
+
 
 
 
