@@ -6,6 +6,8 @@ import java.util.Map;
 
 import com.dsp.cga.assurance.dto.CommitteeDecisionDTO;
 import com.dsp.cga.assurance.dto.ImplementationTypeDTO;
+import com.dsp.cga.assurance.dto.MemberDTO;
+import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,7 +58,8 @@ public class AssuranceImplementationDTO {
 		  // private String statusForMinistry;
 		    private String statementNo;
 		 
-		   
+		    private List<MemberDTO> clubbedMembersData;
+		    private List<Supplementary> supplementary;
 		    private Long session;
 		  
 		    private List<Map<String, Object>> implementationReportFiles;

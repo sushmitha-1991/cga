@@ -8,10 +8,10 @@ import com.dsp.cga.assurance.entity.Assurance;
 public interface AssuranceRepositoryCustom {
 
 	List<Assurance> findFilteredAssurancesWithCriteria(LocalDate fromDate, LocalDate toDate, Long ministryId,
-			Long memberId);
+			Long rajyaSabhaSessionNo,	Long memberId );
 
 	List<Assurance> findFilteredAssurancesLsWithCriteria(LocalDate fromDate, LocalDate toDate, Long ministryId,
-			Long memberId);
+			Long lokSabhaNo, Long lokSabhaSessionNo, Long memberId);
 	
    // List<Assurance> findFilteredAssurancesWithCriteria(EntityManager em, LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId);
 

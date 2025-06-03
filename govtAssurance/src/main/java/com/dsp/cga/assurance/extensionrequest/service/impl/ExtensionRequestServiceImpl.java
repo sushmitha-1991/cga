@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
 import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
 import com.dsp.cga.assurance.dto.CommonRequestResponseDTO;
+import com.dsp.cga.assurance.dto.MemberDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
@@ -67,6 +68,8 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	@Autowired
 	private RestTemplate restTemplate;
 	
+	@Value("${member.memberServiceUrl}")
+	private String memberServiceUrl;
 
 	@Autowired
 	private ExtensionRequestRepository extenionRequestRepository;
@@ -348,6 +351,66 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		return houseId;
 	}
 
+//	@Override
+//	public ExtensionRequestResponseDTO getExtensionRequestById(Long id) {
+//	    ExtensionRequest er = extenionRequestRepository.findById(id).orElse(null);
+//	    if (er == null) return null;
+//
+//	    Assurance assurance = null;
+//	    String memberName = null;
+//	    String departmentName = null;
+//	    String ministryName = null;
+//	    if (er.getAssuranceId() != null) {
+//	        assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
+//	        if (assurance != null && assurance.getMemberId() != null) {
+//	            memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
+//	            
+//	        }
+//	        if (assurance.getDepartmentId() != null) {
+//                departmentName = departmentRepository.findById(assurance.getDepartmentId())
+//                    .map(Departments::getDepartmentName)
+//                    .orElse(null);
+//            }
+//	        if (assurance.getMinistryId() != null) {
+//                ministryName = ministryRepository.findById(assurance.getDepartmentId())
+//                    .map(Ministries::getMinistryName)
+//                    .orElse(null);
+//            }
+//	        if (assurance.getClubbedMembers() != null) {
+//                clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+//            }
+//	        
+//	    }
+//
+//	    return ExtensionRequestResponseDTO.builder()
+//	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
+//	            .extensionNo(er.getExtensionNo())
+//	            .questionNo(assurance.getQuestionNo())
+//	            .subject(assurance.getSubject())
+//	            .questionNo(assurance.getQuestionNo())
+//	            .status(codeRepository.findCodeById(assurance != null ? assurance.getStatusId() : null))
+//	            .lokSabhaSessionNo(assurance != null
+//	                    ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
+//	                    : null)
+//	            .lokSabhaNo(assurance != null
+//	                    ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo())
+//	                    : null)
+//	            .rajyaSabhaSessionNumber(assurance != null
+//	                    ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
+//	                    : null)
+//	            .remarks(er.getRemarks())
+//	            .extGrantedTillDate(er.getExtGrantedTillDate())
+//	            .extRequestedTillDate(er.getExtRequestedTillDate())
+//	            .ministryRefDate(er.getMinistryRefDate())
+//	            .memberName(memberName)
+//	            .departmentName(departmentName)
+//	            .ministryName(ministryName)
+//	            .id(er.getId())
+//	            .ministryRefNo(er.getMinistryRefNo())
+//	            .extensionFiles(er.getExtensionFiles())
+//	            .build();
+//	}
+	
 	@Override
 	public ExtensionRequestResponseDTO getExtensionRequestById(Long id) {
 	    ExtensionRequest er = extenionRequestRepository.findById(id).orElse(null);
@@ -357,40 +420,42 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	    String memberName = null;
 	    String departmentName = null;
 	    String ministryName = null;
+
+	    List<MemberDTO> clubbedMembersData = new ArrayList<>();
+
 	    if (er.getAssuranceId() != null) {
 	        assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
-	        if (assurance != null && assurance.getMemberId() != null) {
-	            memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
-	            
+	        if (assurance != null) {
+	            if (assurance.getMemberId() != null) {
+	                memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
+	            }
+
+	            if (assurance.getDepartmentId() != null) {
+	                departmentName = departmentRepository.findById(assurance.getDepartmentId())
+	                        .map(Departments::getDepartmentName).orElse(null);
+	            }
+
+	            if (assurance.getMinistryId() != null) {
+	                ministryName = ministryRepository.findById(assurance.getMinistryId())
+	                        .map(Ministries::getMinistryName).orElse(null);
+	            }
+
+	            // ✅ Fetch and set clubbed members
+	            if (assurance.getClubbedMembers() != null) {
+	                clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+	            }
 	        }
-	        if (assurance.getDepartmentId() != null) {
-                departmentName = departmentRepository.findById(assurance.getDepartmentId())
-                    .map(Departments::getDepartmentName)
-                    .orElse(null);
-            }
-	        if (assurance.getMinistryId() != null) {
-                ministryName = ministryRepository.findById(assurance.getDepartmentId())
-                    .map(Ministries::getMinistryName)
-                    .orElse(null);
-            }
 	    }
 
 	    return ExtensionRequestResponseDTO.builder()
 	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
 	            .extensionNo(er.getExtensionNo())
-	            .questionNo(assurance.getQuestionNo())
-	            .subject(assurance.getSubject())
-	            .questionNo(assurance.getQuestionNo())
+	            .questionNo(assurance != null ? assurance.getQuestionNo() : null)
+	            .subject(assurance != null ? assurance.getSubject() : null)
 	            .status(codeRepository.findCodeById(assurance != null ? assurance.getStatusId() : null))
-	            .lokSabhaSessionNo(assurance != null
-	                    ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
-	                    : null)
-	            .lokSabhaNo(assurance != null
-	                    ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo())
-	                    : null)
-	            .rajyaSabhaSessionNumber(assurance != null
-	                    ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
-	                    : null)
+	            .lokSabhaSessionNo(assurance != null ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()) : null)
+	            .lokSabhaNo(assurance != null ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()) : null)
+	            .rajyaSabhaSessionNumber(assurance != null ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()) : null)
 	            .remarks(er.getRemarks())
 	            .extGrantedTillDate(er.getExtGrantedTillDate())
 	            .extRequestedTillDate(er.getExtRequestedTillDate())
@@ -400,7 +465,58 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	            .ministryName(ministryName)
 	            .id(er.getId())
 	            .ministryRefNo(er.getMinistryRefNo())
+	            .extensionFiles(er.getExtensionFiles())
+	            .clubbedMembersData(clubbedMembersData) // ✅ added here
 	            .build();
+	}
+
+
+	private List<MemberDTO> fetchClubbedMembersData(List<Long> clubbedMembers) {
+		// Check if the list is not empty
+		if (clubbedMembers == null || clubbedMembers.isEmpty()) {
+			return new ArrayList<>(); // Return an empty list if no members
+		}
+
+		List<MemberDTO> memberDTOs = new ArrayList<>();
+
+		// Iterate over each member ID in the clubbedMembers list
+		for (Long memberId : clubbedMembers) {
+			// Fetch the MemberDTO for each memberId
+			MemberDTO memberDTO = fetchMemberData(memberId);
+			if (memberDTO != null) {
+				 memberDTO.generateMemberName();
+				memberDTOs.add(memberDTO); // Add the memberDTO to the list
+			}
+		}
+
+		return memberDTOs; // Return the list of MemberDTOs
+	}
+	private MemberDTO fetchMemberData(Long memberId) {
+		String url = memberServiceUrl + memberId;
+		log.debug("Fetching Member by memberId from URL: {}", url);
+
+		try {
+			ResponseEntity<GenericResponse<MemberDTO>> response = restTemplate.exchange(url, HttpMethod.GET, null,
+					new ParameterizedTypeReference<GenericResponse<MemberDTO>>() {
+					});
+
+			if (response == null || response.getBody() == null || response.getBody().getData() == null) {
+				log.error("Response or body is null when fetching Member for memberId: {}", memberId);
+				throw new RuntimeException("Failed to fetch Member, response is null");
+			}
+
+			MemberDTO memberDTO = response.getBody().getData();
+			memberDTO.generateMemberName();
+			log.debug("Fetched MemberDTO: {}", memberDTO);
+			return memberDTO;
+
+		} catch (ResourceNotFoundException e) {
+			log.error("Resource not found for memberId: {}", memberId);
+			throw e;
+		} catch (Exception e) {
+			log.error("Error fetching Member for memberId: {}", memberId, e);
+			throw new RuntimeException("Failed to fetch Member data", e);
+		}
 	}
 
 	@Override
@@ -666,6 +782,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                                    .statusId(req.getStatusId())
 	                                    .statusForMinistry(req.getStatusForMinistry())
 	                                    .draftStatus(req.getDraftStatus())
+	                                   .extensionFiles(req.getExtensionFiles())
 	                                    .fromMinistry(req.getFromMinistry())
 	                                    .date(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null)
 	                                    // Merge assurance details
@@ -741,6 +858,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                                    .acceptedId(req.getAcceptedId())
 	                                    .type(req.getType())
 	                                    .communicationDate(req.getCommunicationDate())
+	                                    .droppingFiles(req.getDroppingFiles())
 	                                    .session(req.getSession())
 	                                    .meetingNo(req.getMeetingNo())
 	                                    .meetingDate(req.getMeetingDate())

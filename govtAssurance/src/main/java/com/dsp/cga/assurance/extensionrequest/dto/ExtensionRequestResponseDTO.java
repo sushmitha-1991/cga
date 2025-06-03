@@ -1,6 +1,11 @@
 package com.dsp.cga.assurance.extensionrequest.dto;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+import com.dsp.cga.assurance.dto.MemberDTO;
+import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
@@ -33,4 +38,8 @@ public class ExtensionRequestResponseDTO {
     private String departmentName;
 	private String rajyaSabhaSessionNumber;
     private String statusForMinistry;
+    private List<Map<String, Object>> extensionFiles;
+    private List<MemberDTO> clubbedMembersData;
+    private List<Supplementary> supplementary;
+
 }

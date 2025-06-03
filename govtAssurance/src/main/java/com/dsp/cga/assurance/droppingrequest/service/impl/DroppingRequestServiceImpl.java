@@ -411,6 +411,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		            .ministryName(ministryName)
 		            .departmentName(departmentName)
 		            .ministryRefNo(dr.getMinistryRefNo())
+		            .droppingFiles(dr.getDroppingFiles())
 		            .status(codeRepository.findCodeById(assurance.getStatusId()))
 		            .remarks(dr.getRemarks())
 		            .build();

@@ -1,6 +1,11 @@
 package com.dsp.cga.assurance.droppingrequest.dto;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+import com.dsp.cga.assurance.dto.MemberDTO;
+import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,8 +34,11 @@ public class AssuranceDroppingResponseDTO {
     private String status;
     private String remarks;
     private String ministryRefNo;
+    private List<Map<String, Object>> droppingFiles;
 private String questionNo;
 private String subject;
 	private LocalDate ministryRefDate;
 	private String statusForMinistry;
+	  private List<MemberDTO> clubbedMembersData;
+	    private List<Supplementary> supplementary;
 }

@@ -1,6 +1,10 @@
 package com.dsp.cga.assurance.droppingrequest.dto;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import com.dsp.cga.assurance.dto.MemberDTO;
+import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +24,8 @@ public class AssuranceDroppingRequestDTO {
     private LocalDate ministryRefDate;
     private String ministryRefNo;
     private String remarks;
+    private List<MemberDTO> clubbedMembersData;
+    private List<Supplementary> supplementary;
     private Long statusId; // Optional
 }
 

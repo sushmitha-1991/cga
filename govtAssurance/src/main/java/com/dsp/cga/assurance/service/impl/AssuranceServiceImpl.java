@@ -739,6 +739,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 				dto.setPendingDueToDTO(fetchPendingDueToData(assurance.getPendingDueTo()));
 			}
 		dto.setSourceDTO(fetchSourceData(assurance.getSourceId()));
+		
 		if (assurance.getClubbedMembers() != null) {
 
 			// Fetch and set clubbed members
@@ -948,9 +949,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 
 	@Override
-	public List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
+	public List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId, Long rajyaSabhaSessionNo, Long memberId) {
 	    // Fetch filtered assurances dynamically using Criteria API
-	    List<Assurance> assurances = assuranceRepository.findFilteredAssurancesWithCriteria(fromDate, toDate, ministryId, memberId);
+	    List<Assurance> assurances = assuranceRepository.findFilteredAssurancesWithCriteria(fromDate, toDate, ministryId, rajyaSabhaSessionNo, memberId);
 
 	    // Map entities to DTOs with additional data populated
 	    List<AssuranceDTO> assuranceDTOs = assurances.stream().map(assurance -> {
@@ -1056,9 +1057,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 	}
 
 	@Override
-	public List<AssuranceDTO> getFilteredAssurancesLs(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
+	public List<AssuranceDTO> getFilteredAssurancesLs(LocalDate fromDate, LocalDate toDate, Long ministryId, Long lokSabhaNo, Long lokSabhaSessionNo, Long memberId) {
 	    // Fetch filtered assurances dynamically using Criteria API
-	    List<Assurance> assurances = assuranceRepository.findFilteredAssurancesLsWithCriteria(fromDate, toDate, ministryId, memberId);
+	    List<Assurance> assurances = assuranceRepository.findFilteredAssurancesLsWithCriteria(fromDate, toDate, ministryId, lokSabhaNo, lokSabhaSessionNo,  memberId);
 
 	    // Map entities to DTOs with additional data populated
 	    List<AssuranceDTO> assuranceDTOs = assurances.stream().map(assurance -> {

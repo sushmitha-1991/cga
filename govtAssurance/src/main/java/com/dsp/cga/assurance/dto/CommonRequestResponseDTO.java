@@ -30,6 +30,9 @@ public class CommonRequestResponseDTO {
 	private String extensionNo;
 
 	private LocalDate requestedDate;
+	private List<Map<String, Object>> extensionFiles;
+   // private List<Map<String, Object>> droppingFiles;
+
 
 	private Long statusId;
 
@@ -52,6 +55,8 @@ public class CommonRequestResponseDTO {
 	private LocalDate communicationDate;
 
 	// private Long dropStatusId;
+	//private List<Map<String, Object>> fileUrl;
+
 
 	private String remarks;
 

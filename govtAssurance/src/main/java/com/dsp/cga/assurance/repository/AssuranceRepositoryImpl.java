@@ -27,7 +27,7 @@ public class AssuranceRepositoryImpl implements AssuranceRepositoryCustom {
 
     @Override
     public List<Assurance> findFilteredAssurancesWithCriteria(
-        LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
+        LocalDate fromDate, LocalDate toDate, Long ministryId,  Long rajyaSabhaSessionNo,Long memberId) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Assurance> query = cb.createQuery(Assurance.class);
@@ -43,6 +43,11 @@ public class AssuranceRepositoryImpl implements AssuranceRepositoryCustom {
         if (ministryId != null) {
             predicates.add(cb.equal(root.get("ministryId"), ministryId));
         }
+        
+        if (rajyaSabhaSessionNo != null) {
+            predicates.add(cb.equal(root.get("rajyaSabhaSessionNo"), rajyaSabhaSessionNo));
+        }
+        
         if (memberId != null) {
             predicates.add(cb.equal(root.get("memberId"), memberId));
         }
@@ -57,7 +62,7 @@ public class AssuranceRepositoryImpl implements AssuranceRepositoryCustom {
     
     @Override
     public List<Assurance> findFilteredAssurancesLsWithCriteria(
-        LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId) {
+        LocalDate fromDate, LocalDate toDate, Long ministryId, Long lokSabhaNo, Long lokSabhaSessionNo, Long memberId) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Assurance> query = cb.createQuery(Assurance.class);
@@ -79,6 +84,14 @@ public class AssuranceRepositoryImpl implements AssuranceRepositoryCustom {
         // Filtering by ministryId
         if (ministryId != null) {
             predicates.add(cb.equal(root.get("ministryId"), ministryId));
+        }
+
+        if (lokSabhaNo != null) {
+            predicates.add(cb.equal(root.get("lokSabhaNo"), lokSabhaNo));
+        }
+
+        if (lokSabhaSessionNo != null) {
+            predicates.add(cb.equal(root.get("lokSabhaSessionNo"), lokSabhaSessionNo));
         }
 
         if (memberId != null) {

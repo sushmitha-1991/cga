@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import com.dsp.cga.assurance.dto.MemberDTO;
+import com.dsp.cga.assurance.supplementry.entity.Supplementary;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,7 +36,8 @@ private Long lokSabhaNo;
     private String lokSabhaSessionNumber;
     private String lokSabhaSession;
     private String rajyaSabhaSession;
-
+    private List<MemberDTO> clubbedMembersData;
+    private List<Supplementary> supplementary;
     // ImplementationRequest-related
     private Long implementationTypeId;
     private String partId;

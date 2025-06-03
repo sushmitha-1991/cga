@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import com.dsp.cga.assurance.dto.MemberDTO;
+import com.dsp.cga.assurance.supplementry.entity.Supplementary;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,7 +34,8 @@ public class OtherRequestDTO {
 	private String questionNo;
 	private String statusForMinistry;
 	 private LocalDate requestedDate;
-	
+	 private List<MemberDTO> clubbedMembersData;
+	    private List<Supplementary> supplementary;
 	    private Long statusId; 
 	   
 	    private String remarks;

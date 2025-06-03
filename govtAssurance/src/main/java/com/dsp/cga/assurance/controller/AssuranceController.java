@@ -171,13 +171,14 @@ public class AssuranceController {
 			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
 	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
 	        @RequestParam(required = false) Long ministryId,
+	        @RequestParam(required = false) Long rajyaSabhaSessionNo,
 	        @RequestParam(required = false) Long memberId) {
 		
 		 log.info("fromDate: {}", fromDate);
 		    log.info("toDate: {}", toDate);
 		    log.info("ministryId: {}", ministryId);
 		    log.info("memberId: {}", memberId);
-	    List<AssuranceDTO> assurances = assuranceService.getFilteredAssurances(fromDate, toDate, ministryId, memberId);
+	    List<AssuranceDTO> assurances = assuranceService.getFilteredAssurances(fromDate, toDate, ministryId, rajyaSabhaSessionNo, memberId);
 	    GenericResponse<List<AssuranceDTO>> response = new GenericResponse<>(
 	            HttpStatus.OK.value(),
 	            true,
@@ -198,9 +199,11 @@ public class AssuranceController {
 	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
 	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
 	        @RequestParam(required = false) Long ministryId,
+	        @RequestParam(required = false) Long lokSabhaNo,
+	        @RequestParam(required = false) Long lokSabhaSessionNo,
 	        @RequestParam(required = false) Long memberId) {
 
-	    List<AssuranceDTO> assurances = assuranceService.getFilteredAssurancesLs(fromDate, toDate, ministryId, memberId);
+	    List<AssuranceDTO> assurances = assuranceService.getFilteredAssurancesLs(fromDate, toDate, ministryId, lokSabhaNo, lokSabhaSessionNo, memberId);
 	    GenericResponse<List<AssuranceDTO>> response = new GenericResponse<>(
 	            HttpStatus.OK.value(),
 	            true,
