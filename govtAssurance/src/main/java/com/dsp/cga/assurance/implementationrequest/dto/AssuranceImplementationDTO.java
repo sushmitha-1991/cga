@@ -60,6 +60,7 @@ public class AssuranceImplementationDTO {
 		 
 		    private List<MemberDTO> clubbedMembersData;
 		    private List<Supplementary> supplementary;
+		    private List<MemberDTO> supplementaryClubbedMembersData;
 		    private Long session;
 		  
 		    private List<Map<String, Object>> implementationReportFiles;

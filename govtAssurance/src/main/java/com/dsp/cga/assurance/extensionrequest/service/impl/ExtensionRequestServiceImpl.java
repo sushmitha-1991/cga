@@ -48,6 +48,8 @@ import com.dsp.cga.assurance.repository.MasterLSSRepository;
 import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
+import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
+import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ExtensionRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
@@ -411,6 +413,66 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 //	            .build();
 //	}
 	
+//	@Override
+//	public ExtensionRequestResponseDTO getExtensionRequestById(Long id) {
+//	    ExtensionRequest er = extenionRequestRepository.findById(id).orElse(null);
+//	    if (er == null) return null;
+//
+//	    Assurance assurance = null;
+//	    String memberName = null;
+//	    String departmentName = null;
+//	    String ministryName = null;
+//
+//	    List<MemberDTO> clubbedMembersData = new ArrayList<>();
+//
+//	    if (er.getAssuranceId() != null) {
+//	        assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
+//	        if (assurance != null) {
+//	            if (assurance.getMemberId() != null) {
+//	                memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
+//	            }
+//
+//	            if (assurance.getDepartmentId() != null) {
+//	                departmentName = departmentRepository.findById(assurance.getDepartmentId())
+//	                        .map(Departments::getDepartmentName).orElse(null);
+//	            }
+//
+//	            if (assurance.getMinistryId() != null) {
+//	                ministryName = ministryRepository.findById(assurance.getMinistryId())
+//	                        .map(Ministries::getMinistryName).orElse(null);
+//	            }
+//
+//	            // ✅ Fetch and set clubbed members
+//	            if (assurance.getClubbedMembers() != null) {
+//	                clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+//	            }
+//	            
+//	        }
+//	    }
+//
+//	    return ExtensionRequestResponseDTO.builder()
+//	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
+//	            .extensionNo(er.getExtensionNo())
+//	            .questionNo(assurance != null ? assurance.getQuestionNo() : null)
+//	            .subject(assurance != null ? assurance.getSubject() : null)
+//	            .status(codeRepository.findCodeById(assurance != null ? assurance.getStatusId() : null))
+//	            .lokSabhaSessionNo(assurance != null ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()) : null)
+//	            .lokSabhaNo(assurance != null ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()) : null)
+//	            .rajyaSabhaSessionNumber(assurance != null ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()) : null)
+//	            .remarks(er.getRemarks())
+//	            .extGrantedTillDate(er.getExtGrantedTillDate())
+//	            .extRequestedTillDate(er.getExtRequestedTillDate())
+//	            .ministryRefDate(er.getMinistryRefDate())
+//	            .memberName(memberName)
+//	            .departmentName(departmentName)
+//	            .ministryName(ministryName)
+//	            .id(er.getId())
+//	            .ministryRefNo(er.getMinistryRefNo())
+//	            .extensionFiles(er.getExtensionFiles())
+//	            .clubbedMembersData(clubbedMembersData) // ✅ added here
+//	            .build();
+//	}
+
 	@Override
 	public ExtensionRequestResponseDTO getExtensionRequestById(Long id) {
 	    ExtensionRequest er = extenionRequestRepository.findById(id).orElse(null);
@@ -422,6 +484,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	    String ministryName = null;
 
 	    List<MemberDTO> clubbedMembersData = new ArrayList<>();
+	    List<MemberDTO> supplementaryClubbedMembersData = new ArrayList<>();
 
 	    if (er.getAssuranceId() != null) {
 	        assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
@@ -440,9 +503,25 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                        .map(Ministries::getMinistryName).orElse(null);
 	            }
 
-	            // ✅ Fetch and set clubbed members
+	            // ✅ Clubbed members from Assurance
 	            if (assurance.getClubbedMembers() != null) {
 	                clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+	            }
+
+	            // ✅ Supplementary clubbed members
+	            if (assurance.getSupplementary() != null && !assurance.getSupplementary().isEmpty()) {
+	                List<Long> supplementaryMemberIds = new ArrayList<>();
+	                for (Supplementary supp : assurance.getSupplementary()) {
+	                    if (supp.getClubbedMembers() != null) {
+	                        for (ClubbedMemberInfo info : supp.getClubbedMembers()) {
+	                        	if (info != null && info.getClubbedMember() != null) {
+	                        	    supplementaryMemberIds.add(info.getClubbedMember());
+	                        	}
+
+	                        }
+	                    }
+	                }
+	                supplementaryClubbedMembersData = fetchClubbedMembersData(supplementaryMemberIds);
 	            }
 	        }
 	    }
@@ -466,7 +545,8 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	            .id(er.getId())
 	            .ministryRefNo(er.getMinistryRefNo())
 	            .extensionFiles(er.getExtensionFiles())
-	            .clubbedMembersData(clubbedMembersData) // ✅ added here
+	            .clubbedMembersData(clubbedMembersData)
+	            .supplementaryClubbedMembersData(supplementaryClubbedMembersData) // ✅ Added
 	            .build();
 	}
 

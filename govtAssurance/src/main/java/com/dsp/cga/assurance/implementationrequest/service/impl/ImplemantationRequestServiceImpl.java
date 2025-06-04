@@ -64,6 +64,8 @@ import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.assurance.service.impl.AssuranceServiceImpl;
+import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
+import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.entity.MastersLokSabhaSession;
 import com.dsp.cga.entity.MastersRajyaSabha;
 import com.dsp.cga.exception.ResourceNotFoundException;
@@ -84,6 +86,10 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	@Value("${master.codeServiceUrl}")
 	private String codeServiceUrl;
+	
+	@Value("${member.memberServiceUrl}")
+	private String memberServiceUrl;
+	
 	@Autowired
 	private RestTemplate restTemplate;
 	@Autowired
@@ -530,6 +536,54 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		}
 		return houseId;
 	}
+	
+	private List<MemberDTO> fetchClubbedMembersData(List<Long> clubbedMembers) {
+		// Check if the list is not empty
+		if (clubbedMembers == null || clubbedMembers.isEmpty()) {
+			return new ArrayList<>(); // Return an empty list if no members
+		}
+
+		List<MemberDTO> memberDTOs = new ArrayList<>();
+
+		// Iterate over each member ID in the clubbedMembers list
+		for (Long memberId : clubbedMembers) {
+			// Fetch the MemberDTO for each memberId
+			MemberDTO memberDTO = fetchMemberData(memberId);
+			if (memberDTO != null) {
+				 memberDTO.generateMemberName();
+				memberDTOs.add(memberDTO); // Add the memberDTO to the list
+			}
+		}
+
+		return memberDTOs; // Return the list of MemberDTOs
+	}
+	private MemberDTO fetchMemberData(Long memberId) {
+		String url = memberServiceUrl + memberId;
+		log.debug("Fetching Member by memberId from URL: {}", url);
+
+		try {
+			ResponseEntity<GenericResponse<MemberDTO>> response = restTemplate.exchange(url, HttpMethod.GET, null,
+					new ParameterizedTypeReference<GenericResponse<MemberDTO>>() {
+					});
+
+			if (response == null || response.getBody() == null || response.getBody().getData() == null) {
+				log.error("Response or body is null when fetching Member for memberId: {}", memberId);
+				throw new RuntimeException("Failed to fetch Member, response is null");
+			}
+
+			MemberDTO memberDTO = response.getBody().getData();
+			memberDTO.generateMemberName();
+			log.debug("Fetched MemberDTO: {}", memberDTO);
+			return memberDTO;
+
+		} catch (ResourceNotFoundException e) {
+			log.error("Resource not found for memberId: {}", memberId);
+			throw e;
+		} catch (Exception e) {
+			log.error("Error fetching Member for memberId: {}", memberId, e);
+			throw new RuntimeException("Failed to fetch Member data", e);
+		}
+	}
 
 	@Override
 	public AssuranceImplementationDTO getImplementationDetailById(Long id) {
@@ -547,6 +601,9 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    String memberName = null;
 	    String departmentName = null;
 	    String ministryName = null;
+	    
+	    List<MemberDTO> clubbedMembersData = new ArrayList<>();
+	    List<MemberDTO> supplementaryClubbedMembersData = new ArrayList<>();
 
 	    if (assurance.getMemberId() != null) {
 	        memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
@@ -563,6 +620,26 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	            .map(Ministries::getMinistryName)
 	            .orElse(null);
 	    }
+	    
+	    if (assurance.getClubbedMembers() != null) {
+            clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+        }
+
+        // ✅ Supplementary clubbed members
+        if (assurance.getSupplementary() != null && !assurance.getSupplementary().isEmpty()) {
+            List<Long> supplementaryMemberIds = new ArrayList<>();
+            for (Supplementary supp : assurance.getSupplementary()) {
+                if (supp.getClubbedMembers() != null) {
+                    for (ClubbedMemberInfo info : supp.getClubbedMembers()) {
+                    	if (info != null && info.getClubbedMember() != null) {
+                    	    supplementaryMemberIds.add(info.getClubbedMember());
+                    	}
+
+                    }
+                }
+            }
+            supplementaryClubbedMembersData = fetchClubbedMembersData(supplementaryMemberIds);
+        }
 
 	    Long houseId = getHouseIdFromAssurance(assurance);
 	    
@@ -589,6 +666,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .applicationId(implementationRequest.getApplicationId())
 	        .applicationNo(implementationRequest.getApplicationNo())
 	        .houseId(houseId)
+	        .clubbedMembersData(clubbedMembersData)
+            .supplementaryClubbedMembersData(supplementaryClubbedMembersData) // ✅ Added
 	        .currentStatus(implementationRequest.getCurrentStatus())
 	        //.refId(implementationRequest.getRefId())
 	        .id(implementationRequest.getId())

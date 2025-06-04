@@ -8,10 +8,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.dsp.cga.assurance.dto.MemberDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.entity.Departments;
@@ -27,6 +33,10 @@ import com.dsp.cga.assurance.repository.MasterLSSRepository;
 import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
+import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
+import com.dsp.cga.assurance.supplementry.entity.Supplementary;
+import com.dsp.cga.exception.ResourceNotFoundException;
+import com.dsp.cga.response.GenericResponse;
 
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
@@ -36,6 +46,12 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 
 	@Autowired
 	private OtherRequestRepository otherRequestRepo;
+	
+	@Autowired
+	private RestTemplate restTemplate;
+	
+	@Value("${member.memberServiceUrl}")
+	private String memberServiceUrl;
 	
 	@Autowired
 	private AssuranceRepository assuranceRepository;
@@ -202,6 +218,9 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	        String memberName = null;
 		    String departmentName = null;
 		    String ministryName = null;
+		    
+		    List<MemberDTO> clubbedMembersData = new ArrayList<>();
+		    List<MemberDTO> supplementaryClubbedMembersData = new ArrayList<>();
 
 	        if (or.getAssuranceId() != null) {
 	            assurance = assuranceRepository.findById(or.getAssuranceId()).orElse(null);
@@ -220,6 +239,26 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	                    .map(Ministries::getMinistryName)
 	                    .orElse(null);
 	            }
+		        
+		        if (assurance.getClubbedMembers() != null) {
+		            clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+		        }
+
+		        // ✅ Supplementary clubbed members
+		        if (assurance.getSupplementary() != null && !assurance.getSupplementary().isEmpty()) {
+		            List<Long> supplementaryMemberIds = new ArrayList<>();
+		            for (Supplementary supp : assurance.getSupplementary()) {
+		                if (supp.getClubbedMembers() != null) {
+		                    for (ClubbedMemberInfo info : supp.getClubbedMembers()) {
+		                    	if (info != null && info.getClubbedMember() != null) {
+		                    	    supplementaryMemberIds.add(info.getClubbedMember());
+		                    	}
+
+		                    }
+		                }
+		            }
+		            supplementaryClubbedMembersData = fetchClubbedMembersData(supplementaryMemberIds);
+		        }
 	        }
 
 	        return OtherRequestDTO.builder()
@@ -231,6 +270,8 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .departmentName(departmentName)
 	            .questionNo(assurance.getQuestionNo())
 	            .fileUrl(or.getFileUrl())
+	            .clubbedMembersData(clubbedMembersData)
+	            .supplementaryClubbedMembersData(supplementaryClubbedMembersData) // ✅ Added
 	            .requestedDate(or.getRequestedDate())
 	            .remarks(or.getRemarks())
 	            .lokSabhaSessionNumber(assurance != null
@@ -242,6 +283,55 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .build();
 	    }
 
+	
+	private List<MemberDTO> fetchClubbedMembersData(List<Long> clubbedMembers) {
+		// Check if the list is not empty
+		if (clubbedMembers == null || clubbedMembers.isEmpty()) {
+			return new ArrayList<>(); // Return an empty list if no members
+		}
+
+		List<MemberDTO> memberDTOs = new ArrayList<>();
+
+		// Iterate over each member ID in the clubbedMembers list
+		for (Long memberId : clubbedMembers) {
+			// Fetch the MemberDTO for each memberId
+			MemberDTO memberDTO = fetchMemberData(memberId);
+			if (memberDTO != null) {
+				 memberDTO.generateMemberName();
+				memberDTOs.add(memberDTO); // Add the memberDTO to the list
+			}
+		}
+
+		return memberDTOs; // Return the list of MemberDTOs
+	}
+	private MemberDTO fetchMemberData(Long memberId) {
+		String url = memberServiceUrl + memberId;
+		//log.debug("Fetching Member by memberId from URL: {}", url);
+
+		try {
+			ResponseEntity<GenericResponse<MemberDTO>> response = restTemplate.exchange(url, HttpMethod.GET, null,
+					new ParameterizedTypeReference<GenericResponse<MemberDTO>>() {
+					});
+
+			if (response == null || response.getBody() == null || response.getBody().getData() == null) {
+				//log.error("Response or body is null when fetching Member for memberId: {}", memberId);
+				throw new RuntimeException("Failed to fetch Member, response is null");
+			}
+
+			MemberDTO memberDTO = response.getBody().getData();
+			memberDTO.generateMemberName();
+			//log.debug("Fetched MemberDTO: {}", memberDTO);
+			return memberDTO;
+
+		} catch (ResourceNotFoundException e) {
+		//	log.error("Resource not found for memberId: {}", memberId);
+			throw e;
+		} catch (Exception e) {
+			//log.error("Error fetching Member for memberId: {}", memberId, e);
+			throw new RuntimeException("Failed to fetch Member data", e);
+		}
+	}
+	
 	@Override
 	
 	public OtherRequestDTO updateOtherRequestById(Long id, OtherRequestDTO dto) {

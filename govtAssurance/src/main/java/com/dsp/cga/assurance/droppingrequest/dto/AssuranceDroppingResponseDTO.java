@@ -40,5 +40,7 @@ private String subject;
 	private LocalDate ministryRefDate;
 	private String statusForMinistry;
 	  private List<MemberDTO> clubbedMembersData;
-	    private List<Supplementary> supplementary;
+
+	 
+	    private List<MemberDTO> supplementaryClubbedMembersData;
 }

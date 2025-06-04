@@ -35,7 +35,7 @@ public class OtherRequestDTO {
 	private String statusForMinistry;
 	 private LocalDate requestedDate;
 	 private List<MemberDTO> clubbedMembersData;
-	    private List<Supplementary> supplementary;
+	    private List<MemberDTO> supplementaryClubbedMembersData;
 	    private Long statusId; 
 	   
 	    private String remarks;

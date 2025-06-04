@@ -40,6 +40,7 @@ public class ExtensionRequestResponseDTO {
     private String statusForMinistry;
     private List<Map<String, Object>> extensionFiles;
     private List<MemberDTO> clubbedMembersData;
-    private List<Supplementary> supplementary;
+    private List<MemberDTO> supplementaryClubbedMembersData;
+
 
 }
