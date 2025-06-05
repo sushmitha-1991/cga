@@ -423,7 +423,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	@Override
 	public List<AssuranceImplementationDTO> getAssuranceImplementations(Long sessionNo, LocalDate layingDate,
-	        Long implementationTypeId, Long statusId, Integer ministryCode) {
+	        Long implementationTypeId, String statusForMinistry, Integer ministryCode) {
 
 	    // Get ministryId from ministryCode if provided
 	    final Long ministryId;
@@ -447,7 +447,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	    // ✅ Common Specification using ImplementationRequest
 	    Specification<ImplementationRequest> spec =
-	            ImplementationRequestSpecification.filterByCriteria(finalSessionNo, layingDate, implementationTypeId, statusId, ministryId, houseId);
+	            ImplementationRequestSpecification.filterByCriteria(finalSessionNo, layingDate, implementationTypeId, statusForMinistry, ministryId, houseId);
 
 	    List<ImplementationRequest> implementationRequests = implementationRequestRepository.findAll(spec);
 

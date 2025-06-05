@@ -1,7 +1,9 @@
 package com.dsp.cga.assurance.controller;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,27 +54,76 @@ public class AssuranceController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
+//	@GetMapping("/getAll")
+//	@Operation(summary = "Get all Assurance")
+//	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
+//			@ApiResponse(responseCode = "500", description = "Internal server error") })
+//	public ResponseEntity<GenericResponse<List<AssuranceDTO>>> getAllAssurance() {
+//		List<AssuranceDTO> assurance = assuranceService.getAllAssurance();
+//		GenericResponse<List<AssuranceDTO>> response = new GenericResponse<>(HttpStatus.OK.value(), true,
+//				"assurance fetched successfully", assurance);
+//		return new ResponseEntity<>(response, HttpStatus.OK);
+//	}
+	
 	@GetMapping("/getAll")
 	@Operation(summary = "Get all Assurance")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
-			@ApiResponse(responseCode = "500", description = "Internal server error") })
-	public ResponseEntity<GenericResponse<List<AssuranceDTO>>> getAllAssurance() {
-		List<AssuranceDTO> assurance = assuranceService.getAllAssurance();
-		GenericResponse<List<AssuranceDTO>> response = new GenericResponse<>(HttpStatus.OK.value(), true,
-				"assurance fetched successfully", assurance);
-		return new ResponseEntity<>(response, HttpStatus.OK);
+	@ApiResponses(value = { 
+	    @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
+	    @ApiResponse(responseCode = "500", description = "Internal server error") 
+	})
+	public ResponseEntity<GenericResponse<Map<String, Object>>> getAllAssurance() {
+	    List<AssuranceDTO> assuranceList = assuranceService.getAllAssurance();
+
+	    Map<String, Object> responseData = new HashMap<>();
+	    responseData.put("count", assuranceList.size());
+	    responseData.put("assuranceList", assuranceList);
+
+	    GenericResponse<Map<String, Object>> response = new GenericResponse<>(
+	        HttpStatus.OK.value(),
+	        true,
+	        "Assurance fetched successfully",
+	        responseData
+	    );
+
+	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+
+	
+	
+//	@GetMapping("/getAllLokSabha")
+//	@Operation(summary = "Get all Assurance")
+//	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
+//			@ApiResponse(responseCode = "500", description = "Internal server error") })
+//	public ResponseEntity<GenericResponse<List<AssuranceDTO>>> getAllLokSabhaAssurance() {
+//		List<AssuranceDTO> assurance = assuranceService.getAllLokSabhaAssurance();
+//		GenericResponse<List<AssuranceDTO>> response = new GenericResponse<>(HttpStatus.OK.value(), true,
+//				"assurance fetched successfully", assurance);
+//		return new ResponseEntity<>(response, HttpStatus.OK);
+//	}
 	
 	@GetMapping("/getAllLokSabha")
 	@Operation(summary = "Get all Assurance")
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
-			@ApiResponse(responseCode = "500", description = "Internal server error") })
-	public ResponseEntity<GenericResponse<List<AssuranceDTO>>> getAllLokSabhaAssurance() {
-		List<AssuranceDTO> assurance = assuranceService.getAllLokSabhaAssurance();
-		GenericResponse<List<AssuranceDTO>> response = new GenericResponse<>(HttpStatus.OK.value(), true,
-				"assurance fetched successfully", assurance);
-		return new ResponseEntity<>(response, HttpStatus.OK);
+	@ApiResponses(value = {
+	    @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
+	    @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<GenericResponse<Map<String, Object>>> getAllLokSabhaAssurance() {
+	    List<AssuranceDTO> assuranceList = assuranceService.getAllLokSabhaAssurance();
+
+	    Map<String, Object> responseData = new HashMap<>();
+	    responseData.put("count", assuranceList.size());
+	    responseData.put("assuranceList", assuranceList);
+
+	    GenericResponse<Map<String, Object>> response = new GenericResponse<>(
+	        HttpStatus.OK.value(),
+	        true,
+	        "Assurance fetched successfully",
+	        responseData
+	    );
+
+	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+
 
 	@GetMapping("/{id}")
 	@Operation(summary = "Get Assurance by ID")

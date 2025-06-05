@@ -19,7 +19,7 @@ public interface ExtensionRequestService {
 	GenericResponse<List<ExtensionRequestDTO>> createOrUpdateExtensionRequests(
 			List<ExtensionRequestDTO> extensionRequestDTOList);
 
-	List<ExtensionRequestResponseDTO> getFilteredExtensions(Long sessionNo, String StatusForMinistry,
+	List<ExtensionRequestResponseDTO> getFilteredExtensions(Long sessionNo, String statusForMinistry,
 			LocalDate extRequestedTillDate, LocalDate extGrantedTillDate, LocalDate ministryRefDate, Integer ministryCode);
 
 	ExtensionRequestResponseDTO getExtensionRequestById(Long id);

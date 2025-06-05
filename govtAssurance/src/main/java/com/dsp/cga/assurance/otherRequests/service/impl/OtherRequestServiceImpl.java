@@ -104,7 +104,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 
 	@Override
 	public List<OtherRequestDTO> getFilteredOtherRequests(Long sessionNo, LocalDate requestedDate,
-	                                                      Long statusId, Integer ministryCode) {
+	                                                      String statusForMinistry, Integer ministryCode) {
 
 	    // 🔹 Get ministryId from ministryCode
 	    final Long ministryId;
@@ -134,8 +134,8 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	    Specification<OtherRequests> specification = (root, query, cb) -> {
 	        List<Predicate> predicates = new ArrayList<>();
 
-	        if (statusId != null) {
-	            predicates.add(cb.equal(root.get("statusId"), statusId));
+	        if (statusForMinistry != null) {
+	            predicates.add(cb.equal(root.get("statusForMinistry"), statusForMinistry));
 	        }
 
 	        if (requestedDate != null) {
@@ -265,6 +265,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .id(or.getId())
 	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
 	            .status(codeRepository.findCodeById(or.getStatusId()))
+	            .subject(assurance.getSubject())
 	            .memberName(memberName)
 	            .ministryName(ministryName)
 	            .departmentName(departmentName)

@@ -59,10 +59,10 @@ public class OtherRequestController {
 	public ResponseEntity<GenericResponse<List<OtherRequestDTO>>> getOtherRequests(
 	        @RequestParam(required = false) Long sessionNo,
 	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedDate,
-	        @RequestParam(required = false) Long statusId,
+	        @RequestParam(required = false) String statusForMinistry,
 	        @RequestParam(required = false) Integer ministryCode
 	) {
-	    List<OtherRequestDTO> results = otherRequestService.getFilteredOtherRequests(sessionNo, requestedDate, statusId, ministryCode);
+	    List<OtherRequestDTO> results = otherRequestService.getFilteredOtherRequests(sessionNo, requestedDate, statusForMinistry, ministryCode);
 
 	    if (results.isEmpty()) {
 	        return ResponseEntity.status(HttpStatus.OK)

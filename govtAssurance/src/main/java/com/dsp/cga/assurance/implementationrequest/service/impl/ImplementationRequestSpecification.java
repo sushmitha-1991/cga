@@ -19,7 +19,7 @@ import jakarta.persistence.criteria.Subquery;
 public class ImplementationRequestSpecification {
 
 	public static Specification<ImplementationRequest> filterByCriteria(
-	        Long sessionNo, LocalDate layingDate, Long implementationTypeId, Long statusId, Long ministryId, Long houseId) {
+	        Long sessionNo, LocalDate layingDate, Long implementationTypeId, String statusForMinistry, Long ministryId, Long houseId) {
 
 	    return (Root<ImplementationRequest> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
 	        List<Predicate> predicates = new ArrayList<>();
@@ -44,19 +44,24 @@ public class ImplementationRequestSpecification {
 	        if (layingDate != null) {
 	            predicates.add(cb.equal(root.get("layingDate"), layingDate));
 	        }
+	        
+	        if (statusForMinistry != null) {
+	            predicates.add(cb.equal(root.get("statusForMinistry"), statusForMinistry));
+	        }
+	        
 	        if (implementationTypeId != null) {
 	            predicates.add(cb.equal(root.get("implementationTypeId"), implementationTypeId));
 	        }
-	        if (statusId != null) {
-	            // Join Assurance table (assuming assuranceId is present in ImplementationRequest)
-	            Root<ImplementationRequest> implRoot = root;
-	            Subquery<Long> subquery = query.subquery(Long.class);
-	            Root<Assurance> assuranceRoot = subquery.from(Assurance.class);
-	            subquery.select(assuranceRoot.get("id"))
-	                    .where(cb.equal(assuranceRoot.get("statusId"), statusId));
-
-	            predicates.add(cb.in(root.get("assuranceId")).value(subquery));
-	        }
+//	        if (statusId != null) {
+//	            // Join Assurance table (assuming assuranceId is present in ImplementationRequest)
+//	            Root<ImplementationRequest> implRoot = root;
+//	            Subquery<Long> subquery = query.subquery(Long.class);
+//	            Root<Assurance> assuranceRoot = subquery.from(Assurance.class);
+//	            subquery.select(assuranceRoot.get("id"))
+//	                    .where(cb.equal(assuranceRoot.get("statusId"), statusId));
+//
+//	            predicates.add(cb.in(root.get("assuranceId")).value(subquery));
+//	        }
 
 	        if (ministryId != null) {
 	            Subquery<Long> subquery = query.subquery(Long.class);

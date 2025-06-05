@@ -83,10 +83,10 @@ public class DroppingRequestController {
 	         @RequestParam(required = false) Integer ministryCode,
 	         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedDate,
 	         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfDropping,
-	         @RequestParam(required = false) Long statusId) {
+	         @RequestParam(required = false) String statusForMinistry) {
 
 	     List<AssuranceDroppingResponseDTO> result = droppingRequestService.getFilteredDroppingRequests(
-	             sessionNo, droppingTypeId, requestedDate, dateOfDropping, statusId, ministryCode);
+	             sessionNo, droppingTypeId, requestedDate, dateOfDropping, statusForMinistry, ministryCode);
 
 	     DroppingResponseWrapperDTO wrapper = DroppingResponseWrapperDTO.builder()
 	             .data(result)

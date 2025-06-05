@@ -219,7 +219,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	        Long droppingTypeId,
 	        LocalDate requestedDate,
 	        LocalDate dateOfDropping,
-	        Long statusId,
+	        String statusForMinistry,
 	        Integer ministryCode) {
 
 	    // 🔹 Get ministryId from ministryCode
@@ -263,6 +263,10 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	            predicates.add(cb.equal(root.get("actualDropDate"), dateOfDropping));
 	        }
 
+	        if (statusForMinistry != null) {
+	            predicates.add(cb.equal(root.get("statusForMinistry"), statusForMinistry));
+	        }
+
 	        return cb.and(predicates.toArray(new Predicate[0]));
 	    };
 
@@ -282,7 +286,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	                Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
 	                if (assurance == null) return false;
 
-	                if (statusId != null && !statusId.equals(assurance.getStatusId())) return false;
+	              //  if (statusId != null && !statusId.equals(assurance.getStatusId())) return false;
 	                if (ministryId != null && !ministryId.equals(assurance.getMinistryId())) return false;
 
 	                return true;

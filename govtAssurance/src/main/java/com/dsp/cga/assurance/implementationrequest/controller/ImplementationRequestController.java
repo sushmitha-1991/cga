@@ -104,11 +104,11 @@ public class ImplementationRequestController {
 	         @RequestParam(required = false) Long sessionNo,
 	         @RequestParam(required = false) LocalDate layingDate,
 	         @RequestParam(required = false) Long implementationTypeId,
-	         @RequestParam(required = false) Long statusId,
+	         @RequestParam(required = false) String statusForMinistry,
 	         @RequestParam(required = false) Integer ministryCode
 	 ) {
 	     List<AssuranceImplementationDTO> implementations = implementationRequestService.getAssuranceImplementations(
-	             sessionNo, layingDate, implementationTypeId, statusId, ministryCode);
+	             sessionNo, layingDate, implementationTypeId, statusForMinistry, ministryCode);
 
 	     if (implementations.isEmpty()) {
 	         return ResponseEntity.status(HttpStatus.OK)

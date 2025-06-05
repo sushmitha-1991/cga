@@ -19,7 +19,7 @@ public interface ImplementationRequestService {
 	ImplementationRequestDTO getImplementationRequestByAssuranceId(Long id);
 
 	List<AssuranceImplementationDTO> getAssuranceImplementations(Long sessionNo, LocalDate layingDate,
-			Long implementationTypeId, Long statusId, Integer ministryCode);
+			Long implementationTypeId, String statusForMinistry, Integer ministryCode);
 
 	AssuranceImplementationDTO getImplementationDetailById(Long id);
 

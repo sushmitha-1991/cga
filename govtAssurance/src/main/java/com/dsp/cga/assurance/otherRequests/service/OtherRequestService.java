@@ -9,7 +9,7 @@ public interface OtherRequestService {
 
 	OtherRequestDTO createOtherRequest(OtherRequestDTO dto);
 
-	List<OtherRequestDTO> getFilteredOtherRequests(Long sessionNo, LocalDate requestedDate, Long statusId,
+	List<OtherRequestDTO> getFilteredOtherRequests(Long sessionNo, LocalDate requestedDate, String statusForMinistry,
 			Integer ministryCode);
 
 	OtherRequestDTO getOtherRequestById(Long id);
