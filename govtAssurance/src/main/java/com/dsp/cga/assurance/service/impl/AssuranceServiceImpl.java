@@ -210,18 +210,18 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 		//validateAssuranceFields(assuranceDTO);
 		
-//		 Optional<Assurance> existingAssurance = assuranceRepository
-//			        .findByLokSabhaNoAndLokSabhaSessionNoAndSourceIdAndQuestionNoAndAssuranceTypeId(
-//			            assuranceDTO.getLokSabhaNo(),
-//			            assuranceDTO.getLokSabhaSessionNo(),
-//			            assuranceDTO.getSourceId(),
-//			            assuranceDTO.getQuestionNo(),
-//			            assuranceDTO.getAssuranceTypeId()
-//			        );
-//
-//			    if (existingAssurance.isPresent()) {
-//			        throw new IllegalArgumentException("An assurance for the same question already exists.");
-//			    }
+		 Optional<Assurance> existingAssurance = assuranceRepository
+			        .findByLokSabhaNoAndLokSabhaSessionNoAndSourceIdAndQuestionNoAndAssuranceTypeId(
+			            assuranceDTO.getLokSabhaNo(),
+			            assuranceDTO.getLokSabhaSessionNo(),
+			            assuranceDTO.getSourceId(),
+			            assuranceDTO.getQuestionNo(),
+			            assuranceDTO.getAssuranceTypeId()
+			        );
+
+			    if (existingAssurance.isPresent()) {
+			        throw new IllegalArgumentException("An assurance for the same question already exists.");
+			    }
 			    
 			   
 		
