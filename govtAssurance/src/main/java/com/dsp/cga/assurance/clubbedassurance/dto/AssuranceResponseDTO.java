@@ -27,5 +27,6 @@ public class AssuranceResponseDTO {
     private List<String> clubbedAssuranceNos;
     private List<MemberDTO> clubbedMembersData;
     private String status;
+    private String statusForMinistry;
     private List<Long> clubbedAssuranceIds;
 }

@@ -312,11 +312,12 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	     	                .map(Departments::getDepartmentName)
 	     	                .orElse(null);
 	     	        }
-	     	        if (assurance.getMinistryId() != null) {
-	     	            ministryName = ministryRepository.findById(assurance.getDepartmentId())
-	     	                .map(Ministries::getMinistryName)
-	     	                .orElse(null);
-	     	        }
+	     	       if (assurance.getMinistryId() != null) {
+	     	    	    ministryName = ministryRepository.findById(assurance.getMinistryId())
+	     	    	        .map(Ministries::getMinistryName)
+	     	    	        .orElse(null);
+	     	    	}
+
 	     		    if (assurance == null) return null;
 	               // Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
 	                return AssuranceDroppingResponseDTO.builder()

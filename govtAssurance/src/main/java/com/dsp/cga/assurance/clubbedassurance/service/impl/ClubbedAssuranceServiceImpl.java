@@ -226,9 +226,19 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	                            ? codeRepository.findCodeById(assurance.getStatusId()) : null)
 	                    .clubbedAssuranceIds(clubbedIds)
 	                    .clubbedAssuranceNos(clubbedAssuranceNos) 
-
+                        .statusForMinistry(clubbed.getStatusForMinistry())
 	                    .subject(assurance.getSubject())
 	                    .date(clubbed.getDate())
+	                    .memberName(assurance != null && assurance.getMemberId() != null
+	                    ? personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId()) : null)
+
+	                .departmentName(assurance != null && assurance.getDepartmentId() != null
+	                    ? departmentRepository.findById(assurance.getDepartmentId()).map(Departments::getDepartmentName).orElse(null)
+	                    : null)
+
+	                .ministryName(assurance != null && assurance.getMinistryId() != null
+	                    ? ministryRepository.findById(assurance.getMinistryId()).map(Ministries::getMinistryName).orElse(null)
+	                    : null)
 	                    .build();
 	        })
 	        .collect(Collectors.toList());
@@ -287,7 +297,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
                 .orElse(null);
         }
         if (assurance.getMinistryId() != null) {
-            ministryName = ministryRepository.findById(assurance.getDepartmentId())
+            ministryName = ministryRepository.findById(assurance.getMinistryId())
                 .map(Ministries::getMinistryName)
                 .orElse(null);
         }

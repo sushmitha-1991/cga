@@ -11,5 +11,6 @@ public class GenericResponse<T> {
 	private int statusCode;
 	private boolean success;
 	private String message;
+	
 	private T data;
 }

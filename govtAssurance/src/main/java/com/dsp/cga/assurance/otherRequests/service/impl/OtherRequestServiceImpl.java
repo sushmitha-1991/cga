@@ -235,7 +235,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	                    .orElse(null);
 	            }
 		        if (assurance.getMinistryId() != null) {
-	                ministryName = ministryRepository.findById(assurance.getDepartmentId())
+	                ministryName = ministryRepository.findById(assurance.getMinistryId())
 	                    .map(Ministries::getMinistryName)
 	                    .orElse(null);
 	            }
@@ -259,7 +259,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 		            }
 		            supplementaryClubbedMembersData = fetchClubbedMembersData(supplementaryMemberIds);
 		        }
-	        }
+        }
 
 	        return OtherRequestDTO.builder()
 	            .id(or.getId())
