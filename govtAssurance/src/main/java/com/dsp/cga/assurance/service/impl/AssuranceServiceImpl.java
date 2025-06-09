@@ -779,12 +779,40 @@ public class AssuranceServiceImpl implements AssuranceService {
 	    assuranceMapper.updateAssuranceFromDTO(assuranceDTO, existingAssurance);
 
 	    // Update PartDetails - Add new entries only
+//	    if (assuranceDTO.getPartDetails() != null) {
+//	        List<PartDetails> existingPartDetails = existingAssurance.getPartDetails();
+//
+//	        // Collect existing IDs for comparison
+//	        Set<Long> existingIds = existingPartDetails.stream()
+//	                .filter(part -> part.getId() != null) // Only consider parts with IDs
+//	                .map(PartDetails::getId)
+//	                .collect(Collectors.toSet());
+//
+//	        for (PartDetailsDTO partDTO : assuranceDTO.getPartDetails()) {
+//	            if (partDTO.getId() == null || !existingIds.contains(partDTO.getId())) {
+//	                // Add only if it's a new entry
+//	                PartDetails newPart = assuranceMapper.mapToPartEntity(partDTO);
+//	                newPart.setAssurance(existingAssurance);
+//	                existingPartDetails.add(newPart);
+//	            }
+//	        }
+//	    }
+
 	    if (assuranceDTO.getPartDetails() != null) {
 	        List<PartDetails> existingPartDetails = existingAssurance.getPartDetails();
 
+	        // Remove PartDetails entries not present in incoming list
+	        Set<Long> incomingPartIds = assuranceDTO.getPartDetails().stream()
+	                .map(PartDetailsDTO::getId)
+	                .filter(Objects::nonNull)
+	                .collect(Collectors.toSet());
+
+	        existingPartDetails.removeIf(existing ->
+	                existing.getId() != null && !incomingPartIds.contains(existing.getId()));
+
 	        // Collect existing IDs for comparison
 	        Set<Long> existingIds = existingPartDetails.stream()
-	                .filter(part -> part.getId() != null) // Only consider parts with IDs
+	                .filter(part -> part.getId() != null)
 	                .map(PartDetails::getId)
 	                .collect(Collectors.toSet());
 
@@ -798,25 +826,6 @@ public class AssuranceServiceImpl implements AssuranceService {
 	        }
 	    }
 
-//	    // Update Supplementary - Add new entries only
-//	    if (assuranceDTO.getSupplementary() != null) {
-//	        List<Supplementary> existingSupplementary = existingAssurance.getSupplementary();
-//
-//	        // Collect existing IDs for comparison
-//	        Set<Long> existingIds = existingSupplementary.stream()
-//	                .filter(supp -> supp.getId() != null) // Only consider supplementary with IDs
-//	                .map(Supplementary::getId)
-//	                .collect(Collectors.toSet());
-//
-//	        for (SupplementaryDTO suppDTO : assuranceDTO.getSupplementary()) {
-//	            if (suppDTO.getId() == null || !existingIds.contains(suppDTO.getId())) {
-//	                // Add only if it's a new entry
-//	                Supplementary newSupp = assuranceMapper.mapToSupplementaryEntity(suppDTO);
-//	                newSupp.setAssurance(existingAssurance);
-//	                existingSupplementary.add(newSupp);
-//	            }
-//	        }
-//	    }
 
 
 	    if (assuranceDTO.getSupplementary() != null) {
