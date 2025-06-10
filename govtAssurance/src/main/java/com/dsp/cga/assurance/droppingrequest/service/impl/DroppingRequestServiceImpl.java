@@ -444,7 +444,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	                .orElse(null);
 	        }
 	        if (assurance.getMinistryId() != null) {
-	            ministryName = ministryRepository.findById(assurance.getDepartmentId())
+	            ministryName = ministryRepository.findById(assurance.getMinistryId())
 	                .map(Ministries::getMinistryName)
 	                .orElse(null);
 	        }
