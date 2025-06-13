@@ -498,6 +498,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                .assuranceNo(assurance.getAssuranceNo())
 	                .id(impl.getId())
 	                .questionNo(assurance.getQuestionNo())
+	                .subject(assurance.getSubject())
 	                .status(codeRepository.findCodeById(assurance.getStatusId()))
 	                .dueDateOfImplementation(impl.getDueDateOfImplementation())
 	                .detailsOfImplementation(impl.getDetailsOfImplementation())

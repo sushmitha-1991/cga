@@ -1207,10 +1207,17 @@ public class AssuranceServiceImpl implements AssuranceService {
 	    dto.setMemberName(memberName);
 	    dto.setDepartmentName(departmentName);
 	    dto.setMinistryName(ministryName);
+	    dto.setSubject(assurance.getSubject());
+	    dto.setQuestionNo(assurance.getQuestionNo());
 
 	    // Clubbed members
-//	    List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
-//	    dto.setClubbedMembersData(clubbedMembersData);
+	    if (assurance.getClubbedMembers() != null && !assurance.getClubbedMembers().isEmpty()) {
+	        List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
+	        dto.setClubbedMembersData(clubbedMembersData);
+	    } else {
+	        dto.setClubbedMembersData(Collections.emptyList());
+	    }
+
 
 	    return dto;
 	}

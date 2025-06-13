@@ -182,6 +182,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .questionNo(assurance.getQuestionNo())
 	            .requestedDate(or.getRequestedDate())
 	            .remarks(or.getRemarks())
+	            .subject(assurance.getSubject())
 	            .statusForMinistry(or.getStatusForMinistry())
 	            .subject(assurance.getSubject())
 	            .lokSabhaSessionNumber(assurance != null

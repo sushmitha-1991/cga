@@ -330,6 +330,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                .rajyaSabhaSessionNumber(assurance != null
                     ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
                     : null)
+	                .subject(assurance.getSubject())
 	                .remarks(er.getRemarks())
 	                .extGrantedTillDate(er.getExtGrantedTillDate())
 	                .id(er.getId())
