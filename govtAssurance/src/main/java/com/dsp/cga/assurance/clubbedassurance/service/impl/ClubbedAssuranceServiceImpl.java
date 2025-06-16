@@ -264,6 +264,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 		                .assuranceId(dto.getAssuranceId())
 		                .clubbedAssuranceIds(dto.getClubbedAssuranceIds())
 		                .date(dto.getDate())
+		                .statusForMinistry("Submitted")
 		                .build();
 
 		        ClubbedAssurance saved = clubbedAssuranceRepository.save(entity);
@@ -273,6 +274,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 		                .assuranceId(saved.getAssuranceId())
 		                .clubbedAssuranceIds(saved.getClubbedAssuranceIds())
 		                .date(saved.getDate())
+		                .statusForMinistry(saved.getStatusForMinistry())
 		                .build();
 		    }
 
