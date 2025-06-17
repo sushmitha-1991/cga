@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,7 @@ import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.entity.Departments;
 import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.implementationrequest.service.impl.ImplemantationRequestServiceImpl;
+import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
 import com.dsp.cga.assurance.repository.DepartmentRepository;
@@ -333,7 +335,18 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	                        .assuranceNo(assurance.getAssuranceNo())
 	                        .partId(dr.getPartId())
 	                        .questionNo(assurance.getQuestionNo())
-	                        .subject(assurance.getSubject())
+	                        //.subject(assurance.getSubject())
+	                        .subject(assurance.getSubject() != null 
+	                        ? assurance.getSubject() 
+	                        : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+	                            ? assurance.getPartDetails().stream()
+	                                .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+	                                .map(PartDetails::getSubject)
+	                                .filter(Objects::nonNull)
+	                                .findFirst()
+	                                .orElse(null)
+	                            : null))
+	                        
 	                        .supplementaryId(dr.getSupplementaryId())
 	                      .statusForMinistry(dr.getStatusForMinistry())
 	                        .droppingType(assurance != null

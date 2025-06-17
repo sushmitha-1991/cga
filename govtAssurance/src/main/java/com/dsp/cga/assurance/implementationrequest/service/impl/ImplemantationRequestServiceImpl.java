@@ -56,6 +56,7 @@ import com.dsp.cga.assurance.implementationrequest.repository.ApplicationReposit
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
 import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
+import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
 import com.dsp.cga.assurance.repository.DepartmentRepository;
@@ -498,7 +499,17 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                .assuranceNo(assurance.getAssuranceNo())
 	                .id(impl.getId())
 	                .questionNo(assurance.getQuestionNo())
-	                .subject(assurance.getSubject())
+	               // .subject(assurance.getSubject())
+	                .subject(assurance.getSubject() != null 
+                    ? assurance.getSubject() 
+                    : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+                        ? assurance.getPartDetails().stream()
+                            .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+                            .map(PartDetails::getSubject)
+                            .filter(Objects::nonNull)
+                            .findFirst()
+                            .orElse(null)
+                        : null))
 	                .status(codeRepository.findCodeById(assurance.getStatusId()))
 	                .dueDateOfImplementation(impl.getDueDateOfImplementation())
 	                .detailsOfImplementation(impl.getDetailsOfImplementation())
@@ -651,7 +662,17 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .departmentName(departmentName)
 	        .status(codeRepository.findCodeById(assurance.getStatusId()))
 	        .dueDateOfImplementation(implementationRequest.getDueDateOfImplementation())
-	        .subject(assurance.getSubject())
+	       // .subject(assurance.getSubject())
+	        .subject(assurance.getSubject() != null 
+            ? assurance.getSubject() 
+            : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+                ? assurance.getPartDetails().stream()
+                    .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+                    .map(PartDetails::getSubject)
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null)
+                : null))
 	        .questionNo(assurance.getQuestionNo())
 	        .dateOfImplementation(implementationRequest.getDateOfImplementation())
 	        .detailsOfImplementation(implementationRequest.getDetailsOfImplementation())

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -41,6 +42,7 @@ import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
+import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
 import com.dsp.cga.assurance.repository.DepartmentRepository;
@@ -330,7 +332,17 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                .rajyaSabhaSessionNumber(assurance != null
                     ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
                     : null)
-	                .subject(assurance.getSubject())
+	                //.subject(assurance.getSubject())
+	                .subject(assurance.getSubject() != null 
+                    ? assurance.getSubject() 
+                    : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+                        ? assurance.getPartDetails().stream()
+                            .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+                            .map(PartDetails::getSubject)
+                            .filter(Objects::nonNull)
+                            .findFirst()
+                            .orElse(null)
+                        : null))
 	                .remarks(er.getRemarks())
 	                .extGrantedTillDate(er.getExtGrantedTillDate())
 	                .id(er.getId())
@@ -413,7 +425,17 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
 	            .extensionNo(er.getExtensionNo())
 	            .questionNo(assurance != null ? assurance.getQuestionNo() : null)
-	            .subject(assurance != null ? assurance.getSubject() : null)
+	           // .subject(assurance != null ? assurance.getSubject() : null)
+	            .subject(assurance.getSubject() != null 
+                ? assurance.getSubject() 
+                : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+                    ? assurance.getPartDetails().stream()
+                        .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+                        .map(PartDetails::getSubject)
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(null)
+                    : null))
 	            .status(codeRepository.findCodeById(assurance != null ? assurance.getStatusId() : null))
 	            .lokSabhaSessionNo(assurance != null ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()) : null)
 	            .lokSabhaNo(assurance != null ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()) : null)

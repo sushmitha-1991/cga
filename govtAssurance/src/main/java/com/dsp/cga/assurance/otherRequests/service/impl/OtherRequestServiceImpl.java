@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ import com.dsp.cga.assurance.otherRequests.dto.OtherRequestDTO;
 import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
 import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
 import com.dsp.cga.assurance.otherRequests.service.OtherRequestService;
+import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
 import com.dsp.cga.assurance.repository.DepartmentRepository;
@@ -182,7 +184,17 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .questionNo(assurance.getQuestionNo())
 	            .requestedDate(or.getRequestedDate())
 	            .remarks(or.getRemarks())
-	            .subject(assurance.getSubject())
+	            //.subject(assurance.getSubject())
+	            .subject(assurance.getSubject() != null 
+                ? assurance.getSubject() 
+                : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+                    ? assurance.getPartDetails().stream()
+                        .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+                        .map(PartDetails::getSubject)
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(null)
+                    : null))
 	            .statusForMinistry(or.getStatusForMinistry())
 	            .subject(assurance.getSubject())
 	            .lokSabhaSessionNumber(assurance != null
@@ -266,7 +278,17 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .id(or.getId())
 	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
 	            .status(codeRepository.findCodeById(or.getStatusId()))
-	            .subject(assurance.getSubject())
+	           // .subject(assurance.getSubject())
+	            .subject(assurance.getSubject() != null 
+                ? assurance.getSubject() 
+                : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+                    ? assurance.getPartDetails().stream()
+                        .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+                        .map(PartDetails::getSubject)
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(null)
+                    : null))
 	            .memberName(memberName)
 	            .ministryName(ministryName)
 	            .departmentName(departmentName)
