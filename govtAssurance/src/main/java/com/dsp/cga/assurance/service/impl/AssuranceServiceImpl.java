@@ -948,11 +948,23 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 
 
+//	@Override
+//	public List<AssuranceListDTO> getAllAssurancesList() {
+//		List<Assurance> assurances = assuranceRepository.findAll();
+//		return assurances.stream().map(AssuranceListMapper::toDto) // Use the mapper for conversion
+//				.toList(); // Collect as a list
+//	}
+	
 	@Override
 	public List<AssuranceListDTO> getAllAssurancesList() {
-		List<Assurance> assurances = assuranceRepository.findAll();
-		return assurances.stream().map(AssuranceListMapper::toDto) // Use the mapper for conversion
-				.toList(); // Collect as a list
+	    Long houseId = getHouseId();
+	    List<Assurance> assurances = assuranceRepository.findAll();
+
+	    return assurances.stream()
+	            .filter(a -> (houseId == 1 && a.getRajyaSabhaSessionNo() != null)
+	                      || (houseId == 2 && a.getLokSabhaSessionNo() != null))
+	            .map(AssuranceListMapper::toDto)
+	            .toList();
 	}
 
 
