@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Embeddable
 public class ClubbedMemberInfo {
+	
     private Long clubbedMember; // Member ID
-    private Integer pageNumber; // Page number
+    private String pageNumber; // Page number
+    
 }

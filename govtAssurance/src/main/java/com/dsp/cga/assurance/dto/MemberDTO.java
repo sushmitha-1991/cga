@@ -24,7 +24,7 @@ public class MemberDTO {
 
 	private Long userId;
 	
-	 private Integer pageNumber;
+	 private String pageNumber;
 
 	// private String lastNameHindi;
 	
