@@ -196,7 +196,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
                         .orElse(null)
                     : null))
 	            .statusForMinistry(or.getStatusForMinistry())
-	            .subject(assurance.getSubject())
+	            //.subject(assurance.getSubject())
 	            .lokSabhaSessionNumber(assurance != null
 	                ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
 	                : null)
