@@ -1,6 +1,8 @@
 package com.dsp.cga.assurance.extensionrequest.service.impl;
 
 import java.time.LocalDate;
+import org.springframework.data.domain.Sort;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -292,7 +294,10 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	    };
 
 	    //  Fetch and filter manually using assuranceId
-	    List<ExtensionRequest> filteredList = extenionRequestRepository.findAll(specification).stream()
+	    List<ExtensionRequest> filteredList = extenionRequestRepository
+	    	    .findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt")).stream()
+
+	   // List<ExtensionRequest> filteredList = extenionRequestRepository.findAll(specification).stream()
 	        .filter(er -> {
 	        	 if (er.getAssuranceId() == null) return false;
 	            Assurance assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
@@ -314,7 +319,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 	    //  Convert to DTO
 	    return filteredList.stream()
-	    	    .sorted(Comparator.comparing(ExtensionRequest::getCreatedAt).reversed()) // sort before mapping
+	    	   // .sorted(Comparator.comparing(ExtensionRequest::getCreatedAt).reversed()) // sort before mapping
 .map(er -> {
 	        Assurance assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
 	        return ExtensionRequestResponseDTO.builder()

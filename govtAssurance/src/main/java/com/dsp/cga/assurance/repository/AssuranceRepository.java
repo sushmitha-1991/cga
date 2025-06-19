@@ -89,8 +89,13 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 
 
 
-	Optional<Assurance> findByLokSabhaNoAndLokSabhaSessionNoAndSourceIdAndQuestionNoAndAssuranceTypeId(Long lokSabhaNo,
-			Long lokSabhaSessionNo, Long sourceId, String questionNo, Long assuranceTypeId);
+//	Optional<Assurance> findByLokSabhaNoAndLokSabhaSessionNoAndSourceIdAndQuestionNoAndAssuranceTypeId(Long lokSabhaNo,
+//			Long lokSabhaSessionNo, Long sourceId, String questionNo, Long assuranceTypeId);
+
+
+
+	Optional<Assurance> findByLokSabhaNoAndLokSabhaSessionNoAndSourceIdAndQuestionNo(Long lokSabhaNo,
+			Long lokSabhaSessionNo, Long sourceId, String questionNo);
 
 
 
