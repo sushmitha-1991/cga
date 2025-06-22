@@ -3,6 +3,7 @@ package com.dsp.cga.assurance.service.impl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -210,18 +211,23 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 		//validateAssuranceFields(assuranceDTO);
 		
-		 Optional<Assurance> existingAssurance = assuranceRepository
-			        .findByLokSabhaNoAndLokSabhaSessionNoAndSourceIdAndQuestionNoAndAssuranceTypeId(
-			            assuranceDTO.getLokSabhaNo(),
-			            assuranceDTO.getLokSabhaSessionNo(),
-			            assuranceDTO.getSourceId(),
-			            assuranceDTO.getQuestionNo(),
-			            assuranceDTO.getAssuranceTypeId()
-			        );
-
-			    if (existingAssurance.isPresent()) {
-			        throw new IllegalArgumentException("An assurance for the same question already exists.");
-			    }
+//		 Optional<Assurance> existingAssurance = assuranceRepository
+//			        .findByLokSabhaNoAndLokSabhaSessionNoAndSourceIdAndQuestionNo(
+//			            assuranceDTO.getLokSabhaNo(),
+//			            assuranceDTO.getLokSabhaSessionNo(),
+//			            assuranceDTO.getSourceId(),
+//			            assuranceDTO.getQuestionNo()
+//			        );
+//		 
+//
+//			    if (existingAssurance.isPresent()) {
+//			        throw new IllegalArgumentException("An assurance for the same question already exists.");
+//			    }
+		
+		   Optional<Assurance> existingAssurance = assuranceRepository.findByQuestionNo(assuranceDTO.getQuestionNo());
+		    if (existingAssurance.isPresent()) {
+		        throw new IllegalArgumentException("An assurance with this question number already exists.");
+		    }
 			    
 			   
 		
@@ -282,19 +288,11 @@ public class AssuranceServiceImpl implements AssuranceService {
 	private String generateAssuranceNo(Long lokSabhaNo, Long lokSabhaSessionNo, Long sourceId, String questionNo, Long assuranceTypeId) {
 	    // Fetching data using the provided IDs
 	    LokSabhaNoDTO lokSabhaDTO = fetchLokSabhaData(lokSabhaNo);
-//	    if (lokSabhaDTO == null) {
-//	        throw new IllegalArgumentException("Invalid Lok Sabha Number: " + lokSabhaNo);
-//	    }
+
 
 	    LoksabhaSessionNoDTO lokSabhaSessionDTO = fetchLoksabhaSessionData(lokSabhaSessionNo);
-//	    if (lokSabhaSessionDTO == null) {
-//	        throw new IllegalArgumentException("Invalid Lok Sabha Session Number: " + lokSabhaSessionNo);
-//	    }
 
 	    SourceDTO categoryDTO = fetchSourceData(sourceId);
-//	    if (categoryDTO == null) {
-//	        throw new IllegalArgumentException("Invalid Source ID: " + sourceId);
-	 //   }
 
 	    // Determine the category code
 	    String categoryCode;
@@ -333,6 +331,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	    return categoryCode + "-" + lokSabhaNoStr + "/" + sessionNoStr + "/" + questionNo;
 	}
+
 
 	
 
@@ -1155,7 +1154,16 @@ public class AssuranceServiceImpl implements AssuranceService {
 	                .map(a -> AssuranceListDTO.builder()
 	                        .id(a.getId())
 	                        .assuranceNo(a.getAssuranceNo())
-	                        //.subject(a.getSubject())
+	                        .subject(a.getSubject() != null 
+	                        ? a.getSubject() 
+	                        : (a.getPartDetails() != null && !a.getPartDetails().isEmpty()
+	                            ? a.getPartDetails().stream()
+	                                .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+	                                .map(PartDetails::getSubject)
+	                                .filter(Objects::nonNull)
+	                                .findFirst()
+	                                .orElse(null)
+	                            : null))
 	                        .build())
 	                .collect(Collectors.toList());
 	    }
@@ -1219,6 +1227,16 @@ public class AssuranceServiceImpl implements AssuranceService {
 	    dto.setMemberName(memberName);
 	    dto.setDepartmentName(departmentName);
 	    dto.setMinistryName(ministryName);
+	    String subject = (assurance.getSubject() != null)
+	            ? assurance.getSubject()
+	            : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+	                ? assurance.getPartDetails().stream()
+	                    .sorted(Comparator.comparing(PartDetails::getId).reversed())
+	                    .map(PartDetails::getSubject)
+	                    .filter(Objects::nonNull)
+	                    .findFirst()
+	                    .orElse(null)
+	                : null);
 	    dto.setSubject(assurance.getSubject());
 	    dto.setQuestionNo(assurance.getQuestionNo());
 

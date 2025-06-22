@@ -1,6 +1,7 @@
 package com.dsp.cga.assurance.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class CommonRequestResponseDTO {
 	private Long id;
 	private String requestType;
 	private Long assuranceId;
-
+	
 	private Boolean fromMinistry;
 
 	private String status;
@@ -33,6 +34,7 @@ public class CommonRequestResponseDTO {
 	private List<Map<String, Object>> extensionFiles;
    // private List<Map<String, Object>> droppingFiles;
 
+	private LocalDateTime createdAt;
 
 	private Long statusId;
 

@@ -1,6 +1,8 @@
 package com.dsp.cga.assurance.implementationrequest.service.impl;
 
 import java.time.LocalDate;
+import org.springframework.data.domain.Sort;
+
 
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -450,15 +452,17 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    Specification<ImplementationRequest> spec =
 	            ImplementationRequestSpecification.filterByCriteria(finalSessionNo, layingDate, implementationTypeId, statusForMinistry, ministryId, houseId);
 
-	    List<ImplementationRequest> implementationRequests = implementationRequestRepository.findAll(spec);
+	    //List<ImplementationRequest> implementationRequests = implementationRequestRepository.findAll(spec);
+	    List<ImplementationRequest> implementationRequests = implementationRequestRepository
+	            .findAll(spec, Sort.by(Sort.Direction.DESC, "createdAt"));
 
 	    if (CollectionUtils.isEmpty(implementationRequests)) {
 	        return List.of();
 	    }
 
-	    implementationRequests = implementationRequests.stream()
-	    	    .sorted(Comparator.comparing(ImplementationRequest::getCreatedAt).reversed())
-	    	    .collect(Collectors.toList());
+//	    implementationRequests = implementationRequests.stream()
+//	    	    .sorted(Comparator.comparing(ImplementationRequest::getCreatedAt).reversed())
+//	    	    .collect(Collectors.toList());
 	    
 	    return implementationRequests.stream().map(impl -> {
 	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);

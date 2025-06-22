@@ -1,6 +1,8 @@
 package com.dsp.cga.assurance.otherRequests.service.impl;
 
 import java.time.LocalDate;
+import org.springframework.data.domain.Sort;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -148,7 +150,11 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	    };
 
 	    // 🔹 Fetch and filter based on Assurance
-	    List<OtherRequests> filteredList = otherRequestRepo.findAll(specification).stream()
+	 //   List<OtherRequests> filteredList = otherRequestRepo.findAll(specification).stream()
+	    List<OtherRequests> filteredList = otherRequestRepo
+	    	    .findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt"))
+	    	    .stream()
+
 	        .filter(or -> {
 	            if (or.getAssuranceId() == null) return false;
 
@@ -196,7 +202,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
                         .orElse(null)
                     : null))
 	            .statusForMinistry(or.getStatusForMinistry())
-	            .subject(assurance.getSubject())
+	            //.subject(assurance.getSubject())
 	            .lokSabhaSessionNumber(assurance != null
 	                ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
 	                : null)

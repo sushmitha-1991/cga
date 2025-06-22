@@ -1,6 +1,8 @@
 package com.dsp.cga.assurance.droppingrequest.service.impl;
 
 import java.time.LocalDate;
+import org.springframework.data.domain.Sort;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -273,8 +275,10 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	    };
 
 	
-	    List<DroppingRequest> filteredList = droppingRequestRepository.findAll(specification).stream()
-	            .filter(dr -> {
+	  //  List<DroppingRequest> filteredList = droppingRequestRepository.findAll(specification).stream()
+	    List<DroppingRequest> filteredList = droppingRequestRepository.findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt")).stream()
+
+	    .filter(dr -> {
 	                Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
 	                if (assurance == null) return false;
 
@@ -297,7 +301,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 
 	    // 🔹 Map to DTO
 	    return filteredList.stream()
-	    		.sorted(Comparator.comparing(DroppingRequest::getCreatedAt).reversed())
+	    		//.sorted(Comparator.comparing(DroppingRequest::getCreatedAt).reversed())
 
 	            .map(dr -> {
 	            	 String memberName = null;

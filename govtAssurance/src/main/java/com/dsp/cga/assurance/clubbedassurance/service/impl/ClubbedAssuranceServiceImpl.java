@@ -1,6 +1,8 @@
 package com.dsp.cga.assurance.clubbedassurance.service.impl;
 
 import java.time.LocalDate;
+import org.springframework.data.domain.Sort;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -143,6 +145,120 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 		return assurance.map(Assurance::getAssuranceNo).orElse(null);
 	}
 	
+//	@Override
+//	public List<AssuranceResponseDTO> getFilteredClubbedAssurances(Long sessionNo, LocalDate assuranceDate,
+//	                                                               Long statusId, Integer ministryCode) {
+//
+//	    // 🔹 Get ministryId from ministryCode
+//	    final Long ministryId;
+//	    if (ministryCode != null) {
+//	        Ministries ministry = ministryRepository.findByMinistryCode(ministryCode);
+//	        if (ministry != null) {
+//	            ministryId = ministry.getId();
+//	        } else {
+//	            return List.of(); // Invalid ministryCode
+//	        }
+//	    } else {
+//	        ministryId = null;
+//	    }
+//
+//	    // 🔹 Get current houseId
+//	    Long houseId = getHouseId(); // 1 = RS, else LS
+//
+//	    // 🔹 Get latest session if sessionNo is null
+//	    if (sessionNo == null) {
+//	        sessionNo = (houseId == 1)
+//	                ? rssRepo.findLatestByCreatedAt()
+//	                : lssRepo.findLatestByCreatedAt();
+//	    }
+//	    Long finalSessionNo = sessionNo;
+//
+//	    // 🔹 Get all clubbed assurance records
+//	    List<ClubbedAssurance> allClubbedAssurances = clubbedAssuranceRepository.findAll();
+//
+//	    // 🔹 Filter them based on Assurance fields
+//	    List<ClubbedAssurance> filteredClubbedList = allClubbedAssurances.stream()
+//	        .filter(clubbed -> {
+//	            Assurance assurance = assuranceRepository.findById(clubbed.getAssuranceId()).orElse(null);
+//	            if (assurance == null) return false;
+//
+//	            if (assuranceDate != null && !assuranceDate.equals(assurance.getAssuranceDate())) return false;
+//	            if (statusId != null && !statusId.equals(assurance.getStatusId())) return false;
+//	            if (ministryId != null && !ministryId.equals(assurance.getMinistryId())) return false;
+//
+//	            if (houseId == 1 && !finalSessionNo.equals(assurance.getRajyaSabhaSessionNo())) return false;
+//	            if (houseId != 1 && !finalSessionNo.equals(assurance.getLokSabhaSessionNo())) return false;
+//
+//	            return true;
+//	        })
+//	        .collect(Collectors.toList());
+//
+//	    // 🔹 Map to DTO
+//	    return filteredClubbedList.stream()
+//	    	    .sorted(Comparator.comparing(ClubbedAssurance::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
+//
+//	        .map(clubbed -> {
+//	            Assurance assurance = assuranceRepository.findById(clubbed.getAssuranceId()).orElse(null);
+//
+//	            List<Long> clubbedIds = clubbed.getClubbedAssuranceIds() != null
+//	                    ? clubbed.getClubbedAssuranceIds().stream().distinct().toList()
+//	                    : List.of();
+//	            
+//	            List<String> clubbedAssuranceNos = new ArrayList<>();
+//	            if (clubbed.getClubbedAssuranceIds() != null) {
+//	                clubbed.getClubbedAssuranceIds().stream().distinct().forEach(id -> {
+//	                    assuranceRepository.findById(id).ifPresent(ca -> {
+//	                        if (ca.getAssuranceNo() != null) {
+//	                            clubbedAssuranceNos.add(ca.getAssuranceNo());
+//	                        }
+//	                    });
+//	                });
+//	            }
+//
+//	            return AssuranceResponseDTO.builder()
+//	            		.id(clubbed.getId())
+//	                    .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
+//	                    .lokSabhaSessionNo(assurance != null && assurance.getLokSabhaSessionNo() != null
+//	                            ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()) : null)
+//	                    .lokSabhaNo(assurance != null && assurance.getLokSabhaNo() != null
+//	                            ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()) : null)
+//	                    .rajyaSabhaSessionNo(assurance != null && assurance.getRajyaSabhaSessionNo() != null
+//	                            ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()) : null)
+//	                  //  .assuranceDate(assurance != null ? assurance.getAssuranceDate() : null)
+//	                    .questionNo(assurance != null ? assurance.getQuestionNo() : null)
+//	                    .status(assurance != null
+//	                            ? codeRepository.findCodeById(assurance.getStatusId()) : null)
+//	                    .clubbedAssuranceIds(clubbedIds)
+//	                    .clubbedAssuranceNos(clubbedAssuranceNos) 
+//                        .statusForMinistry(clubbed.getStatusForMinistry())
+//	                   // .subject(assurance.getSubject())
+//                        .subject(assurance.getSubject() != null 
+//                        ? assurance.getSubject() 
+//                        : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+//                            ? assurance.getPartDetails().stream()
+//                                .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+//                                .map(PartDetails::getSubject)
+//                                .filter(Objects::nonNull)
+//                                .findFirst()
+//                                .orElse(null)
+//                            : null))
+//	                    .date(clubbed.getDate())
+//	                    .memberName(assurance != null && assurance.getMemberId() != null
+//	                    ? personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId()) : null)
+//
+//	                .departmentName(assurance != null && assurance.getDepartmentId() != null
+//	                    ? departmentRepository.findById(assurance.getDepartmentId()).map(Departments::getDepartmentName).orElse(null)
+//	                    : null)
+//
+//	                .ministryName(assurance != null && assurance.getMinistryId() != null
+//	                    ? ministryRepository.findById(assurance.getMinistryId()).map(Ministries::getMinistryName).orElse(null)
+//	                    : null)
+//	                    .build();
+//	        })
+//	        .collect(Collectors.toList());
+//	}
+
+
 	@Override
 	public List<AssuranceResponseDTO> getFilteredClubbedAssurances(Long sessionNo, LocalDate assuranceDate,
 	                                                               Long statusId, Integer ministryCode) {
@@ -171,8 +287,9 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	    }
 	    Long finalSessionNo = sessionNo;
 
-	    // 🔹 Get all clubbed assurance records
-	    List<ClubbedAssurance> allClubbedAssurances = clubbedAssuranceRepository.findAll();
+	    // 🔹 Get all clubbed assurance records (sorted by latest first)
+	    List<ClubbedAssurance> allClubbedAssurances = clubbedAssuranceRepository
+	            .findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
 
 	    // 🔹 Filter them based on Assurance fields
 	    List<ClubbedAssurance> filteredClubbedList = allClubbedAssurances.stream()
@@ -193,15 +310,13 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 
 	    // 🔹 Map to DTO
 	    return filteredClubbedList.stream()
-	    	    .sorted(Comparator.comparing(ClubbedAssurance::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
-
 	        .map(clubbed -> {
 	            Assurance assurance = assuranceRepository.findById(clubbed.getAssuranceId()).orElse(null);
 
 	            List<Long> clubbedIds = clubbed.getClubbedAssuranceIds() != null
 	                    ? clubbed.getClubbedAssuranceIds().stream().distinct().toList()
 	                    : List.of();
-	            
+
 	            List<String> clubbedAssuranceNos = new ArrayList<>();
 	            if (clubbed.getClubbedAssuranceIds() != null) {
 	                clubbed.getClubbedAssuranceIds().stream().distinct().forEach(id -> {
@@ -214,7 +329,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	            }
 
 	            return AssuranceResponseDTO.builder()
-	            		.id(clubbed.getId())
+	                    .id(clubbed.getId())
 	                    .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
 	                    .lokSabhaSessionNo(assurance != null && assurance.getLokSabhaSessionNo() != null
 	                            ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo()) : null)
@@ -222,41 +337,35 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	                            ? lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo()) : null)
 	                    .rajyaSabhaSessionNo(assurance != null && assurance.getRajyaSabhaSessionNo() != null
 	                            ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()) : null)
-	                  //  .assuranceDate(assurance != null ? assurance.getAssuranceDate() : null)
 	                    .questionNo(assurance != null ? assurance.getQuestionNo() : null)
 	                    .status(assurance != null
 	                            ? codeRepository.findCodeById(assurance.getStatusId()) : null)
 	                    .clubbedAssuranceIds(clubbedIds)
-	                    .clubbedAssuranceNos(clubbedAssuranceNos) 
-                        .statusForMinistry(clubbed.getStatusForMinistry())
-	                   // .subject(assurance.getSubject())
-                        .subject(assurance.getSubject() != null 
-                        ? assurance.getSubject() 
-                        : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
-                            ? assurance.getPartDetails().stream()
-                                .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
-                                .map(PartDetails::getSubject)
-                                .filter(Objects::nonNull)
-                                .findFirst()
-                                .orElse(null)
-                            : null))
+	                    .clubbedAssuranceNos(clubbedAssuranceNos)
+	                    .statusForMinistry(clubbed.getStatusForMinistry())
+	                    .subject(assurance.getSubject() != null 
+	                        ? assurance.getSubject() 
+	                        : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+	                            ? assurance.getPartDetails().stream()
+	                                .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest part
+	                                .map(PartDetails::getSubject)
+	                                .filter(Objects::nonNull)
+	                                .findFirst()
+	                                .orElse(null)
+	                            : null))
 	                    .date(clubbed.getDate())
 	                    .memberName(assurance != null && assurance.getMemberId() != null
-	                    ? personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId()) : null)
-
-	                .departmentName(assurance != null && assurance.getDepartmentId() != null
-	                    ? departmentRepository.findById(assurance.getDepartmentId()).map(Departments::getDepartmentName).orElse(null)
-	                    : null)
-
-	                .ministryName(assurance != null && assurance.getMinistryId() != null
-	                    ? ministryRepository.findById(assurance.getMinistryId()).map(Ministries::getMinistryName).orElse(null)
-	                    : null)
+	                        ? personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId()) : null)
+	                    .departmentName(assurance != null && assurance.getDepartmentId() != null
+	                        ? departmentRepository.findById(assurance.getDepartmentId()).map(Departments::getDepartmentName).orElse(null)
+	                        : null)
+	                    .ministryName(assurance != null && assurance.getMinistryId() != null
+	                        ? ministryRepository.findById(assurance.getMinistryId()).map(Ministries::getMinistryName).orElse(null)
+	                        : null)
 	                    .build();
 	        })
 	        .collect(Collectors.toList());
 	}
-
-
 
 
 
