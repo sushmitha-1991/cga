@@ -960,7 +960,9 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .supplementaryId(impl.getSupplementaryId())
 	        .partId(impl.getPartId())
 	        .houseId(houseId)
-	        .house(isLokSabha ? "Lok Sabha" : "Rajya Sabha");
+	        .house(isLokSabha ? "Lok Sabha" : "Rajya Sabha")
+	        .creationDate(impl.getCreatedAt().toLocalDate())
+	        ;
 
 	    if (isLokSabha) {
 	        builder

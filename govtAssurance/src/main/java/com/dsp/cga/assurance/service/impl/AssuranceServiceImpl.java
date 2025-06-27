@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
@@ -207,45 +209,14 @@ public class AssuranceServiceImpl implements AssuranceService {
 	@Transactional
 	@Override
 	public AssuranceDTO createAssurance(AssuranceDTO assuranceDTO) {
-		// Fetch external names using the external service
-
-		//validateAssuranceFields(assuranceDTO);
 		
-//		 Optional<Assurance> existingAssurance = assuranceRepository
-//			        .findByLokSabhaNoAndLokSabhaSessionNoAndSourceIdAndQuestionNo(
-//			            assuranceDTO.getLokSabhaNo(),
-//			            assuranceDTO.getLokSabhaSessionNo(),
-//			            assuranceDTO.getSourceId(),
-//			            assuranceDTO.getQuestionNo()
-//			        );
-//		 
-//
-//			    if (existingAssurance.isPresent()) {
-//			        throw new IllegalArgumentException("An assurance for the same question already exists.");
-//			    }
-		
-		   Optional<Assurance> existingAssurance = assuranceRepository.findByQuestionNo(assuranceDTO.getQuestionNo());
-		    if (existingAssurance.isPresent()) {
-		        throw new IllegalArgumentException("An assurance with this question number already exists.");
-		    }
-			    
-			   
-		
-        // Check if both LokSabhaNo and LokSabhaSessionNo are available to generate AssuranceNo
-        if (assuranceDTO.getLokSabhaNo() != null && assuranceDTO.getLokSabhaSessionNo() != null && assuranceDTO.getSourceId() != null && assuranceDTO.getQuestionNo() != null) {
-            // Generate the Assurance No only when both lokSabhaNo and lokSabhaSessionNo are provided
-            String assuranceNo = generateAssuranceNo(
-                assuranceDTO.getLokSabhaNo(),
-                assuranceDTO.getLokSabhaSessionNo(),
-                assuranceDTO.getSourceId(),
-                assuranceDTO.getQuestionNo(),
-                assuranceDTO.getAssuranceTypeId()
-            );
-            
-            // Set the generated Assurance No in the DTO
-            assuranceDTO.setAssuranceNo(assuranceNo);
-        }
-        
+	   Optional<List<Assurance>> existingAssurance = assuranceRepository.findAllByQuestionNo(assuranceDTO.getQuestionNo());
+	    if (!CollectionUtils.isEmpty(existingAssurance.get())) {
+	        throw new IllegalArgumentException("Assurance with this Question Number already exists.");
+	    }
+	
+	    assuranceDTO.setAssuranceNo(generateAssuranceNo(assuranceDTO));
+	    
 		// Map the AssuranceDTO to Assurance entity
 		Assurance assurance = assuranceMapper.toEntity(assuranceDTO);
 		// assurance.setClubbedMembers(assuranceDTO.getClubbedMembers());
@@ -253,25 +224,18 @@ public class AssuranceServiceImpl implements AssuranceService {
 			supplementary.setAssurance(assurance); // Link Assurance to Supplementary
 		});
 
-		
-		// Save Assurance entity
+
 		Assurance savedAssurance = assuranceRepository.save(assurance);
-		 if (assuranceDTO.getRajyaSabhaSessionNo() != null) {
-		        String rajyaSabhaAssuranceNo = generateRajyaSabhaAssuranceNo(assuranceDTO.getRajyaSabhaSessionNo());
-		        savedAssurance.setAssuranceNo(rajyaSabhaAssuranceNo);
-		        savedAssurance = assuranceRepository.save(savedAssurance);
-		    }
 
 		// Map entity back to DTO to return response
 		AssuranceDTO savedAssuranceDTO = assuranceMapper.toDTO(savedAssurance);
 		
-		
-
 		return savedAssuranceDTO;
 	}
 
-	private String generateRajyaSabhaAssuranceNo(Long rajyaSabhaSessionId) {
-	    // Fetch session number using ID
+	private String generateRSAssuranceNo(Long rajyaSabhaSessionId) {
+	    
+		// Fetch session number using ID
 	    String sessionNumber = rssRepo.findSessionNumberById(rajyaSabhaSessionId);
 
 	    // Count how many assurances already exist for that session
@@ -285,7 +249,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 	}
 
 	
-	private String generateAssuranceNo(Long lokSabhaNo, Long lokSabhaSessionNo, Long sourceId, String questionNo, Long assuranceTypeId) {
+	private String generateLSAssuranceNo(Long lokSabhaNo, Long lokSabhaSessionNo, Long sourceId, String questionNo, Long assuranceTypeId) {
 	    // Fetching data using the provided IDs
 	    LokSabhaNoDTO lokSabhaDTO = fetchLokSabhaData(lokSabhaNo);
 
@@ -333,7 +297,22 @@ public class AssuranceServiceImpl implements AssuranceService {
 	}
 
 
-	
+	private String generateAssuranceNo (AssuranceDTO dto) {
+		
+		if (dto.getLokSabhaSessionNo() != null) {
+			return generateLSAssuranceNo(dto.getLokSabhaNo(),
+										dto.getLokSabhaSessionNo(),
+										dto.getSourceId(),
+										dto.getQuestionNo(),
+										dto.getAssuranceTypeId());
+		} 
+		
+		if (dto.getRajyaSabhaSessionNo() != null) {
+			return generateRSAssuranceNo (dto.getRajyaSabhaSessionNo());
+		} 
+		
+		return null;
+	}
 
 	@Override
 	@Transactional
@@ -922,7 +901,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 
         if (assuranceDTO.getLokSabhaNo() != null && assuranceDTO.getLokSabhaSessionNo() != null && assuranceDTO.getSourceId() != null && assuranceDTO.getQuestionNo() != null) {
             // Generate the Assurance No only when both lokSabhaNo and lokSabhaSessionNo are provided
-            String assuranceNo = generateAssuranceNo(
+            String assuranceNo = generateLSAssuranceNo(
                 assuranceDTO.getLokSabhaNo(),
                 assuranceDTO.getLokSabhaSessionNo(),
                 assuranceDTO.getSourceId(),

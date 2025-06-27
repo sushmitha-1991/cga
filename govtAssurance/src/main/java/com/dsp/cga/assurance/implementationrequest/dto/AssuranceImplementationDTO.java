@@ -57,6 +57,7 @@ public class AssuranceImplementationDTO {
 		  private Long committeeDecisionId;
 		  // private String statusForMinistry;
 		    private String statementNo;
+		private LocalDate creationDate;    
 		 
 		    private List<MemberDTO> clubbedMembersData;
 		    private List<Supplementary> supplementary;

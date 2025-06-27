@@ -183,7 +183,7 @@ public class ExtensionRequestController {
 //	    return ResponseEntity.ok(response);
 //	}
 
-	@GetMapping("getAllRequests")
+	@GetMapping("/getAllRequests")
 	@Operation(summary = "Get all requests")
 	@ApiResponses(value = {
 	    @ApiResponse(responseCode = "200", description = "Requests fetched successfully"),
@@ -208,7 +208,7 @@ public class ExtensionRequestController {
 	    return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("getRequestById")
+	@GetMapping("/getRequestById")
 	@Operation(summary = "Get request by ID and type")
 	@ApiResponses(value = {
 	    @ApiResponse(responseCode = "200", description = "Request fetched successfully"),

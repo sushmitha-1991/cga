@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -778,6 +779,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
 	                            return CommonRequestResponseDTO.builder()
 	                                    .id(req.getId())
+	                                    .assuranceNo(assurance.getAssuranceNo())
 	                                    .requestType("Extension Request")
 	                                    .assuranceId(req.getAssuranceId())
 	                                    .subject(req.getSubject())
@@ -853,6 +855,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
 	                            return CommonRequestResponseDTO.builder()
 	                                    .id(req.getId())
+	                                    .assuranceNo(assurance.getAssuranceNo())
 	                                    .requestType("Dropping Request")
 	                                    .assuranceId(req.getAssuranceId())
 	                                    .subject(req.getSubject())
@@ -1073,7 +1076,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		if (status != null) {
 			spec = spec.and(ExtensionRequestSpec.hasStatus(status));
 		} else {
-			spec = spec.and(ExtensionRequestSpec.hasStatus());
+//			spec = spec.and(ExtensionRequestSpec.hasStatus());
 		}
 		
 		if (ministryId != null) {
@@ -1099,7 +1102,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 		extenionRequestRepository.findAll(spec).forEach(req -> {
-			response.add(buildDTO(req.getId(), "Extension Request", req.getAssuranceId(), req.getSubject(),
+			response.add(buildDTO(req.getId(), "Extension Request", req.getAssuranceId(), req.getAssurance().getSubject(),
 					req.getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
 					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
 		});
@@ -1125,7 +1128,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		if (status != null) {
 			spec = spec.and(OtherRequestSpec.hasStatus(status));
 		} else {
-			spec = spec.and(OtherRequestSpec.hasStatus());
+//			spec = spec.and(OtherRequestSpec.hasStatus());
 		}
 	
 		if (ministryId != null) {
@@ -1149,7 +1152,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
 		otherRequestRepository.findAll(spec).forEach(req -> {
-			response.add(buildDTO(req.getId(), "Other Request", req.getAssuranceId(), req.getSubject(),
+			response.add(buildDTO(req.getId(), "Other Request", req.getAssuranceId(), req.getAssurance().getSubject(),
 					req.getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
 					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
 		});
@@ -1168,17 +1171,19 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 			spec = spec.and(ClubbedAssuranceRequestSpec.hasDateBetween(fromDate, toDate));
 		}
 		
-		if (status != null) {
+		if (!StringUtils.isEmpty(status)) {
 			spec = spec.and(ClubbedAssuranceRequestSpec.hasStatus(status));
 		} else {
-			spec = spec.and(ClubbedAssuranceRequestSpec.hasStatus());
+//			spec = spec.and(ClubbedAssuranceRequestSpec.hasStatus());
 		}
 	
 		if (ministryId != null) {
+			System.out.println("Ministry ID: " + ministryId);
 			spec = spec.and(ClubbedAssuranceRequestSpec.hasMinistryId(ministryId));
 		}
 
 		if (memberId != null) {
+			System.out.println("Member ID: " + memberId);
 			spec = spec.and(ClubbedAssuranceRequestSpec.hasMemberId(memberId));
 		}
 		
@@ -1191,6 +1196,8 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 		Specification<ClubbedAssurance> spec = createClubbedAssuranceSpecification(fromDate, toDate, ministryId, memberId,
 				status);
+		
+		System.out.println("Club SPEC: " + spec);
 
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
@@ -1218,7 +1225,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		if (status != null) {
 			spec = spec.and(DroppingRequestSpec.hasStatus(status));
 		} else {
-			spec = spec.and(DroppingRequestSpec.hasStatus());
+//			spec = spec.and(DroppingRequestSpec.hasStatus());
 		}
 	
 		if (ministryId != null) {
@@ -1242,7 +1249,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
 		droppingRequestRepository.findAll(spec).forEach(req -> {
-			response.add(buildDTO(req.getId(), "Dropping Request", req.getAssuranceId(), req.getSubject(),
+			response.add(buildDTO(req.getId(), "Dropping Request", req.getAssuranceId(), req.getAssurance().getSubject(),
 					req.getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
 					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
 		});
