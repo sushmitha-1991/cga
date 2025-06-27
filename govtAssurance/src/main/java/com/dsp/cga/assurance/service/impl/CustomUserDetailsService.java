@@ -37,7 +37,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 		// Create a UserDetailsDTO object from BaseUser
 		return new UserDetailsDTO(baseUser.getId(), baseUser.getUsername(), baseUser.getPhone(), baseUser.getEmail(),
-				baseUser.getPassword(), baseUser.getHouseId(), baseUser.getIsActive());
+				baseUser.getPassword(), baseUser.getHouseId(), baseUser.getHouse().getAbbr(), baseUser.getIsActive());
 	}
 
 }

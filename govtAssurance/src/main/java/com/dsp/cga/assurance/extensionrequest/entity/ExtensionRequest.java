@@ -11,6 +11,7 @@ import com.dsp.cga.util.JsonMapConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,10 +40,11 @@ public class ExtensionRequest extends Auditable {
 	@Column(name = "assurance_id", nullable = false)
 	private Long assuranceId;
 
-
-//	@Column(name = "question_no", length = 10)
-//	private String questionNo;
-
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "assurance_id", nullable = false, insertable = false,updatable = false)
+	private Assurance assurance;
+	
 	@Column(name = "extension_no")
 	private String extensionNo;
 

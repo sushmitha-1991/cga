@@ -166,14 +166,39 @@ public class ExtensionRequestController {
 	    return ResponseEntity.ok(response);
 	}
 
+//	@GetMapping("getAllRequests")
+//	@Operation(summary = "Get all requests")
+//	@ApiResponses(value = {
+//	    @ApiResponse(responseCode = "200", description = "Requests fetched successfully"),
+//	    @ApiResponse(responseCode = "500", description = "Internal server error")
+//	})
+//	public ResponseEntity<GenericResponse<List<CommonRequestResponseDTO>>> getAllRequests() {
+//	    List<CommonRequestResponseDTO> responseList = extensionRequestService.getAllRequests();
+//	    GenericResponse<List<CommonRequestResponseDTO>> response = new GenericResponse<>(
+//	            HttpStatus.OK.value(),
+//	            true,
+//	            "Requests fetched successfully",
+//	            responseList
+//	    );
+//	    return ResponseEntity.ok(response);
+//	}
+
 	@GetMapping("getAllRequests")
 	@Operation(summary = "Get all requests")
 	@ApiResponses(value = {
 	    @ApiResponse(responseCode = "200", description = "Requests fetched successfully"),
 	    @ApiResponse(responseCode = "500", description = "Internal server error")
 	})
-	public ResponseEntity<GenericResponse<List<CommonRequestResponseDTO>>> getAllRequests() {
-	    List<CommonRequestResponseDTO> responseList = extensionRequestService.getAllRequests();
+	public ResponseEntity<GenericResponse<List<CommonRequestResponseDTO>>> getAllRequests(
+		    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+		    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,		   
+		    @RequestParam(required = false) Long ministryId,
+			@RequestParam(required = false) Long memberId,
+		    @RequestParam(required = false) String status) {
+	
+		List<CommonRequestResponseDTO> responseList = extensionRequestService.getAllRequests(
+															fromDate, toDate, ministryId, memberId, status);
+		
 	    GenericResponse<List<CommonRequestResponseDTO>> response = new GenericResponse<>(
 	            HttpStatus.OK.value(),
 	            true,
@@ -182,7 +207,6 @@ public class ExtensionRequestController {
 	    );
 	    return ResponseEntity.ok(response);
 	}
-
 
 	@GetMapping("getRequestById")
 	@Operation(summary = "Get request by ID and type")

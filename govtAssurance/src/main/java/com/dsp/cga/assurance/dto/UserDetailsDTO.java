@@ -36,6 +36,7 @@ public class UserDetailsDTO implements UserDetails {
 	private String email;
 	private String password;
 	private Long houseId;
+	private String houseAbbr;
 	private boolean isActive;
 
 	@Override

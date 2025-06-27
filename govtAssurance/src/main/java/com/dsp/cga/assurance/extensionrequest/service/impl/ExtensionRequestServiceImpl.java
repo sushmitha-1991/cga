@@ -25,7 +25,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.dsp.cga.assurance.clubbedassurance.entity.ClubbedAssurance;
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
+import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
 import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
 import com.dsp.cga.assurance.dto.CommonRequestResponseDTO;
 import com.dsp.cga.assurance.dto.MemberDTO;
@@ -43,6 +45,7 @@ import com.dsp.cga.assurance.extensionrequest.service.ExtensionRequestService;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
+import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
 import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
@@ -58,6 +61,11 @@ import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ExtensionRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.response.GenericResponse;
+import com.dsp.cga.specification.ClubbedAssuranceRequestSpec;
+import com.dsp.cga.specification.DroppingRequestSpec;
+import com.dsp.cga.specification.ExtensionRequestSpec;
+import com.dsp.cga.specification.OtherRequestSpec;
+import com.dsp.cga.util.Utils;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -106,6 +114,9 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
     
     @Autowired
     private ImplementationRequestRepository implementationRequestRepository;
+    
+    @Autowired
+    private Utils util;
 
 @Autowired
 private DroppingRequestRepositiry droppingRequestRepository;
@@ -1023,7 +1034,218 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	    }
 
 
-	   
+	@Override
+	public List<CommonRequestResponseDTO> getAllRequests(
+				LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
+	    
+	    List<CommonRequestResponseDTO> assurances = new ArrayList<>();
+
+	    // ExtensionRequest
+	    assurances.addAll(getExtensionRequests(fromDate, toDate, ministryId, memberId, status));
+	    // OtherRequests
+	    assurances.addAll(getOtherRequests(fromDate, toDate, ministryId, memberId, status));
+	    // ClubbedAssurance
+	    assurances.addAll(getClubbedAssurances(fromDate, toDate, ministryId, memberId, status));
+	    // DroppingRequest
+	    assurances.addAll(getDroppingRequests(fromDate, toDate, ministryId, memberId, status));
+
+	    assurances.sort(
+	    	    Comparator.comparing(CommonRequestResponseDTO::getDate, Comparator.nullsLast(Comparator.reverseOrder()))
+	    	);
 
 
+	    return assurances;
+	}
+
+
+	private Specification<ExtensionRequest> createExtensionSpecification(
+			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
+		
+		Specification<ExtensionRequest> spec = Specification.where(null);
+		spec = spec.and(ExtensionRequestSpec.isActive(true));
+		spec = spec.and(ExtensionRequestSpec.hasHouse(util.getHouseAbbr()));
+		spec = spec.and(ExtensionRequestSpec.isFromMinistry(true));
+
+		if (fromDate != null || toDate != null) {
+			spec = spec.and(ExtensionRequestSpec.hasDateBetween(fromDate, toDate));
+		}
+		
+		if (status != null) {
+			spec = spec.and(ExtensionRequestSpec.hasStatus(status));
+		} else {
+			spec = spec.and(ExtensionRequestSpec.hasStatus());
+		}
+		
+		if (ministryId != null) {
+			spec = spec.and(ExtensionRequestSpec.hasMinistryId(ministryId));
+		}
+
+		if (memberId != null) {
+			spec = spec.and(ExtensionRequestSpec.hasMemberId(memberId));
+		}
+		
+		return spec;
+	}
+	
+
+	
+	private List<CommonRequestResponseDTO> getExtensionRequests(LocalDate fromDate, LocalDate toDate, Long ministryId,
+			Long memberId, String status) {
+
+		Specification<ExtensionRequest> spec = createExtensionSpecification(fromDate, toDate, ministryId, memberId,
+				status);
+
+		System.out.println("SPEC:" + spec.toString());
+		
+		List<CommonRequestResponseDTO> response = new ArrayList<>();
+		extenionRequestRepository.findAll(spec).forEach(req -> {
+			response.add(buildDTO(req.getId(), "Extension Request", req.getAssuranceId(), req.getSubject(),
+					req.getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
+					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
+		});
+
+		System.out.println("Number of records: " + response.size());
+
+		return response;
+	}
+	
+	
+	private Specification<OtherRequests> createOtherRequestSpecification(
+			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
+		
+		Specification<OtherRequests> spec = Specification.where(null);
+		spec = spec.and(OtherRequestSpec.isActive(true));
+		spec = spec.and(OtherRequestSpec.hasHouse(util.getHouseAbbr()));
+		spec = spec.and(OtherRequestSpec.isFromMinistry(true));
+
+		if (fromDate != null || toDate != null) {
+			spec = spec.and(OtherRequestSpec.hasDateBetween(fromDate, toDate));
+		}
+		
+		if (status != null) {
+			spec = spec.and(OtherRequestSpec.hasStatus(status));
+		} else {
+			spec = spec.and(OtherRequestSpec.hasStatus());
+		}
+	
+		if (ministryId != null) {
+			spec = spec.and(OtherRequestSpec.hasMinistryId(ministryId));
+		}
+
+		if (memberId != null) {
+			spec = spec.and(OtherRequestSpec.hasMemberId(memberId));
+		}
+		
+		return spec;
+	}	
+	
+	
+	private List<CommonRequestResponseDTO> getOtherRequests(LocalDate fromDate, LocalDate toDate, Long ministryId,
+			Long memberId, String status) {
+
+		Specification<OtherRequests> spec = createOtherRequestSpecification(fromDate, toDate, ministryId, memberId,
+				status);
+
+		List<CommonRequestResponseDTO> response = new ArrayList<>();
+
+		otherRequestRepository.findAll(spec).forEach(req -> {
+			response.add(buildDTO(req.getId(), "Other Request", req.getAssuranceId(), req.getSubject(),
+					req.getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
+					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
+		});
+		return response;
+	}
+
+	private Specification<ClubbedAssurance> createClubbedAssuranceSpecification(
+			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
+		
+		Specification<ClubbedAssurance> spec = Specification.where(null);
+		spec = spec.and(ClubbedAssuranceRequestSpec.isActive(true));
+		spec = spec.and(ClubbedAssuranceRequestSpec.hasHouse(util.getHouseAbbr()));
+		spec = spec.and(ClubbedAssuranceRequestSpec.isFromMinistry(true));
+
+		if (fromDate != null || toDate != null) {
+			spec = spec.and(ClubbedAssuranceRequestSpec.hasDateBetween(fromDate, toDate));
+		}
+		
+		if (status != null) {
+			spec = spec.and(ClubbedAssuranceRequestSpec.hasStatus(status));
+		} else {
+			spec = spec.and(ClubbedAssuranceRequestSpec.hasStatus());
+		}
+	
+		if (ministryId != null) {
+			spec = spec.and(ClubbedAssuranceRequestSpec.hasMinistryId(ministryId));
+		}
+
+		if (memberId != null) {
+			spec = spec.and(ClubbedAssuranceRequestSpec.hasMemberId(memberId));
+		}
+		
+		return spec;
+	}	
+
+		
+	private List<CommonRequestResponseDTO> getClubbedAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId,
+			Long memberId, String status) {
+
+		Specification<ClubbedAssurance> spec = createClubbedAssuranceSpecification(fromDate, toDate, ministryId, memberId,
+				status);
+
+		List<CommonRequestResponseDTO> response = new ArrayList<>();
+
+		clubbedAssuranceRepository.findAll(spec).forEach(req -> {
+			response.add(buildDTO(req.getId(), "Clubbed Assurance", req.getAssuranceId(), req.getAssurance().getSubject(),
+					req.getAssurance().getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
+					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
+		});
+		return response;
+	}
+	
+	
+	private Specification<DroppingRequest> createDroppingRequestSpecification(
+			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
+		
+		Specification<DroppingRequest> spec = Specification.where(null);
+		spec = spec.and(DroppingRequestSpec.isActive(true));
+		spec = spec.and(DroppingRequestSpec.hasHouse(util.getHouseAbbr()));
+		spec = spec.and(DroppingRequestSpec.isFromMinistry(true));
+
+		if (fromDate != null || toDate != null) {
+			spec = spec.and(DroppingRequestSpec.hasDateBetween(fromDate, toDate));
+		}
+		
+		if (status != null) {
+			spec = spec.and(DroppingRequestSpec.hasStatus(status));
+		} else {
+			spec = spec.and(DroppingRequestSpec.hasStatus());
+		}
+	
+		if (ministryId != null) {
+			spec = spec.and(DroppingRequestSpec.hasMinistryId(ministryId));
+		}
+
+		if (memberId != null) {
+			spec = spec.and(DroppingRequestSpec.hasMemberId(memberId));
+		}
+		
+		return spec;
+	}	
+
+	
+	private List<CommonRequestResponseDTO> getDroppingRequests (LocalDate fromDate, LocalDate toDate, Long ministryId,
+			Long memberId, String status) {
+
+		Specification<DroppingRequest> spec = createDroppingRequestSpecification(fromDate, toDate, ministryId, memberId,
+				status);
+
+		List<CommonRequestResponseDTO> response = new ArrayList<>();
+
+		droppingRequestRepository.findAll(spec).forEach(req -> {
+			response.add(buildDTO(req.getId(), "Dropping Request", req.getAssuranceId(), req.getSubject(),
+					req.getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
+					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
+		});
+		return response;
+	}
 }

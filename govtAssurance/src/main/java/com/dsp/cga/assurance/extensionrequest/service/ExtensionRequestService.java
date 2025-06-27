@@ -32,4 +32,5 @@ public interface ExtensionRequestService {
 
 	CommonRequestResponseDTO updateRequest(Long id, String requestType, CommonRequestResponseDTO updateDto);
 
+	List<CommonRequestResponseDTO> getAllRequests(LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status);
 }

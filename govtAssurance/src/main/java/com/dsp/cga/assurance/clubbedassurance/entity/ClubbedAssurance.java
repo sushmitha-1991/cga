@@ -3,6 +3,7 @@ package com.dsp.cga.assurance.clubbedassurance.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.entity.Auditable;
 
 import jakarta.persistence.CollectionTable;
@@ -14,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -38,6 +40,10 @@ public class ClubbedAssurance extends Auditable{
 
 	@Column(name = "assurance_id", nullable = false)
 	private Long assuranceId;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "assurance_id", nullable = false, insertable = false,updatable = false)
+	private Assurance assurance;	
 	
 	@Column(name = "date")
 	private LocalDate date;

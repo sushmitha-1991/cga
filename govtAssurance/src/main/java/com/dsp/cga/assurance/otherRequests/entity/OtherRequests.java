@@ -4,15 +4,19 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.entity.Auditable;
 import com.dsp.cga.util.JsonMapConverter;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -36,7 +40,12 @@ public class OtherRequests extends Auditable{
 
 	  @Column(name = "assurance_id")
 	  private Long assuranceId;
-	
+
+		
+		@ManyToOne(fetch = FetchType.EAGER)
+		@JoinColumn(name = "assurance_id", nullable = false, insertable = false,updatable = false)
+		private Assurance assurance;
+		
 	  @Column(name = "requested_date")
 	   private LocalDate requestedDate;
 
