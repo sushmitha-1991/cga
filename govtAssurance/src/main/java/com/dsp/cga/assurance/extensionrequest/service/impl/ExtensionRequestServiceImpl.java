@@ -1073,7 +1073,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 			spec = spec.and(ExtensionRequestSpec.hasDateBetween(fromDate, toDate));
 		}
 		
-		if (status != null) {
+		if (!StringUtils.isEmpty(status)) {
 			spec = spec.and(ExtensionRequestSpec.hasStatus(status));
 		} else {
 //			spec = spec.and(ExtensionRequestSpec.hasStatus());
@@ -1125,7 +1125,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 			spec = spec.and(OtherRequestSpec.hasDateBetween(fromDate, toDate));
 		}
 		
-		if (status != null) {
+		if (!StringUtils.isEmpty(status)) {
 			spec = spec.and(OtherRequestSpec.hasStatus(status));
 		} else {
 //			spec = spec.and(OtherRequestSpec.hasStatus());
@@ -1222,7 +1222,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 			spec = spec.and(DroppingRequestSpec.hasDateBetween(fromDate, toDate));
 		}
 		
-		if (status != null) {
+		if (!StringUtils.isEmpty(status)) {
 			spec = spec.and(DroppingRequestSpec.hasStatus(status));
 		} else {
 //			spec = spec.and(DroppingRequestSpec.hasStatus());
