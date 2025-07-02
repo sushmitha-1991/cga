@@ -972,6 +972,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 															ImplementationRequest impl,
 															Boolean mopaFlag) {
 	    String memberName = null, departmentName = null, ministryName = null;
+	    
+	    mopaFlag = mopaFlag == null ? false : mopaFlag;
 
 	    if (assurance.getMemberId() != null) {
 	        memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
