@@ -34,6 +34,7 @@ import com.dsp.cga.assurance.repository.MasterLSSRepository;
 import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
+import com.dsp.cga.eunms.MinistryRequestStatus;
 import com.dsp.cga.mapper.ClubbedAssuranceMapper;
 import com.dsp.cga.response.GenericResponse;
 
@@ -486,6 +487,9 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 		            throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
 		        }
 
+		    // Update status fields
+		    clubbed.setStatusForMinistry(MinistryRequestStatus.SUBMITTED.getValue());
+		    
 		    if (dto.getAssuranceId() != null) {
 		        clubbed.setAssuranceId(dto.getAssuranceId());
 		    }

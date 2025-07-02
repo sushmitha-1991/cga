@@ -58,6 +58,7 @@ import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
+import com.dsp.cga.eunms.MinistryRequestStatus;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ExtensionRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
@@ -529,6 +530,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		    if (er.getStatusForMinistry() == null || !er.getStatusForMinistry().equalsIgnoreCase("Returned")) {
 		        throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
 		    }
+		    
+		    // Update status fields
+		    er.setStatusForMinistry(MinistryRequestStatus.SUBMITTED.getValue());
 
 		    Assurance assurance = null;
 		    if (er.getAssuranceId() != null) {

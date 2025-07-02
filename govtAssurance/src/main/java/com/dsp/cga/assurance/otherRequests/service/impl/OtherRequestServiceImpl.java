@@ -39,6 +39,7 @@ import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
+import com.dsp.cga.eunms.MinistryRequestStatus;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.response.GenericResponse;
 
@@ -379,7 +380,10 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	        !existing.getStatusForMinistry().equalsIgnoreCase("Returned")) {
 	        throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
 	    }
-
+	    
+	    // Update status fields
+	    existing.setStatusForMinistry(MinistryRequestStatus.SUBMITTED.getValue());
+	    
 	    // Only update fields if they are not null (optional update)
 	    if (dto.getAssuranceId() != null) {
 	        existing.setAssuranceId(dto.getAssuranceId());
