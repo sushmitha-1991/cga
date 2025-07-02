@@ -1080,7 +1080,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		if (!StringUtils.isEmpty(status)) {
 			spec = spec.and(ExtensionRequestSpec.hasStatus(status));
 		} else {
-//			spec = spec.and(ExtensionRequestSpec.hasStatus());
+			spec = spec.and(ExtensionRequestSpec.hasStatus());
 		}
 		
 		if (ministryId != null) {
@@ -1132,7 +1132,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		if (!StringUtils.isEmpty(status)) {
 			spec = spec.and(OtherRequestSpec.hasStatus(status));
 		} else {
-//			spec = spec.and(OtherRequestSpec.hasStatus());
+			spec = spec.and(OtherRequestSpec.hasStatus());
 		}
 	
 		if (ministryId != null) {
@@ -1178,7 +1178,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		if (!StringUtils.isEmpty(status)) {
 			spec = spec.and(ClubbedAssuranceRequestSpec.hasStatus(status));
 		} else {
-//			spec = spec.and(ClubbedAssuranceRequestSpec.hasStatus());
+			spec = spec.and(ClubbedAssuranceRequestSpec.hasStatus());
 		}
 	
 		if (ministryId != null) {
@@ -1229,7 +1229,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		if (!StringUtils.isEmpty(status)) {
 			spec = spec.and(DroppingRequestSpec.hasStatus(status));
 		} else {
-//			spec = spec.and(DroppingRequestSpec.hasStatus());
+			spec = spec.and(DroppingRequestSpec.hasStatus());
 		}
 	
 		if (ministryId != null) {
