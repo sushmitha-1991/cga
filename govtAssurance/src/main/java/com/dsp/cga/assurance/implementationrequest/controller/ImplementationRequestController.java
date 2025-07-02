@@ -216,9 +216,10 @@ public class ImplementationRequestController {
 	     @ApiResponse(responseCode = "500", description = "Internal server error")
 	 })
 	 public ResponseEntity<GenericResponse<List<AssuranceImplementationDTO>>> getAllImplementationDetails(
-	         @RequestParam(required = false) String houseAbbr) {
+	         @RequestParam(required = false) String houseAbbr,
+	         @RequestParam(required = false) Boolean mopaFlag) {
 
-	     List<AssuranceImplementationDTO> list = implementationRequestService.getAllImplementationDetails(houseAbbr);
+	     List<AssuranceImplementationDTO> list = implementationRequestService.getAllImplementationDetails(houseAbbr, mopaFlag);
 
 	     return ResponseEntity.ok(
 	         new GenericResponse<>(HttpStatus.OK.value(), true, "Implementation details fetched successfully", list)

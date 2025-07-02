@@ -32,6 +32,9 @@ public interface ImplementationRequestService {
 	
 
 	List<AssuranceImplementationDTO> getAllImplementationDetails(String houseAbbr);
+	
+	List<AssuranceImplementationDTO> getAllImplementationDetails(String houseAbbr, Boolean mopaFlag);
+
 
 	AssuranceImplementationDTO updateImplementationRequestforMinistryStatusById(Long id, ImplementationRequestDTO dto);
 

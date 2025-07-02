@@ -48,6 +48,7 @@ import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
+import com.dsp.cga.eunms.MinistryRequestStatus;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.DroppingRequestMapper;
 import com.dsp.cga.response.GenericResponse;
@@ -529,6 +530,9 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		        throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
 		    }
 
+		    // Update status fields
+		    dr.setStatusForMinistry(MinistryRequestStatus.SUBMITTED.getValue());
+		    
 		    Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
 		    if (assurance == null) return null;
 
