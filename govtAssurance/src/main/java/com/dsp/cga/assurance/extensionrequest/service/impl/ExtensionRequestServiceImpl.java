@@ -46,6 +46,7 @@ import com.dsp.cga.assurance.extensionrequest.service.ExtensionRequestService;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
+import com.dsp.cga.assurance.implementationrequest.service.impl.ImplementationRequestSpecification;
 import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
 import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
@@ -66,6 +67,7 @@ import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.specification.ClubbedAssuranceRequestSpec;
 import com.dsp.cga.specification.DroppingRequestSpec;
 import com.dsp.cga.specification.ExtensionRequestSpec;
+import com.dsp.cga.specification.ImplementationRequestSpec;
 import com.dsp.cga.specification.OtherRequestSpec;
 import com.dsp.cga.util.Utils;
 
@@ -1046,7 +1048,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 				LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
 	    
 	    List<CommonRequestResponseDTO> assurances = new ArrayList<>();
-
+	    
+	    // Implementation Request
+	    assurances.addAll(getImplementationRequests(fromDate, toDate, ministryId, memberId, status));
 	    // ExtensionRequest
 	    assurances.addAll(getExtensionRequests(fromDate, toDate, ministryId, memberId, status));
 	    // OtherRequests
@@ -1254,6 +1258,53 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 		droppingRequestRepository.findAll(spec).forEach(req -> {
 			response.add(buildDTO(req.getId(), "Dropping Request", req.getAssuranceId(), req.getAssurance().getSubject(),
+					req.getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
+					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
+		});
+		return response;
+	}
+	
+	
+	private Specification<ImplementationRequest> createImplementationSpecification(
+			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
+		
+		Specification<ImplementationRequest> spec = Specification.where(null);
+		spec = spec.and(ImplementationRequestSpec.isActive(true));
+		spec = spec.and(ImplementationRequestSpec.hasHouse(util.getHouseAbbr()));
+		spec = spec.and(ImplementationRequestSpec.isFromMinistry(true));
+
+		if (fromDate != null || toDate != null) {
+			spec = spec.and(ImplementationRequestSpec.hasDateBetween(fromDate, toDate));
+		}
+		
+		if (!StringUtils.isEmpty(status)) {
+			spec = spec.and(ImplementationRequestSpec.hasStatus(status));
+		} else {
+			spec = spec.and(ImplementationRequestSpec.hasStatus());
+		}
+		
+		if (ministryId != null) {
+			spec = spec.and(ImplementationRequestSpec.hasMinistryId(ministryId));
+		}
+
+		if (memberId != null) {
+			spec = spec.and(ImplementationRequestSpec.hasMemberId(memberId));
+		}
+		
+		return spec;
+	}
+	
+	
+	private List<CommonRequestResponseDTO> getImplementationRequests (LocalDate fromDate, LocalDate toDate, Long ministryId,
+			Long memberId, String status) {
+
+		Specification<ImplementationRequest> spec = createImplementationSpecification(fromDate, toDate, ministryId, memberId,
+				status);
+
+		List<CommonRequestResponseDTO> response = new ArrayList<>();
+
+		implementationRequestRepository.findAll(spec).forEach(req -> {
+			response.add(buildDTO(req.getId(), "Implementation Request", req.getAssuranceId(), req.getAssurance().getSubject(),
 					req.getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
 					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
 		});

@@ -4,11 +4,15 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.util.JsonMapConverter;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +35,10 @@ public class ImplementationRequest extends ApplicationInstance {
 	@Column(name = "assurance_id", nullable = false)
 	private Long assuranceId;
 
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "assurance_id", nullable = false, insertable = false,updatable = false)
+	private Assurance assurance;
+	
 	@Column(name = "committee_decision_id")
 	private Long committeeDecisionId;
 

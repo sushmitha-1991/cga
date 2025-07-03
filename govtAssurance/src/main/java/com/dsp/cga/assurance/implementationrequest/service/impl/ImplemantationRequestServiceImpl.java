@@ -152,7 +152,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	public ImplementationRequestDTO createImplementationRequest(ImplementationRequestDTO implementationRequestDTO) {
 	    // Convert DTO to Entity
 	    ImplementationRequest implementationRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
-
+	    System.out.println("Implementation request created");
+	    
 	    // Get house ID (Lok Sabha or Rajya Sabha)
 	    Long houseId = getHouseId();
 	    SerialNumberRequest serialNumberRequest = new SerialNumberRequest();
@@ -169,9 +170,13 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    // ✅ Get Assurance entity by ID
 	    Optional<Assurance> optionalAssurance = assuranceRepository.findById(implementationRequest.getAssuranceId());
 	    if (optionalAssurance.isPresent()) {
+		    System.out.println("Assurance found");
+
 	        Assurance assurance = optionalAssurance.get();
 
 	        if (houseId == 1) { // Rajya Sabha
+			    System.out.println("In RS");
+
 	            Long rajyaSabhaSessionId = assurance.getRajyaSabhaSessionNo();
 	            serialNumberRequest.setSessionId(rajyaSabhaSessionId);
 
@@ -181,7 +186,11 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	            });
 
 	        } else if (houseId == 2) { // Lok Sabha
+			    System.out.println("In LS");
+
 	            Long lokSabhaSessionId = assurance.getLokSabhaSessionNo();
+			    System.out.println("lokSabhaSessionId: " + lokSabhaSessionId);
+
 	            serialNumberRequest.setSessionId(lokSabhaSessionId);
 
 	            Optional<MastersLokSabhaSession> optionalSession = lssRepo.findById(lokSabhaSessionId);
@@ -190,14 +199,20 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                implementationRequest.setLokSabhaSession(session.getLokSabha().getLokSabhaNumber());
 	            });
 	        }
+		    System.out.println("session set");
 
 	        // Generate serial number if blank
 	        if (StringUtils.isBlank(implementationRequestDTO.getApplicationNo())) {
+			    System.out.println("In Serial No");
+
 	            SerialNumberResponse serialNumberResponse = generateSerialNumber(serialNumberRequest);
 	            implementationRequest.setApplicationNo(serialNumberResponse.getId());
+			    System.out.println("Created Serial No");
+
 	        }
 
 	    } else {
+		    System.out.println("Assurance not found");
 	        throw new ResourceNotFoundException("Assurance not found with ID: " + implementationRequest.getAssuranceId());
 	    }
 
@@ -211,9 +226,11 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 //	    implementationRequest.setRefId(implementationRequest.getId());
 //	    System.out.println("***********refId" + implementationRequest.getId());
 	    implementationRequest.setApplicationId(optionalApp.get().getId());
-	  
+	    System.out.println("saving Implementation");
+
 	    // Save to DB
 	    ImplementationRequest saved = implementationRequestRepository.save(implementationRequest);
+	    System.out.println("Implementation saved");
 
 	    saved.setRefId(saved.getId());
 
@@ -528,7 +545,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                .implementationTypeId(codeRepository.findCodeById(impl.getImplementationTypeId()))
 	                .memberName(memberName)
 	                .departmentName(departmentName)
-	                .ministryName(ministryName);
+	                .ministryName(ministryName)
+	                .creationDate(impl.getCreatedAt().toLocalDate());
 
 	        if (houseId == 1) {
 	            builder.house("Rajya Sabha");
