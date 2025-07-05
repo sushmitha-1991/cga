@@ -144,6 +144,9 @@ public class Assurance extends Auditable {
 	@Column(name = "assuranceNo")
 	private String assuranceNo;
 
+	@Column(name = "house_id")
+	private Long houseId;
+
 	@Column(name = "pageNoUncorrected", columnDefinition = "TEXT")
 	private String pageNoUncorrected;
 

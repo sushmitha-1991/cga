@@ -83,6 +83,7 @@ import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.mapper.PartDetailsMapper;
 import com.dsp.cga.mapper.SupplementaryMapper;
 import com.dsp.cga.response.GenericResponse;
+import com.dsp.cga.util.Utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -216,6 +217,10 @@ public class AssuranceServiceImpl implements AssuranceService {
 	    }
 	
 	    assuranceDTO.setAssuranceNo(generateAssuranceNo(assuranceDTO));
+	    
+	    // Populate House ID
+	    Long houseId = Utils.getHouseId();
+	    assuranceDTO.setHouseId(houseId);
 	    
 		// Map the AssuranceDTO to Assurance entity
 		Assurance assurance = assuranceMapper.toEntity(assuranceDTO);

@@ -94,6 +94,7 @@ public class AssuranceMapper {
 				.groupName(assurance.getGroupName()).mpaRefNo(assurance.getMpaRefNo())
 				.otherPendingDueTo(assurance.getOtherPendingDueTo()).partDetails(partDetailsDTOs)
 				.supplementary(supplementaryDTOs) // Set the List<SupplementaryDTO>
+				.houseId(assurance.getHouseId())
 				.build();
 	}
 
@@ -128,6 +129,7 @@ public class AssuranceMapper {
 				.pageNoUncorrected(assuranceDTO.getPageNoUncorrected()).sourceId(assuranceDTO.getSourceId())
 				.groupName(assuranceDTO.getGroupName()).mpaRefNo(assuranceDTO.getMpaRefNo())
 				.otherPendingDueTo(assuranceDTO.getOtherPendingDueTo()).clubbedMembers(assuranceDTO.getClubbedMembers())
+				.houseId(assuranceDTO.getHouseId())
 				.build();
 
 		List<Long> clubbedMembers = Optional.ofNullable(assuranceDTO.getClubbedMembers())
