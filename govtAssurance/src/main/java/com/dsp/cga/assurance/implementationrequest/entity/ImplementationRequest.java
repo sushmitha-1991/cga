@@ -103,9 +103,12 @@ public class ImplementationRequest extends ApplicationInstance {
 	@Column(name = "send_to")
 	private String sendTo; 
 	
+	@Column(name = "status_for_cga")
+	private String statusForCga; 
 	
-	
-	
+	@Column(name = "status_for_mopa")
+	private String statusForMopa;
+		
 	
 //	@ManyToOne
 //    @JoinColumn(name = "assurance_id", nullable = false)

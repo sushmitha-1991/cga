@@ -34,5 +34,8 @@ public class ExtensionRequestDTO {
 	private Boolean draftStatus;
 	private String assuranceNo;
     private List<Map<String, Object>> extensionFiles;
+    private String statusForMinistry;
+    private String statusForCga;
+
 
 }

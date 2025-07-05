@@ -64,7 +64,9 @@ public class OtherRequests extends Auditable{
 	    @Column(name = "status_for_ministry")
 	    private String statusForMinistry;
 		
-
+		@Column(name = "status_for_cga")
+		private String statusForCga; 
+		
 	    @Column(name = "other_files", columnDefinition = "jsonb")
 		@Convert(converter = JsonMapConverter.class)
 		private List<Map<String, Object>> fileUrl;

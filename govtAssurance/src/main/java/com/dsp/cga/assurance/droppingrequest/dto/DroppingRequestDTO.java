@@ -69,5 +69,9 @@ public class DroppingRequestDTO {
 	private LocalDate meetingDate;
 	
 	private List<Map<String, Object>> droppingFiles;
+	
+	private String statusForMinistry;
+	
+	private String statusForCga;
 
 }

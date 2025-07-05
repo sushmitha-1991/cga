@@ -6,16 +6,32 @@
  */
 package com.dsp.cga.util;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.dsp.cga.assurance.dto.ApiResponse;
+import com.dsp.cga.assurance.dto.SessionDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
+import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.repository.MyUserRepository;
 import com.dsp.cga.entity.BaseUser;
+import com.dsp.cga.eunms.MinistryStatus;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 
 
@@ -31,7 +47,18 @@ public class Utils {
 
 	@Autowired
 	private MyUserRepository myUserRepository;
+	
+	@Autowired
+	RestTemplate restTemplate;
+	
+	@Value("${master.service.url}")
+	private String masterServiceUrl;
+	
+	@Autowired
+	private HttpServletRequest httpRequest;
 
+	private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+	
 	public Long getUserIdFromAuthentication() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {
@@ -64,5 +91,110 @@ public class Utils {
 		}
 		return udto.getHouseAbbr();
 	}
+	
+	public static String getStatusForMopa (String statusForMinistry, String sendTo) {
+		
+		String returnStatus = null;
+		switch (statusForMinistry) {
+		
+			case "Returned" :
+				returnStatus = MinistryStatus.RETURNED.getValue();
+				break;
+			case "Submitted" :
+				if (StringUtils.isEmpty(sendTo)) returnStatus = MinistryStatus.RECEIVED.getValue();
+				else returnStatus = MinistryStatus.IN_PROGRESS.getValue();
+				break;
+			case "Accepted":
+				returnStatus = MinistryStatus.ACCEPTED.getValue();
+				break;
+			default:
+				break;
+		};
+		
+		return returnStatus;		
+	}	
+	
+	public static String getStatusForCga (String statusForMinistry) {
+		
+		if (StringUtils.isEmpty(statusForMinistry)) return null;
+		
+		String returnStatus = null;
+		switch (statusForMinistry) {
+		
+			case "Returned" :
+				returnStatus = MinistryStatus.RETURNED.getValue();
+				break;
+			case "Submitted" :
+				returnStatus = MinistryStatus.RECEIVED.getValue();
+				break;
+			case "Accepted":
+				returnStatus = MinistryStatus.ACCEPTED.getValue();
+				break;
+			default:
+				returnStatus = statusForMinistry; 
+				break;
+		};
+		
+		return returnStatus;		
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getTokenFromRequest() {
+
+		String authorizationHeader = httpRequest.getHeader("Authorization");
+		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+			return authorizationHeader.substring(7);
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public SessionDTO getCurrentSession() {
+	    String url = masterServiceUrl + "/session/current";
+	    logger.info("URL(master): {}", url);
+
+	    String token = getTokenFromRequest();
+	    if (token == null || token.isEmpty()) {
+	        logger.error("Authorization token is missing. Cannot get Session details");
+	        return null;
+	    }
+
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.set("Authorization", "Bearer " + token);
+
+	    HttpEntity<String> entity = new HttpEntity<>(headers);
+
+	    try {
+	        ParameterizedTypeReference<ApiResponse<SessionDTO>> responseType =
+		            new ParameterizedTypeReference<>() {};
+
+	        ResponseEntity<ApiResponse<SessionDTO>> response = restTemplate.exchange(
+	            url,
+	            HttpMethod.GET,
+	            entity,
+	            responseType
+	        );
+
+	        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+	            SessionDTO session = response.getBody().getData();
+	            logger.info("Session Fetched: {}", session);
+	            return session;
+	        } else {
+	            logger.error("Failed to fetch session. Response: {}", response);
+	        }
+	    } catch (Exception e) {
+	        logger.error("Exception while fetching current session", e);
+	    }
+	    return null;
+	}
+	
+		
 	
 }

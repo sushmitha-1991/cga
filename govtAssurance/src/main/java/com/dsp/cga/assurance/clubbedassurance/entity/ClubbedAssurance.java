@@ -54,7 +54,9 @@ public class ClubbedAssurance extends Auditable{
 	@Column(name = "status_for_ministry")
     private String statusForMinistry;
 	
-
+	@Column(name = "status_for_cga")
+	private String statusForCga; 
+	
 	@ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "clubbed_assurance_mapping", schema = "cga", 
                      joinColumns = @JoinColumn(name = "clubbed_assurance_id"))

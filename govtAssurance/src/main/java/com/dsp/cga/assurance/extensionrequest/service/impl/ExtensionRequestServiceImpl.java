@@ -32,6 +32,7 @@ import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
 import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
 import com.dsp.cga.assurance.dto.CommonRequestResponseDTO;
 import com.dsp.cga.assurance.dto.MemberDTO;
+import com.dsp.cga.assurance.dto.SessionDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
@@ -59,7 +60,9 @@ import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
-import com.dsp.cga.eunms.MinistryRequestStatus;
+import com.dsp.cga.eunms.Entities;
+import com.dsp.cga.eunms.MinistryStatus;
+import com.dsp.cga.eunms.RequestType;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ExtensionRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
@@ -169,9 +172,6 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	}
 
 
-
-	
-
 	@Override
 	public GenericResponse<List<ExtensionRequestDTO>> createOrUpdateExtensionRequests(
 	        List<ExtensionRequestDTO> extensionRequestDTOList) {
@@ -275,12 +275,16 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	    }
 
 	    // 🔹 Determine houseId (Lok Sabha = 2, Rajya Sabha = 1)
-	    Long houseId = getHouseId(); // You should have this implemented
+//	    Long houseId = getHouseId(); // You should have this implemented
 
 	    if (sessionNo == null) {
-	        sessionNo = (houseId == 1)
-	            ? rssRepo.findLatestByCreatedAt()
-	            : lssRepo.findLatestByCreatedAt();
+//	        sessionNo = (houseId == 1)
+//	            ? rssRepo.findLatestByCreatedAt()
+//	            : lssRepo.findLatestByCreatedAt();
+	    	
+	    	SessionDTO session = util.getCurrentSession();
+	    	sessionNo = session.getLokSabhaSessionNoId() != null 
+	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();
 	    }
 
 	    Long finalSessionNo = sessionNo;
@@ -308,20 +312,20 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	        return cb.and(predicates.toArray(new Predicate[0]));
 	    };
 
+	    String houseAbbr = util.getHouseAbbr();
+	    
 	    //  Fetch and filter manually using assuranceId
 	    List<ExtensionRequest> filteredList = extenionRequestRepository
-	    	    .findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt")).stream()
-
-	   // List<ExtensionRequest> filteredList = extenionRequestRepository.findAll(specification).stream()
-	        .filter(er -> {
+    	    .findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt")).stream()
+    	    .filter(er -> {
 	        	 if (er.getAssuranceId() == null) return false;
 	            Assurance assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
 	            if (assurance == null) return false;
 
-	            if (houseId == 1) {
+	            if (Utils.RAJYA_SABHA.equals(houseAbbr)) {
 	                if (assurance.getRajyaSabhaSessionNo() == null) return false;
 	                if (finalSessionNo != null && !finalSessionNo.equals(assurance.getRajyaSabhaSessionNo())) return false;
-	            } else if (houseId == 2) {
+	            } else if (Utils.LOK_SABHA.equals(houseAbbr)) {
 	                if (assurance.getLokSabhaSessionNo() == null || assurance.getLokSabhaNo() == null) return false;
 	                if (finalSessionNo != null && !finalSessionNo.equals(assurance.getLokSabhaSessionNo())) return false;
 	            }
@@ -534,7 +538,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		    }
 		    
 		    // Update status fields
-		    er.setStatusForMinistry(MinistryRequestStatus.SUBMITTED.getValue());
+		    er.setStatusForMinistry(MinistryStatus.SUBMITTED.getValue());
 
 		    Assurance assurance = null;
 		    if (er.getAssuranceId() != null) {
@@ -577,7 +581,8 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	@Override
 	public List<CommonRequestResponseDTO> getAllRequests() {
 	    List<CommonRequestResponseDTO> response = new ArrayList<>();
-	    Long houseId = getHouseId(); // Assume this fetches current houseId
+
+	    String houseAbbr = util.getHouseAbbr();
 
 	    // ExtensionRequest
 	    extenionRequestRepository.findAll().forEach(req -> {
@@ -586,7 +591,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                 "Returned".equalsIgnoreCase(req.getStatusForMinistry()))) {
 
 	            Assurance assurance = getAssurance(req.getAssuranceId());
-	            if (isValidForHouse(houseId, assurance)) {
+	            if (isValidForHouse(houseAbbr, assurance)) {
 	                response.add(buildDTO(
 	                        req.getId(), "Extension Request", req.getAssuranceId(),
 	                        req.getSubject(), req.getRemarks(), req.getFromMinistry(),
@@ -604,9 +609,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                 "Returned".equalsIgnoreCase(req.getStatusForMinistry()))) {
 
 	            Assurance assurance = getAssurance(req.getAssuranceId());
-	            if (isValidForHouse(houseId, assurance)) {
+	            if (isValidForHouse(houseAbbr, assurance)) {
 	                response.add(buildDTO(
-	                        req.getId(), "Other Requests", req.getAssuranceId(),
+	                        req.getId(), "Other Request", req.getAssuranceId(),
 	                        req.getSubject(), req.getRemarks(), req.getFromMinistry(),
 	                        req.getStatusForMinistry(), assurance,
 	                        req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null
@@ -622,7 +627,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                 "Returned".equalsIgnoreCase(req.getStatusForMinistry()))) {
 
 	            Assurance assurance = getAssurance(req.getAssuranceId());
-	            if (isValidForHouse(houseId, assurance)) {
+	            if (isValidForHouse(houseAbbr, assurance)) {
 	                response.add(buildDTO(
 	                        req.getId(), "Clubbed Assurance", req.getAssuranceId(),
 	                        null, null, req.getFromMinistry(),
@@ -640,7 +645,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                 "Returned".equalsIgnoreCase(req.getStatusForMinistry()))) {
 
 	            Assurance assurance = getAssurance(req.getAssuranceId());
-	            if (isValidForHouse(houseId, assurance)) {
+	            if (isValidForHouse(houseAbbr, assurance)) {
 	                response.add(buildDTO(
 	                        req.getId(), "Dropping Request", req.getAssuranceId(),
 	                        req.getSubject(), req.getRemarks(), req.getFromMinistry(),
@@ -659,16 +664,16 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	    return response;
 	}
 
-	private boolean isValidForHouse(Long houseId, Assurance assurance) {
+	private boolean isValidForHouse(String houseAbbr, Assurance assurance) {
 	    if (assurance == null) return false;
 
-	    if (houseId == 1) {
+	    if (Utils.RAJYA_SABHA.equals(houseAbbr)) {
 	        return assurance.getRajyaSabhaSessionNo() != null;
-	    } else if (houseId == 2) {
+	    } else if (Utils.LOK_SABHA.equals(houseAbbr)) { 
 	        return assurance.getLokSabhaSessionNo() != null;
 	    }
 
-	    return true; // If houseId is null or not 1/2, allow all.
+	    return true;
 	}
 
 
@@ -733,8 +738,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 	    @Override
 	    public CommonRequestResponseDTO getRequestById(Long id, String requestType) {
-	        Long houseId = getHouseId(); // Current houseId
-
+//	        Long houseId = getHouseId(); // Current houseId
+	        String houseAbbr = util.getHouseAbbr();
+	        
 	        // Fetch assurance details by ID and return a partial DTO for merging
 	        Function<Assurance, CommonRequestResponseDTO> buildAssuranceDetails = (assurance) -> {
 	            if (assurance == null) return null;
@@ -781,13 +787,12 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                             "Returned".equalsIgnoreCase(req.getStatusForMinistry())))
 	                    .map(req -> {
 	                        Assurance assurance = getAssurance(req.getAssuranceId());
-	                        if (isValidForHouse(houseId, assurance)) {
+	                        if (isValidForHouse(houseAbbr, assurance)) {
 	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
 	                            return CommonRequestResponseDTO.builder()
 	                                    .id(req.getId())
 	                                    .assuranceNo(assurance.getAssuranceNo())
-	                                    .requestType("Extension Request")
-	                                    .assuranceId(req.getAssuranceId())
+	                                    .requestType(RequestType.EXTENSION_REQ.getValue()).assuranceId(req.getAssuranceId())
 	                                    .subject(req.getSubject())
 	                                    .remarks(req.getRemarks())
 	                                    .extensionNo(req.getExtensionNo())
@@ -815,18 +820,18 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                    })
 	                    .orElse(null);
 
-	            case "Other Requests":
+	            case "Other Request":
 	                return otherRequestRepository.findById(id)
 	                    .filter(req -> Boolean.TRUE.equals(req.getFromMinistry()) &&
 	                            ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
 	                             "Returned".equalsIgnoreCase(req.getStatusForMinistry())))
 	                    .map(req -> {
 	                        Assurance assurance = getAssurance(req.getAssuranceId());
-	                        if (isValidForHouse(houseId, assurance)) {
+	                        if (isValidForHouse(houseAbbr, assurance)) {
 	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
 	                            return CommonRequestResponseDTO.builder()
 	                                    .id(req.getId())
-	                                    .requestType("Other Requests")
+	                                    .requestType(RequestType.OTHER_REQ.getValue())
 	                                    .assuranceId(req.getAssuranceId())
 	                                    .assuranceNo(assurance.getAssuranceNo())
 	                                    .subject(req.getSubject())
@@ -857,12 +862,12 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                             "Returned".equalsIgnoreCase(req.getStatusForMinistry())))
 	                    .map(req -> {
 	                        Assurance assurance = getAssurance(req.getAssuranceId());
-	                        if (isValidForHouse(houseId, assurance)) {
+	                        if (isValidForHouse(houseAbbr, assurance)) {
 	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
 	                            return CommonRequestResponseDTO.builder()
 	                                    .id(req.getId())
 	                                    .assuranceNo(assurance.getAssuranceNo())
-	                                    .requestType("Dropping Request")
+	                                    .requestType(RequestType.DROPPING_REQ.getValue())
 	                                    .assuranceId(req.getAssuranceId())
 	                                    .subject(req.getSubject())
 	                                    .droppingType(codeRepository.findCodeById(req.getDroppingType()))
@@ -901,18 +906,18 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                    })
 	                    .orElse(null);
 
-	            case "ClubbedAssurance":
+	            case "Clubbed Assurance":
 	                return clubbedAssuranceRepository.findById(id)
 	                    .filter(req -> Boolean.TRUE.equals(req.getFromMinistry()) &&
 	                            ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
 	                             "Returned".equalsIgnoreCase(req.getStatusForMinistry())))
 	                    .map(req -> {
 	                        Assurance assurance = getAssurance(req.getAssuranceId());
-	                        if (isValidForHouse(houseId, assurance)) {
+	                        if (isValidForHouse(houseAbbr, assurance)) {
 	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
 	                            return CommonRequestResponseDTO.builder()
 	                                    .id(req.getId())
-	                                    .requestType("Clubbed Assurance")
+	                                    .requestType(RequestType.CLUB_REQ.getValue())
 	                                    .assuranceId(req.getAssuranceId())
 	                                    .assuranceNo(assurance.getAssuranceNo())
 	                                    .clubbedAssuranceIds(req.getClubbedAssuranceIds())
@@ -945,11 +950,11 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                    	        )
 	                    .map(req -> {
 	                        Assurance assurance = getAssurance(req.getAssuranceId());
-	                        if (isValidForHouse(houseId, assurance)) {
+	                        if (isValidForHouse(houseAbbr, assurance)) {
 	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
 	                            return CommonRequestResponseDTO.builder()
 	                                    .id(req.getId())
-	                                    .requestType("Implementation Request")
+	                                    .requestType(RequestType.IMPLEMENTATION_REQ.getValue())
 	                                    .assuranceId(req.getAssuranceId())
 	                                    .assuranceNo(assurance.getAssuranceNo())
 	                                    .fromMinistry(req.getFromMinistry())
@@ -984,6 +989,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	        }
 	    }
 
+	    // Used for updating Return & Accept status
 	    @Override
 	    public CommonRequestResponseDTO updateRequest(Long id, String requestType, CommonRequestResponseDTO updateDto) {
 	    	System.out.println(requestType);
@@ -992,17 +998,21 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                return extenionRequestRepository.findById(id).map(entity -> {
 	                    if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
 	                  
-	                    if (updateDto.getStatusForMinistry() != null) entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                  
+	                    if (updateDto.getStatusForMinistry() != null) {
+	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                    	entity.setStatusForCga(Utils.getStatusForCga(updateDto.getStatusForMinistry()));
+	                    }	                  
 	                    extenionRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
 
-	            case "Other Requests":
+	            case "Other Request":
 	                return otherRequestRepository.findById(id).map(entity -> {
 	                    if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
-	                    if (updateDto.getStatusForMinistry() != null) entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    
+	                    if (updateDto.getStatusForMinistry() != null) {
+	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                    	entity.setStatusForCga(Utils.getStatusForCga(updateDto.getStatusForMinistry()));
+	                    }	                    
 	                    otherRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
@@ -1011,7 +1021,10 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                return droppingRequestRepository.findById(id).map(entity -> {
 	                    
 	                    if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
-	                    if (updateDto.getStatusForMinistry() != null) entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                    if (updateDto.getStatusForMinistry() != null) {
+	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                    	entity.setStatusForCga(Utils.getStatusForCga(updateDto.getStatusForMinistry()));
+	                    }
 	                   
 	                    droppingRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
@@ -1019,7 +1032,11 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 	            case "ClubbedAssurance":
 	                return clubbedAssuranceRepository.findById(id).map(entity -> {
-	                    if (updateDto.getStatusForMinistry() != null) entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                    if (updateDto.getStatusForMinistry() != null) {
+	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                    	entity.setStatusForCga(Utils.getStatusForCga(updateDto.getStatusForMinistry()));
+                        }
+	                    
 	                    // Add more fields if required
 	                    clubbedAssuranceRepository.save(entity);
 	                    return getRequestById(id, requestType);
@@ -1027,7 +1044,11 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                
 	            case "Implementation Request":  // New case added
 	                return implementationRequestRepository.findById(id).map(entity -> {
-	                    if (updateDto.getStatusForMinistry() != null) entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                    if (updateDto.getStatusForMinistry() != null) {
+	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+	                    	entity.setStatusForCga(Utils.getStatusForCga(updateDto.getStatusForMinistry()));
+                        }
+
 	                    entity.setReturnFrom("CGA");
 	                    implementationRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
@@ -1035,42 +1056,37 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 	            default:
 	                throw new IllegalArgumentException("Invalid request type: " + requestType);
-
-	           
 	        }
-	        
-	        
 	    }
 
 
 	@Override
 	public List<CommonRequestResponseDTO> getAllRequests(
-				LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
+				LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, 
+				String status, String statusFor) {
 	    
-	    List<CommonRequestResponseDTO> assurances = new ArrayList<>();
-	    
-	    // Implementation Request
-	    assurances.addAll(getImplementationRequests(fromDate, toDate, ministryId, memberId, status));
-	    // ExtensionRequest
-	    assurances.addAll(getExtensionRequests(fromDate, toDate, ministryId, memberId, status));
-	    // OtherRequests
-	    assurances.addAll(getOtherRequests(fromDate, toDate, ministryId, memberId, status));
-	    // ClubbedAssurance
-	    assurances.addAll(getClubbedAssurances(fromDate, toDate, ministryId, memberId, status));
-	    // DroppingRequest
-	    assurances.addAll(getDroppingRequests(fromDate, toDate, ministryId, memberId, status));
+		List<CommonRequestResponseDTO> assurances = new ArrayList<>();
 
-	    assurances.sort(
-	    	    Comparator.comparing(CommonRequestResponseDTO::getDate, Comparator.nullsLast(Comparator.reverseOrder()))
-	    	);
+		// Implementation Request
+		assurances.addAll(getImplementationRequests(fromDate, toDate, ministryId, memberId, status, statusFor));
+		// ExtensionRequest
+		assurances.addAll(getExtensionRequests(fromDate, toDate, ministryId, memberId, status, statusFor));
+		// OtherRequests
+		assurances.addAll(getOtherRequests(fromDate, toDate, ministryId, memberId, status, statusFor));
+		// ClubbedAssurance
+		assurances.addAll(getClubbedAssurances(fromDate, toDate, ministryId, memberId, status, statusFor));
+		// DroppingRequest
+		assurances.addAll(getDroppingRequests(fromDate, toDate, ministryId, memberId, status, statusFor));
 
+		assurances.sort(Comparator.comparing(CommonRequestResponseDTO::getDate,
+				Comparator.nullsLast(Comparator.reverseOrder())));
 
-	    return assurances;
+		return assurances;
 	}
 
 
 	private Specification<ExtensionRequest> createExtensionSpecification(
-			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
+			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status, String statusFor) {
 		
 		Specification<ExtensionRequest> spec = Specification.where(null);
 		spec = spec.and(ExtensionRequestSpec.isActive(true));
@@ -1082,9 +1098,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		}
 		
 		if (!StringUtils.isEmpty(status)) {
-			spec = spec.and(ExtensionRequestSpec.hasStatus(status));
+			spec = spec.and(ExtensionRequestSpec.hasStatus(status, statusFor));
 		} else {
-			spec = spec.and(ExtensionRequestSpec.hasStatus());
+			spec = spec.and(ExtensionRequestSpec.hasStatus(statusFor));
 		}
 		
 		if (ministryId != null) {
@@ -1101,18 +1117,25 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 	
 	private List<CommonRequestResponseDTO> getExtensionRequests(LocalDate fromDate, LocalDate toDate, Long ministryId,
-			Long memberId, String status) {
+			Long memberId, String status, String statusFor) {
+
+		String reqBy = StringUtils.isEmpty(statusFor) ? Entities.MINISTRY.getValue() : statusFor;
 
 		Specification<ExtensionRequest> spec = createExtensionSpecification(fromDate, toDate, ministryId, memberId,
-				status);
+				status, reqBy);
 
 		System.out.println("SPEC:" + spec.toString());
-		
+				
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 		extenionRequestRepository.findAll(spec).forEach(req -> {
+			
+			String reqStatus = Entities.CGA.getValue().equalsIgnoreCase(reqBy) 
+										? req.getStatusForCga() : req.getStatusForMinistry(); 
+			
 			response.add(buildDTO(req.getId(), "Extension Request", req.getAssuranceId(), req.getAssurance().getSubject(),
-					req.getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
-					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
+					req.getRemarks(), req.getFromMinistry(), 
+					reqStatus,  //req.getStatusForMinistry(), 
+					req.getAssurance(), req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
 		});
 
 		System.out.println("Number of records: " + response.size());
@@ -1122,7 +1145,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	
 	
 	private Specification<OtherRequests> createOtherRequestSpecification(
-			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
+			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status, String statusFor) {
 		
 		Specification<OtherRequests> spec = Specification.where(null);
 		spec = spec.and(OtherRequestSpec.isActive(true));
@@ -1134,9 +1157,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		}
 		
 		if (!StringUtils.isEmpty(status)) {
-			spec = spec.and(OtherRequestSpec.hasStatus(status));
+			spec = spec.and(OtherRequestSpec.hasStatus(status, statusFor));
 		} else {
-			spec = spec.and(OtherRequestSpec.hasStatus());
+			spec = spec.and(OtherRequestSpec.hasStatus(statusFor));
 		}
 	
 		if (ministryId != null) {
@@ -1152,23 +1175,29 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	
 	
 	private List<CommonRequestResponseDTO> getOtherRequests(LocalDate fromDate, LocalDate toDate, Long ministryId,
-			Long memberId, String status) {
+			Long memberId, String status, String statusFor) {
+
+		String reqBy = StringUtils.isEmpty(statusFor) ? Entities.MINISTRY.getValue() : statusFor;
 
 		Specification<OtherRequests> spec = createOtherRequestSpecification(fromDate, toDate, ministryId, memberId,
-				status);
-
+				status, reqBy);
+		
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
 		otherRequestRepository.findAll(spec).forEach(req -> {
+
+			String recordStatus = Entities.CGA.getValue().equalsIgnoreCase(reqBy) ? req.getStatusForCga() : req.getStatusForMinistry(); 
+
 			response.add(buildDTO(req.getId(), "Other Request", req.getAssuranceId(), req.getAssurance().getSubject(),
-					req.getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
-					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
+					req.getRemarks(), req.getFromMinistry(), 
+					recordStatus, //req.getStatusForMinistry(), 
+					req.getAssurance(), req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
 		});
 		return response;
 	}
 
 	private Specification<ClubbedAssurance> createClubbedAssuranceSpecification(
-			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
+			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status, String statusFor) {
 		
 		Specification<ClubbedAssurance> spec = Specification.where(null);
 		spec = spec.and(ClubbedAssuranceRequestSpec.isActive(true));
@@ -1180,9 +1209,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		}
 		
 		if (!StringUtils.isEmpty(status)) {
-			spec = spec.and(ClubbedAssuranceRequestSpec.hasStatus(status));
+			spec = spec.and(ClubbedAssuranceRequestSpec.hasStatus(status, statusFor));
 		} else {
-			spec = spec.and(ClubbedAssuranceRequestSpec.hasStatus());
+			spec = spec.and(ClubbedAssuranceRequestSpec.hasStatus(statusFor));
 		}
 	
 		if (ministryId != null) {
@@ -1200,26 +1229,32 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 		
 	private List<CommonRequestResponseDTO> getClubbedAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId,
-			Long memberId, String status) {
+			Long memberId, String status, String statusFor) {
+
+		String reqBy = StringUtils.isEmpty(statusFor) ? Entities.MINISTRY.getValue() : statusFor;
 
 		Specification<ClubbedAssurance> spec = createClubbedAssuranceSpecification(fromDate, toDate, ministryId, memberId,
-				status);
+				status, reqBy);
 		
 		System.out.println("Club SPEC: " + spec);
 
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
 		clubbedAssuranceRepository.findAll(spec).forEach(req -> {
+			
+			String recordStatus = Entities.CGA.getValue().equalsIgnoreCase(reqBy) ? req.getStatusForCga() : req.getStatusForMinistry(); 
+
 			response.add(buildDTO(req.getId(), "Clubbed Assurance", req.getAssuranceId(), req.getAssurance().getSubject(),
-					req.getAssurance().getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
-					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
+					req.getAssurance().getRemarks(), req.getFromMinistry(), 
+					recordStatus, //req.getStatusForMinistry(), 
+					req.getAssurance(), req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
 		});
 		return response;
 	}
 	
 	
 	private Specification<DroppingRequest> createDroppingRequestSpecification(
-			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
+			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status, String statusFor) {
 		
 		Specification<DroppingRequest> spec = Specification.where(null);
 		spec = spec.and(DroppingRequestSpec.isActive(true));
@@ -1231,9 +1266,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		}
 		
 		if (!StringUtils.isEmpty(status)) {
-			spec = spec.and(DroppingRequestSpec.hasStatus(status));
+			spec = spec.and(DroppingRequestSpec.hasStatus(status, statusFor));
 		} else {
-			spec = spec.and(DroppingRequestSpec.hasStatus());
+			spec = spec.and(DroppingRequestSpec.hasStatus(statusFor));
 		}
 	
 		if (ministryId != null) {
@@ -1249,16 +1284,23 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 	
 	private List<CommonRequestResponseDTO> getDroppingRequests (LocalDate fromDate, LocalDate toDate, Long ministryId,
-			Long memberId, String status) {
+			Long memberId, String status, String statusFor) {
+
+		String reqBy = StringUtils.isEmpty(statusFor) ? Entities.MINISTRY.getValue() : statusFor;
 
 		Specification<DroppingRequest> spec = createDroppingRequestSpecification(fromDate, toDate, ministryId, memberId,
-				status);
+				status, statusFor);
 
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
 		droppingRequestRepository.findAll(spec).forEach(req -> {
+			
+			String recordStatus = Entities.CGA.getValue().equalsIgnoreCase(reqBy) ? req.getStatusForCga() : req.getStatusForMinistry(); 
+
 			response.add(buildDTO(req.getId(), "Dropping Request", req.getAssuranceId(), req.getAssurance().getSubject(),
-					req.getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
+					req.getRemarks(), req.getFromMinistry(), 
+					recordStatus, // req.getStatusForMinistry(), 
+					req.getAssurance(),
 					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
 		});
 		return response;
@@ -1266,7 +1308,8 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	
 	
 	private Specification<ImplementationRequest> createImplementationSpecification(
-			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, String status) {
+			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, 
+			String status, String statusFor) {
 		
 		Specification<ImplementationRequest> spec = Specification.where(null);
 		spec = spec.and(ImplementationRequestSpec.isActive(true));
@@ -1278,9 +1321,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		}
 		
 		if (!StringUtils.isEmpty(status)) {
-			spec = spec.and(ImplementationRequestSpec.hasStatus(status));
+			spec = spec.and(ImplementationRequestSpec.hasStatus(status, statusFor));
 		} else {
-			spec = spec.and(ImplementationRequestSpec.hasStatus());
+			spec = spec.and(ImplementationRequestSpec.hasStatus(statusFor));
 		}
 		
 		if (ministryId != null) {
@@ -1296,17 +1339,37 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	
 	
 	private List<CommonRequestResponseDTO> getImplementationRequests (LocalDate fromDate, LocalDate toDate, Long ministryId,
-			Long memberId, String status) {
+			Long memberId, String status, String statusFor) {
+
+		String reqBy = StringUtils.isEmpty(statusFor) ? Entities.MINISTRY.getValue() : statusFor;
 
 		Specification<ImplementationRequest> spec = createImplementationSpecification(fromDate, toDate, ministryId, memberId,
-				status);
+				status, reqBy);
 
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
 		implementationRequestRepository.findAll(spec).forEach(req -> {
+			
+			String recordStatus = null; 
+			
+			switch (reqBy) {
+				case "cga":
+					recordStatus = req.getStatusForCga();
+					break;
+				case "mopa":
+					recordStatus = req.getStatusForMopa();
+					break;
+				case "ministry":
+					recordStatus = req.getStatusForMinistry();
+					break;
+				default:
+					recordStatus = null;
+			}
+			
 			response.add(buildDTO(req.getId(), "Implementation Request", req.getAssuranceId(), req.getAssurance().getSubject(),
-					req.getRemarks(), req.getFromMinistry(), req.getStatusForMinistry(), req.getAssurance(),
-					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
+					req.getRemarks(), req.getFromMinistry(), 
+					recordStatus, //req.getStatusForMinistry(), 
+					req.getAssurance(), req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
 		});
 		return response;
 	}

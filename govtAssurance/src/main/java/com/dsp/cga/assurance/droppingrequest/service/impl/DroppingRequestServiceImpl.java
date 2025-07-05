@@ -32,6 +32,7 @@ import com.dsp.cga.assurance.droppingrequest.service.DroppingRequestService;
 import com.dsp.cga.assurance.dto.AcceptedDTO;
 import com.dsp.cga.assurance.dto.DroppingTypeDTO;
 import com.dsp.cga.assurance.dto.MemberDTO;
+import com.dsp.cga.assurance.dto.SessionDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
@@ -48,10 +49,11 @@ import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
-import com.dsp.cga.eunms.MinistryRequestStatus;
+import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.DroppingRequestMapper;
 import com.dsp.cga.response.GenericResponse;
+import com.dsp.cga.util.Utils;
 
 import jakarta.persistence.criteria.Predicate;
 
@@ -93,6 +95,9 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	@Autowired
 	private AssuranceRepository assuranceRepository;
 
+	@Autowired
+	private Utils util;
+	
 	@Override
 	public DroppingRequestDTO getDroppingRequestByAssuranceId(Long id) {
 		DroppingRequest Request = droppingRequestRepository.findByAssuranceId(id).orElse(null);
@@ -209,6 +214,14 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 			DroppingRequestMapper.updateEntityFromDTO(droppingRequestDTO, existingRequest);
 			savedRequest = droppingRequestRepository.save(existingRequest);
 		} else {
+			// New to be created. Validate if dropping exists for the assurance
+			Long count = droppingRequestRepository.countByAssuranceId(droppingRequestDTO.getAssuranceId());
+			
+			if (count > 0) {
+				return new GenericResponse<>(HttpStatus.FAILED_DEPENDENCY.value(), false,
+						"Dropping Request cannot be created as another Dropping Request exists for the Assurance", null);
+			}
+			
 			DroppingRequest newRequest = DroppingRequestMapper.toEntity(droppingRequestDTO);
 			savedRequest = droppingRequestRepository.save(newRequest);
 		}
@@ -241,13 +254,18 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	    }
 
 	    // 🔹 Determine houseId
-	    Long houseId = getHouseId(); // Implement this method
-
+//	    Long houseId = getHouseId(); // Implement this method
+	    String houseAbbr = util.getHouseAbbr();
+	    
 	    // 🔹 Get latest session if sessionNo is null
 	    if (sessionNo == null) {
-	        sessionNo = (houseId == 1)
-	                ? rssRepo.findLatestByCreatedAt()
-	                : lssRepo.findLatestByCreatedAt();
+//	        sessionNo = (houseId == 1)
+//	                ? rssRepo.findLatestByCreatedAt()
+//	                : lssRepo.findLatestByCreatedAt();
+	       
+	    	SessionDTO session = util.getCurrentSession();
+	    	sessionNo = session.getLokSabhaSessionNoId() != null 
+	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();
 	    }
 
 	    Long finalSessionNo = sessionNo;
@@ -283,7 +301,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	                Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
 	                if (assurance == null) return false;
 
-	                if (houseId == 1) {
+	                if (Utils.RAJYA_SABHA.equals(houseAbbr)) {
 	                    return finalSessionNo.equals(assurance.getRajyaSabhaSessionNo());
 	                } else {
 	                    return finalSessionNo.equals(assurance.getLokSabhaSessionNo());
@@ -293,7 +311,6 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	                Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
 	                if (assurance == null) return false;
 
-	              //  if (statusId != null && !statusId.equals(assurance.getStatusId())) return false;
 	                if (ministryId != null && !ministryId.equals(assurance.getMinistryId())) return false;
 
 	                return true;
@@ -531,7 +548,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		    }
 
 		    // Update status fields
-		    dr.setStatusForMinistry(MinistryRequestStatus.SUBMITTED.getValue());
+		    dr.setStatusForMinistry(MinistryStatus.SUBMITTED.getValue());
 		    
 		    Assurance assurance = assuranceRepository.findById(dr.getAssuranceId()).orElse(null);
 		    if (assurance == null) return null;

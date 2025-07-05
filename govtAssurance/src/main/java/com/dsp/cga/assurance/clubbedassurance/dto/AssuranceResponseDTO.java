@@ -29,4 +29,6 @@ public class AssuranceResponseDTO {
     private String status;
     private String statusForMinistry;
     private List<Long> clubbedAssuranceIds;
+    private String statusForCga;
+
 }

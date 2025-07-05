@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
+import com.dsp.cga.util.Utils;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -19,21 +20,20 @@ import jakarta.persistence.criteria.Subquery;
 public class ImplementationRequestSpecification {
 
 	public static Specification<ImplementationRequest> filterByCriteria(
-	        Long sessionNo, LocalDate layingDate, Long implementationTypeId, String statusForMinistry, Long ministryId, Long houseId) {
+	        Long sessionNo, LocalDate layingDate, Long implementationTypeId, String statusForMinistry, Long ministryId, String houseAbbr) {
 
 	    return (Root<ImplementationRequest> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
 	        List<Predicate> predicates = new ArrayList<>();
-
-
 	        
-	        if (sessionNo != null && houseId != null) {
+	        if (sessionNo != null && houseAbbr != null) {
 	            Subquery<Long> subquery = query.subquery(Long.class);
 	            Root<Assurance> assuranceRoot = subquery.from(Assurance.class);
 	            subquery.select(assuranceRoot.get("id"));
 
-	            if (houseId == 1) {
+//	            if (houseId == 1) {
+	            if (Utils.RAJYA_SABHA.equals(houseAbbr)) {
 	                subquery.where(cb.equal(assuranceRoot.get("rajyaSabhaSessionNo"), sessionNo));
-	            } else if (houseId == 2) {
+	            } else if (Utils.LOK_SABHA.equals(houseAbbr)) {
 	                subquery.where(cb.equal(assuranceRoot.get("lokSabhaSessionNo"), sessionNo));
 	            }
 

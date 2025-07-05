@@ -194,10 +194,12 @@ public class ExtensionRequestController {
 		    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,		   
 		    @RequestParam(required = false) Long ministryId,
 			@RequestParam(required = false) Long memberId,
-		    @RequestParam(required = false) String status) {
+		    @RequestParam(required = false) String status,
+		    @RequestParam(required = false) String requestedBy) {
 	
 		List<CommonRequestResponseDTO> responseList = extensionRequestService.getAllRequests(
-															fromDate, toDate, ministryId, memberId, status);
+															fromDate, toDate, ministryId, memberId, status,
+															requestedBy);
 		
 	    GenericResponse<List<CommonRequestResponseDTO>> response = new GenericResponse<>(
 	            HttpStatus.OK.value(),

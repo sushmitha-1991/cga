@@ -2,9 +2,14 @@ package com.dsp.cga.specification;
 
 import java.time.LocalDate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
+import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
+import com.dsp.cga.eunms.CgaStatus;
+import com.dsp.cga.eunms.Entities;
+import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.util.Utils;
 
 
@@ -45,22 +50,56 @@ public class OtherRequestSpec {
 	}
 
 
-	public static Specification<OtherRequests> hasStatus(String statusForMinistry) {
-		return (root, query, criteriaBuilder) -> statusForMinistry != null ? criteriaBuilder.equal(root.get("statusForMinistry"), statusForMinistry)
-				: null;
+	public static Specification<OtherRequests> hasStatus(String status, String statusFor) {
+		
+		statusFor = StringUtils.isEmpty(statusFor) ? Entities.MINISTRY.getValue() : statusFor;
+		
+		if (Entities.CGA.getValue().equalsIgnoreCase(statusFor)) {
+			return (root, query, criteriaBuilder) -> status != null 
+						? criteriaBuilder.equal(root.get("statusForCga"), status)
+						: criteriaBuilder.conjunction();		
+		}
+		
+		if (Entities.MINISTRY.getValue().equalsIgnoreCase(statusFor)) {
+			return (root, query, criteriaBuilder) -> status != null 
+					? criteriaBuilder.equal(root.get("statusForMinistry"), status)
+					: criteriaBuilder.conjunction();
+		}
+		
+		return (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
 	}
 
 	
-	public static Specification<OtherRequests> hasStatus() {
+	public static Specification<OtherRequests> hasStatus(String statusFor) {
 		
-		Specification<OtherRequests> hasSubmittedStatus = (root, query, cb) -> 
-								cb.equal(root.get("statusForMinistry"), "Submitted");
+		statusFor = StringUtils.isEmpty(statusFor) ? Entities.MINISTRY.getValue() : statusFor;
+		
+		if (Entities.CGA.getValue().equalsIgnoreCase(statusFor)) {
 
-		Specification<OtherRequests> hasReturnedStatus = (root, query, cb) ->
-								cb.equal(root.get("statusForMinistry"), "Returned");
+			Specification<OtherRequests> hasReceivedStatus = (root, query, cb) -> 
+			cb.equal(root.get("statusForCga"), CgaStatus.RECEIVED.getValue());
 
-		Specification<OtherRequests> combinedSpec = hasSubmittedStatus.or(hasReturnedStatus);
-		return combinedSpec;
+			Specification<OtherRequests> hasReturnedStatus = (root, query, cb) ->
+						cb.equal(root.get("statusForCga"), CgaStatus.RETURNED.getValue());
+			
+			Specification<OtherRequests> combinedSpec = hasReceivedStatus.or(hasReturnedStatus);
+			return combinedSpec;
+			
+		}
+		
+		if (Entities.MINISTRY.getValue().equalsIgnoreCase(statusFor)) {
+
+			Specification<OtherRequests> hasSubmittedStatus = (root, query, cb) -> 
+			cb.equal(root.get("statusForMinistry"), MinistryStatus.SUBMITTED.getValue());
+
+			Specification<OtherRequests> hasReturnedStatus = (root, query, cb) ->
+						cb.equal(root.get("statusForMinistry"), MinistryStatus.RETURNED.getValue());
+			
+			Specification<OtherRequests> combinedSpec = hasSubmittedStatus.or(hasReturnedStatus);
+			return combinedSpec;
+		} 
+		
+		return (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
 
 	}
 

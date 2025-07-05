@@ -15,17 +15,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ClubbedAssuranceDTO {
-	
-	 private Long id;
+
+	private Long id;
 	// private Long sessionNo;
-	    private Long assuranceId;
-	    private List<Long> clubbedAssuranceIds;
-	    private String statusForMinistry;
-	    private String AssuranceNo;
-	    private List<AssuranceIdNoPairDTO> clubbedAssurances; 
-	    private LocalDate date;
-	    private List<MemberDTO> clubbedMembersData;
-	    private List<MemberDTO> supplementaryClubbedMembersData;
-	    
+	private Long assuranceId;
+	private List<Long> clubbedAssuranceIds;
+	private String statusForMinistry;
+	private String AssuranceNo;
+	private List<AssuranceIdNoPairDTO> clubbedAssurances;
+	private LocalDate date;
+	private List<MemberDTO> clubbedMembersData;
+	private List<MemberDTO> supplementaryClubbedMembersData;
+	private String statusForCga;
 
 }

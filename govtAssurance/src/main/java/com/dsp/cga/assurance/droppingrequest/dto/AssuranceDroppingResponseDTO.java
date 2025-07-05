@@ -17,30 +17,31 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AssuranceDroppingResponseDTO {
-	
+
 	private Long id;
-    private String lokSabhaNo;
-    private String lokSabhaSessionNo;
-    private String rajyaSabhaSessionNo;
-    private String partId;
-    private String supplementaryId;
-    private String memberName;
-    private String departmentName;
-    private String ministryName;
-    private String droppingType;
-    private LocalDate dropRequestDate;
-    private LocalDate actualDropDate;
-    private String assuranceNo;
-    private String status;
-    private String remarks;
-    private String ministryRefNo;
-    private List<Map<String, Object>> droppingFiles;
-private String questionNo;
-private String subject;
+	private String lokSabhaNo;
+	private String lokSabhaSessionNo;
+	private String rajyaSabhaSessionNo;
+	private String partId;
+	private String supplementaryId;
+	private String memberName;
+	private String departmentName;
+	private String ministryName;
+	private String droppingType;
+	private LocalDate dropRequestDate;
+	private LocalDate actualDropDate;
+	private String assuranceNo;
+	private String status;
+	private String remarks;
+	private String ministryRefNo;
+	private List<Map<String, Object>> droppingFiles;
+	private String questionNo;
+	private String subject;
 	private LocalDate ministryRefDate;
 	private String statusForMinistry;
-	  private List<MemberDTO> clubbedMembersData;
+	private String statusForCga;
 
-	 
-	    private List<MemberDTO> supplementaryClubbedMembersData;
+	private List<MemberDTO> clubbedMembersData;
+
+	private List<MemberDTO> supplementaryClubbedMembersData;
 }

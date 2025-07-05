@@ -1,9 +1,12 @@
 package com.dsp.cga.mapper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
+import com.dsp.cga.eunms.MinistryStatus;
+import com.dsp.cga.util.Utils;
 
 @Component
 public class ImplementationRequestMapper {
@@ -24,7 +27,7 @@ public class ImplementationRequestMapper {
                 .partId(entity.getPartId())
                 .reason(entity.getReason())
                 .draftStatus(entity.getDraftStatus())
-               .implementationReportFiles(entity.getImplementationReportFiles())
+                .implementationReportFiles(entity.getImplementationReportFiles())
                 .partReportFiles(entity.getPartReportFiles())
                 .dueDateOfImplementation(entity.getDueDateOfImplementation())
                 .dateOfImplementation(entity.getDateOfImplementation())
@@ -35,7 +38,8 @@ public class ImplementationRequestMapper {
                 .session(entity.getSession())
                 .applicationId(entity.getApplicationId())
                 .applicationNo(entity.getApplicationNo())
-               // .refId(entity.getRefId())
+                .statusForCga(entity.getStatusForCga())
+                .statusForMopa(entity.getStatusForCga())
                 .build();
     }
 
@@ -62,11 +66,12 @@ public class ImplementationRequestMapper {
                 .partReportFiles(dto.getPartReportFiles())
                 .otherFiles(dto.getOtherFiles())
                 .implementationTypeId(dto.getImplementationTypeId())
-                .session(dto.getSession())
-               
+                .session(dto.getSession())               
                 .fromMinistry(true)
                 .remarks(dto.getRemarks())
-	            .statusForMinistry("Submitted")
+	            .statusForMinistry(MinistryStatus.SUBMITTED.getValue())
+	            .statusForMopa(StringUtils.isEmpty(dto.getStatusForMopa()) ?
+            			Utils.getStatusForMopa(MinistryStatus.SUBMITTED.getValue(), dto.getSendTo()) : dto.getStatusForMopa())
                 .build();
     }
     

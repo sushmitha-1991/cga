@@ -41,6 +41,4 @@ public class ExtensionRequestResponseDTO {
     private List<Map<String, Object>> extensionFiles;
     private List<MemberDTO> clubbedMembersData;
     private List<MemberDTO> supplementaryClubbedMembersData;
-
-
 }

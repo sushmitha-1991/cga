@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.dsp.cga.assurance.dto.MemberDTO;
+import com.dsp.cga.assurance.dto.SessionDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.entity.Departments;
@@ -39,9 +40,11 @@ import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
-import com.dsp.cga.eunms.MinistryRequestStatus;
+import com.dsp.cga.eunms.CgaStatus;
+import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.response.GenericResponse;
+import com.dsp.cga.util.Utils;
 
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
@@ -79,6 +82,9 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	@Autowired
 	private CodeRepository codeRepository;
 	
+	@Autowired
+	private Utils util;
+	
 	@Override
 	public OtherRequestDTO createOtherRequest(OtherRequestDTO dto) {
 		System.out.println(dto.getAssuranceId());
@@ -90,7 +96,8 @@ public class OtherRequestServiceImpl implements OtherRequestService {
                 .remarks(dto.getRemarks())
                 .fileUrl(dto.getFileUrl())
                 .fromMinistry(true)
-	             .statusForMinistry("Submitted")
+	            .statusForMinistry(MinistryStatus.SUBMITTED.getValue())
+	            .statusForCga(CgaStatus.RECEIVED.getValue())
                 .build();
 
         OtherRequests saved = otherRequestRepo.save(entity);
@@ -104,6 +111,8 @@ public class OtherRequestServiceImpl implements OtherRequestService {
                 .remarks(saved.getRemarks())
                 .fileUrl(saved.getFileUrl())
                 .fileUrl(saved.getFileUrl())
+                .statusForMinistry(saved.getStatusForMinistry())
+                .statusForCga(saved.getStatusForCga())
                 .build();
     }
 
@@ -124,13 +133,14 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	        ministryId = null;
 	    }
 
-	    // 🔹 Determine houseId (1 = Rajya Sabha, 2 = Lok Sabha)
-	    Long houseId = getHouseId();
-
 	    if (sessionNo == null) {
-	        sessionNo = (houseId == 1)
-	            ? rssRepo.findLatestByCreatedAt()
-	            : lssRepo.findLatestByCreatedAt();
+//	        sessionNo = (houseId == 1)
+//	            ? rssRepo.findLatestByCreatedAt()
+//	            : lssRepo.findLatestByCreatedAt();
+	        
+	    	SessionDTO session = util.getCurrentSession();
+	    	sessionNo = session.getLokSabhaSessionNoId() != null 
+	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();	        
 	    }
 
 	    Long finalSessionNo = sessionNo;
@@ -151,7 +161,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	    };
 
 	    // 🔹 Fetch and filter based on Assurance
-	 //   List<OtherRequests> filteredList = otherRequestRepo.findAll(specification).stream()
+	    String houseAbbr = util.getHouseAbbr();
 	    List<OtherRequests> filteredList = otherRequestRepo
 	    	    .findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt"))
 	    	    .stream()
@@ -162,10 +172,10 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            Assurance assurance = assuranceRepository.findById(or.getAssuranceId()).orElse(null);
 	            if (assurance == null) return false;
 
-	            if (houseId == 1) {
+	            if (Utils.RAJYA_SABHA.equals(houseAbbr)) {
 	                if (assurance.getRajyaSabhaSessionNo() == null) return false;
 	                if (!finalSessionNo.equals(assurance.getRajyaSabhaSessionNo())) return false;
-	            } else {
+	            } else if (Utils.LOK_SABHA.equals(houseAbbr)){
 	                if (assurance.getLokSabhaSessionNo() == null || assurance.getLokSabhaNo() == null) return false;
 	                if (!finalSessionNo.equals(assurance.getLokSabhaSessionNo())) return false;
 	            }
@@ -382,7 +392,8 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	    }
 	    
 	    // Update status fields
-	    existing.setStatusForMinistry(MinistryRequestStatus.SUBMITTED.getValue());
+	    existing.setStatusForMinistry(MinistryStatus.SUBMITTED.getValue());
+	    existing.setStatusForCga(Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
 	    
 	    // Only update fields if they are not null (optional update)
 	    if (dto.getAssuranceId() != null) {

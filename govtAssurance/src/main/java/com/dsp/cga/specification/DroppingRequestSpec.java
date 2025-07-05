@@ -2,9 +2,14 @@ package com.dsp.cga.specification;
 
 import java.time.LocalDate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
+import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
+import com.dsp.cga.eunms.CgaStatus;
+import com.dsp.cga.eunms.Entities;
+import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.util.Utils;
 
 
@@ -45,22 +50,56 @@ public class DroppingRequestSpec {
 	}
 
 
-	public static Specification<DroppingRequest> hasStatus(String statusForMinistry) {
-		return (root, query, criteriaBuilder) -> statusForMinistry != null ? criteriaBuilder.equal(root.get("statusForMinistry"), statusForMinistry)
-				:  criteriaBuilder.conjunction();
+	public static Specification<DroppingRequest> hasStatus(String status, String statusFor) {
+		
+		statusFor = StringUtils.isEmpty(statusFor) ? Entities.MINISTRY.getValue() : statusFor;
+		
+		if (Entities.CGA.getValue().equalsIgnoreCase(statusFor)) {
+			return (root, query, criteriaBuilder) -> status != null 
+						? criteriaBuilder.equal(root.get("statusForCga"), status)
+						: criteriaBuilder.conjunction();		
+		}
+		
+		if (Entities.MINISTRY.getValue().equalsIgnoreCase(statusFor)) {
+			return (root, query, criteriaBuilder) -> status != null 
+					? criteriaBuilder.equal(root.get("statusForMinistry"), status)
+					: criteriaBuilder.conjunction();
+		}
+		
+		return (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
 	}
 
 	
-	public static Specification<DroppingRequest> hasStatus() {
+	public static Specification<DroppingRequest> hasStatus(String statusFor) {
 		
-		Specification<DroppingRequest> hasSubmittedStatus = (root, query, cb) -> 
-								cb.equal(root.get("statusForMinistry"), "Submitted");
+		statusFor = StringUtils.isEmpty(statusFor) ? Entities.MINISTRY.getValue() : statusFor;
+		
+		if (Entities.CGA.getValue().equalsIgnoreCase(statusFor)) {
 
-		Specification<DroppingRequest> hasReturnedStatus = (root, query, cb) ->
-								cb.equal(root.get("statusForMinistry"), "Returned");
+			Specification<DroppingRequest> hasReceivedStatus = (root, query, cb) -> 
+			cb.equal(root.get("statusForCga"), CgaStatus.RECEIVED.getValue());
 
-		Specification<DroppingRequest> combinedSpec = hasSubmittedStatus.or(hasReturnedStatus);
-		return combinedSpec;
+			Specification<DroppingRequest> hasReturnedStatus = (root, query, cb) ->
+						cb.equal(root.get("statusForCga"), CgaStatus.RETURNED.getValue());
+			
+			Specification<DroppingRequest> combinedSpec = hasReceivedStatus.or(hasReturnedStatus);
+			return combinedSpec;
+			
+		}
+		
+		if (Entities.MINISTRY.getValue().equalsIgnoreCase(statusFor)) {
+
+			Specification<DroppingRequest> hasSubmittedStatus = (root, query, cb) -> 
+			cb.equal(root.get("statusForMinistry"), MinistryStatus.SUBMITTED.getValue());
+
+			Specification<DroppingRequest> hasReturnedStatus = (root, query, cb) ->
+						cb.equal(root.get("statusForMinistry"), MinistryStatus.RETURNED.getValue());
+			
+			Specification<DroppingRequest> combinedSpec = hasSubmittedStatus.or(hasReturnedStatus);
+			return combinedSpec;
+		} 
+		
+		return (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
 
 	}
 

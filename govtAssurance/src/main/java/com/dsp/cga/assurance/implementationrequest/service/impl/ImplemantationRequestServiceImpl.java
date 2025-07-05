@@ -43,6 +43,7 @@ import com.dsp.cga.assurance.dto.ImplementationTypeDTO;
 import com.dsp.cga.assurance.dto.MemberDTO;
 import com.dsp.cga.assurance.dto.SerialNumberRequest;
 import com.dsp.cga.assurance.dto.SerialNumberResponse;
+import com.dsp.cga.assurance.dto.SessionDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
@@ -71,10 +72,13 @@ import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.entity.MastersLokSabhaSession;
 import com.dsp.cga.entity.MastersRajyaSabha;
-import com.dsp.cga.eunms.MinistryRequestStatus;
+import com.dsp.cga.eunms.CgaStatus;
+import com.dsp.cga.eunms.MinistryStatus;
+import com.dsp.cga.eunms.MopaStatus;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.response.GenericResponse;
+import com.dsp.cga.util.Utils;
 
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -146,7 +150,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	@Autowired
 	private CodeRepository codeRepository;
 
-
+	@Autowired
+	private Utils util;
 	
 	@Override
 	public ImplementationRequestDTO createImplementationRequest(ImplementationRequestDTO implementationRequestDTO) {
@@ -156,6 +161,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    
 	    // Get house ID (Lok Sabha or Rajya Sabha)
 	    Long houseId = getHouseId();
+	    String houseAbbr = util.getHouseAbbr();
+	    
 	    SerialNumberRequest serialNumberRequest = new SerialNumberRequest();
 	    Optional<Application> optionalApp = applicationRepository.findByAbbr("IRFM");
 	    System.out.println(optionalApp.get().getId());
@@ -174,7 +181,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	        Assurance assurance = optionalAssurance.get();
 
-	        if (houseId == 1) { // Rajya Sabha
+	        if (Utils.RAJYA_SABHA.equals(houseAbbr)) { // Rajya Sabha
 			    System.out.println("In RS");
 
 	            Long rajyaSabhaSessionId = assurance.getRajyaSabhaSessionNo();
@@ -185,7 +192,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                implementationRequest.setRajyaSabhaSession(session.getSessionNumber());
 	            });
 
-	        } else if (houseId == 2) { // Lok Sabha
+	        } else if (Utils.LOK_SABHA.equals(houseAbbr)) { // Lok Sabha
 			    System.out.println("In LS");
 
 	            Long lokSabhaSessionId = assurance.getLokSabhaSessionNo();
@@ -459,16 +466,21 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        ministryId = null;
 	    }
 
-	    Long houseId = getHouseId(); 
+//	    Long houseId = getHouseId(); 
 	    if (sessionNo == null) {
-	        sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
+//	        sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
+	    
+	    	SessionDTO session = util.getCurrentSession();
+	    	sessionNo = session.getLokSabhaSessionNoId() != null 
+	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();
 	    }
 
 	    final Long finalSessionNo = sessionNo;
-
+	    String houseAbbr = util.getHouseAbbr();
+	    
 	    // ✅ Common Specification using ImplementationRequest
 	    Specification<ImplementationRequest> spec =
-	            ImplementationRequestSpecification.filterByCriteria(finalSessionNo, layingDate, implementationTypeId, statusForMinistry, ministryId, houseId);
+	            ImplementationRequestSpecification.filterByCriteria(finalSessionNo, layingDate, implementationTypeId, statusForMinistry, ministryId, houseAbbr);
 
 	    //List<ImplementationRequest> implementationRequests = implementationRequestRepository.findAll(spec);
 	    List<ImplementationRequest> implementationRequests = implementationRequestRepository
@@ -478,10 +490,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        return List.of();
 	    }
 
-//	    implementationRequests = implementationRequests.stream()
-//	    	    .sorted(Comparator.comparing(ImplementationRequest::getCreatedAt).reversed())
-//	    	    .collect(Collectors.toList());
-	    
 	    return implementationRequests.stream().map(impl -> {
 	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
 	        if (assurance == null) {
@@ -489,12 +497,12 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        }
 
 	        // ✅ House check: skip if Rajya Sabha selected but RS session null
-	        if (houseId == 1 && assurance.getRajyaSabhaSessionNo() == null) {
+	        if (Utils.RAJYA_SABHA.equals(houseAbbr) && assurance.getRajyaSabhaSessionNo() == null) {
 	            return null;
 	        }
 
 	        // ✅ House check: skip if Lok Sabha selected but LS session null
-	        if (houseId == 2 && assurance.getLokSabhaSessionNo() == null) {
+	        if (Utils.LOK_SABHA.equals(houseAbbr) && assurance.getLokSabhaSessionNo() == null) {
 	            return null;
 	        }
 
@@ -548,7 +556,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                .ministryName(ministryName)
 	                .creationDate(impl.getCreatedAt().toLocalDate());
 
-	        if (houseId == 1) {
+	        if (Utils.RAJYA_SABHA.equals(houseAbbr)) {
 	            builder.house("Rajya Sabha");
 	            builder.rajyaSabhaSessionNumber(rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo()));
 	        } else {
@@ -752,7 +760,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    }
 	    
 	    // Update status fields
-	    implReq.setStatusForMinistry(MinistryRequestStatus.SUBMITTED.getValue());
+	    implReq.setStatusForMinistry(MinistryStatus.SUBMITTED.getValue());
 	    implReq.setReturnFrom(null);
 	    	    
 	    Assurance assurance = assuranceRepository.findById(implReq.getAssuranceId()).orElse(null);
@@ -822,7 +830,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	    Map<String, Long> requestCounts = new HashMap<>();
 
-	    if (houseId == 1) {
+//	    if (Utils.RAJYA_SABHA.equals(houseAbbr)) {
+	    if (houseId == 1) {	
 	        requestCounts.put("implementationRequest", implementationRequestRepository.countByMinistryIdAndRajyaSabha(ministryId));
 	        requestCounts.put("extensionRequest", extensionRepo.countByMinistryIdAndRajyaSabha(ministryId));
 	        requestCounts.put("droppingRequest", droppingRepo.countByMinistryIdAndRajyaSabha(ministryId));
@@ -1057,14 +1066,14 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		switch (status) {
 		
 			case "Returned" :
-				returnStatus = MinistryRequestStatus.RETURNED.getValue();
+				returnStatus = MinistryStatus.RETURNED.getValue();
 				break;
 			case "Submitted" :
-				if (StringUtils.isEmpty(impl.getSendTo())) returnStatus = MinistryRequestStatus.RECEIVED.getValue();
-				else returnStatus = MinistryRequestStatus.IN_PROGRESS.getValue();
+				if (StringUtils.isEmpty(impl.getSendTo())) returnStatus = MinistryStatus.RECEIVED.getValue();
+				else returnStatus = MinistryStatus.IN_PROGRESS.getValue();
 				break;
 			case "Accepted":
-				returnStatus = MinistryRequestStatus.ACCEPTED.getValue();
+				returnStatus = MinistryStatus.ACCEPTED.getValue();
 				break;
 			default:
 				break;
@@ -1088,18 +1097,23 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		    	implReq.setRemarks(dto.getRemarks()); // still updating remarks in Assurance (if required)
 		    }
 		    
-		    if (dto.getSendTo() != null) {
-		    	implReq.setSendTo(dto.getSendTo()); 
-		    }
-
-		    if (dto.getStatusForMinistry() != null) {
+		    // When returned by MoPA to Ministry
+		    if (!StringUtils.isEmpty(dto.getStatusForMinistry()) && 
+		    						 MinistryStatus.RETURNED.getValue().equalsIgnoreCase(dto.getStatusForMinistry())) {
 		    	System.out.println(dto.getStatusForMinistry());
-		    	implReq.setStatusForMinistry(dto.getStatusForMinistry()); 
-		    	  implReq.setReturnFrom("Mopa");
+		    	
+		    	implReq.setStatusForMinistry(dto.getStatusForMinistry()); 		    	
+		    	implReq.setReturnFrom("Mopa");		    	
+		    	implReq.setStatusForMopa(MopaStatus.RETURNED.getValue());
 		    }
 		    
-		  
-
+		    // When sending to LS / RS
+		    if (StringUtils.isEmpty(dto.getStatusForMinistry()) && !StringUtils.isEmpty(dto.getSendTo())) {
+		    	implReq.setSendTo(dto.getSendTo());
+		    	implReq.setStatusForMopa(MopaStatus.IN_PROGRESS.getValue());
+		    	implReq.setStatusForCga(CgaStatus.RECEIVED.getValue());
+		    	// Ministry status remains unchanged - SUBMITTED
+		    }
 		    
 		    implementationRequestRepository.save(implReq);
 		    //assuranceRepository.save(assurance); // only if remarks changed

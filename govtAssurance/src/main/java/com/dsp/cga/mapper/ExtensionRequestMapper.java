@@ -4,6 +4,9 @@ import org.springframework.stereotype.Component;
 
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
 import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
+import com.dsp.cga.eunms.CgaStatus;
+import com.dsp.cga.eunms.MinistryStatus;
+import com.dsp.cga.util.Utils;
 @Component
 public class ExtensionRequestMapper {
 	
@@ -15,7 +18,6 @@ public class ExtensionRequestMapper {
 	        return ExtensionRequestDTO.builder()
 	                .id(entity.getId())
 	                .assuranceId(entity.getAssuranceId())
-	                //.questionNo(entity.getQuestionNo())
 	                .extensionNo(entity.getExtensionNo())
 	                .subject(entity.getSubject())
 	                .extRequestedTillDate(entity.getExtRequestedTillDate())
@@ -26,7 +28,9 @@ public class ExtensionRequestMapper {
 	                .extensionFiles(entity.getExtensionFiles())
 	                .draftStatus(entity.getDraftStatus())
 	                .statusId(entity.getStatusId())
-	                .build();
+	                .statusForMinistry(entity.getStatusForMinistry())
+	                .statusForCga(entity.getStatusForCga())
+	                 .build();
 	    }
 
 	 public static void updateEntityFromDTO(ExtensionRequestDTO dto, ExtensionRequest entity) {
@@ -64,7 +68,8 @@ public class ExtensionRequestMapper {
 	                .draftStatus(dto.getDraftStatus())
 	                .extensionFiles(dto.getExtensionFiles())
 	                .fromMinistry(true)
-		             .statusForMinistry("Submitted")
+		             .statusForMinistry(MinistryStatus.SUBMITTED.getValue())
+		             .statusForCga(Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
 	                .statusId(dto.getStatusId())
 	                .build();
 	    }

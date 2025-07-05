@@ -108,5 +108,6 @@ public class DroppingRequest extends Auditable {
 	@Column(name = "status_for_ministry")
     private String statusForMinistry;
 	
-
+	@Column(name = "status_for_cga")
+	private String statusForCga; 
 }

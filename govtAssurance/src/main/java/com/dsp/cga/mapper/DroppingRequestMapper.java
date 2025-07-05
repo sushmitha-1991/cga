@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 
 import com.dsp.cga.assurance.droppingrequest.dto.DroppingRequestDTO;
 import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
+import com.dsp.cga.eunms.MinistryStatus;
+import com.dsp.cga.util.Utils;
 
 @Component
 public class DroppingRequestMapper {
@@ -14,29 +16,30 @@ public class DroppingRequestMapper {
 	        }
 
 	        return DroppingRequest.builder()
-	                .id(dto.getId())
-	                .assuranceId(dto.getAssuranceId())
-	                .droppingType(dto.getDroppingType())
-	                .supplementaryId(dto.getSupplementaryId())
-	                .partId(dto.getPartId())
-	                .dropRequestDate(dto.getDropRequestDate())
-	                .actualDropDate(dto.getActualDropDate())
-	                .ministryRefNo(dto.getMinistryRefNo())
-	                .ministryRefDate(dto.getMinistryRefDate())
-	                .acceptedId(dto.getAcceptedId())
-	                .subject(dto.getSubject())
-	                .remarks(dto.getRemarks())
-	                .meetingDate(dto.getMeetingDate())
-	                .meetingNo(dto.getMeetingNo())
-	                .droppingFiles(dto.getDroppingFiles())
-	                .draftStatus(dto.getDraftStatus())
-	                .type(dto.getType())
-	                .issueLetterMinistry(dto.getIssueLetterMinistry())
-	                .communicationDate(dto.getCommunicationDate())
-	             .fromMinistry(true)
-	             .statusForMinistry("Submitted")
-	                .session(dto.getSession())
-	                .build();
+				.id(dto.getId())
+				.assuranceId(dto.getAssuranceId())
+				.droppingType(dto.getDroppingType())
+				.supplementaryId(dto.getSupplementaryId())
+				.partId(dto.getPartId())
+				.dropRequestDate(dto.getDropRequestDate())
+				.actualDropDate(dto.getActualDropDate())
+				.ministryRefNo(dto.getMinistryRefNo())
+				.ministryRefDate(dto.getMinistryRefDate())
+				.acceptedId(dto.getAcceptedId())
+				.subject(dto.getSubject())
+				.remarks(dto.getRemarks())
+				.meetingDate(dto.getMeetingDate())
+				.meetingNo(dto.getMeetingNo())
+				.droppingFiles(dto.getDroppingFiles())
+				.draftStatus(dto.getDraftStatus())
+				.type(dto.getType())
+				.issueLetterMinistry(dto.getIssueLetterMinistry())
+				.communicationDate(dto.getCommunicationDate())
+				.fromMinistry(true)
+				.statusForMinistry(MinistryStatus.SUBMITTED.getValue())
+				.statusForCga(Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
+				.session(dto.getSession())
+				.build();
 	    }
 
 	    // Convert DroppingRequest entity to DroppingRequestDTO
@@ -66,6 +69,8 @@ public class DroppingRequestMapper {
 	                .issueLetterMinistry(entity.getIssueLetterMinistry())
 	                .type(entity.getType())
 	                .session(entity.getSession())
+	                .statusForMinistry(entity.getStatusForMinistry())
+	                .statusForCga(entity.getStatusForCga())
 	                .build();
 	    }
 

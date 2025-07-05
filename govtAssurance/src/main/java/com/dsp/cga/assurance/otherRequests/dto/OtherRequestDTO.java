@@ -17,15 +17,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class OtherRequestDTO {
-	
+
 	private Long id;
 
 	private String assuranceNo;
-	 private String lokSabhaNumber;
-	    private String lokSabhaSessionNumber;
-	    private String rajyaSabhaSessionNumber;
-    private String extensionNo;
-    private String status;
+	private String lokSabhaNumber;
+	private String lokSabhaSessionNumber;
+	private String rajyaSabhaSessionNumber;
+	private String extensionNo;
+	private String status;
 	private Long assuranceId;
 
 	private String departmentName;
@@ -33,15 +33,21 @@ public class OtherRequestDTO {
 	private String memberName;
 	private String questionNo;
 	private String statusForMinistry;
-	 private LocalDate requestedDate;
-	 private List<MemberDTO> clubbedMembersData;
-	    private List<MemberDTO> supplementaryClubbedMembersData;
-	    private Long statusId; 
-	   
-	    private String remarks;
-	    
-	    private String subject;
-	   
-		private List<Map<String, Object>> fileUrl;
+	private LocalDate requestedDate;
+	private List<MemberDTO> clubbedMembersData;
+	private List<MemberDTO> supplementaryClubbedMembersData;
+	private Long statusId;
+
+	private String remarks;
+
+	private String subject;
+
+	private List<Map<String, Object>> fileUrl;
+
+	private String fromMinistry;
+	
+	private String statusForCga;
+	
+	
 
 }
