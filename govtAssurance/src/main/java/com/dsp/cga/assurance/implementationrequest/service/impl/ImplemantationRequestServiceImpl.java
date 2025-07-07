@@ -1152,9 +1152,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 		    return getImplementationDetailById(id);
 		}
-
-
-
+	
 
 	@Override
 	public List<AssuranceImplementationDTO> getReturnRequestsFromCGA(String houseAbbr) {
@@ -1184,6 +1182,26 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	    return dtoList;
 	}
+
+	@Override
+	public AssuranceImplementationDTO sendToCga (ImplementationRequestDTO dto) {
+		
+		Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(dto.getId());
+		
+		if (optionalRequest.isEmpty()) return null;
+
+	    ImplementationRequest implReq = optionalRequest.get();
+		    
+    	implReq.setSendTo(dto.getSendTo());
+    	implReq.setStatusForMopa(MopaStatus.IN_PROGRESS.getValue());
+    	implReq.setStatusForCga(CgaStatus.RECEIVED.getValue());
+    	// Ministry status remains unchanged - SUBMITTED
+		    
+	    implementationRequestRepository.save(implReq);
+
+	    return getImplementationDetailById(dto.getId());
+	}
+
 }
 
 
