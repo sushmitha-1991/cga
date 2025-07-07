@@ -58,6 +58,8 @@ public class AssuranceImplementationDTO {
 		  // private String statusForMinistry;
 		    private String statementNo;
 		private LocalDate creationDate;    
+		private String statusForMopa;
+		private String statusForCga;
 		 
 		    private List<MemberDTO> clubbedMembersData;
 		    private List<Supplementary> supplementary;

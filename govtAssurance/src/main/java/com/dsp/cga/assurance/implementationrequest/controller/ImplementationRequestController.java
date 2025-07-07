@@ -217,9 +217,9 @@ public class ImplementationRequestController {
 	 })
 	 public ResponseEntity<GenericResponse<List<AssuranceImplementationDTO>>> getAllImplementationDetails(
 	         @RequestParam(required = false) String houseAbbr,
-	         @RequestParam(required = false) Boolean mopaFlag) {
+	         @RequestParam(required = false) String requestedBy) {
 
-	     List<AssuranceImplementationDTO> list = implementationRequestService.getAllImplementationDetails(houseAbbr, mopaFlag);
+	     List<AssuranceImplementationDTO> list = implementationRequestService.getAllImplementationDetails(houseAbbr, requestedBy);
 
 	     return ResponseEntity.ok(
 	         new GenericResponse<>(HttpStatus.OK.value(), true, "Implementation details fetched successfully", list)

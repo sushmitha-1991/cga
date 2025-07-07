@@ -73,6 +73,7 @@ import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.entity.MastersLokSabhaSession;
 import com.dsp.cga.entity.MastersRajyaSabha;
 import com.dsp.cga.eunms.CgaStatus;
+import com.dsp.cga.eunms.Entities;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.eunms.MopaStatus;
 import com.dsp.cga.exception.ResourceNotFoundException;
@@ -932,7 +933,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                continue;
 	            }
 
-	            dtoList.add(buildImplementationDTO(assurance, impl, false));
+	            dtoList.add(buildImplementationDTO(assurance, impl));
 	        }
 	    }
 
@@ -941,7 +942,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	@Override
 	public List<AssuranceImplementationDTO> getAllImplementationDetails(String houseAbbr,
-																		Boolean mopaFlag) {
+																		String requestedBy) {
 	    List<AssuranceImplementationDTO> dtoList = new ArrayList<>();
 
 	    // Fetch all ImplementationRequests
@@ -955,10 +956,10 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    if (houseAbbr != null) {
 	        if (houseAbbr.equalsIgnoreCase("LS")) {
 	            filterHouseId = 2L; // Lok Sabha
-	            expectedSendTo = "Loksabha";
+	            expectedSendTo = "Lok Sabha";
 	        } else if (houseAbbr.equalsIgnoreCase("RS")) {
 	            filterHouseId = 1L; // Rajya Sabha
-	            expectedSendTo = "RajyaSabha";
+	            expectedSendTo = "Rajya Sabha";
 	        }
 	    }
 
@@ -977,7 +978,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                continue;
 	            }
 
-	            dtoList.add(buildImplementationDTO(assurance, impl, mopaFlag));
+	            dtoList.add(buildImplementationDTO(assurance, impl));
 	        }
 	    }
 
@@ -996,12 +997,9 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	
 	private AssuranceImplementationDTO buildImplementationDTO(Assurance assurance, 
-															ImplementationRequest impl,
-															Boolean mopaFlag) {
+															ImplementationRequest impl) {
 	    String memberName = null, departmentName = null, ministryName = null;
 	    
-	    mopaFlag = mopaFlag == null ? false : mopaFlag;
-
 	    if (assurance.getMemberId() != null) {
 	        memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
 	    }
@@ -1041,8 +1039,9 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .houseId(houseId)
 	        .house(isLokSabha ? "Lok Sabha" : "Rajya Sabha")
 	        .creationDate(impl.getCreatedAt().toLocalDate())
-	        .statusForMinistry(getStatusForMinistry(impl, mopaFlag))
-	        ;
+	        .statusForMinistry(impl.getStatusForMinistry())
+	        .statusForMopa(impl.getStatusForMopa())
+	        .statusForCga(impl.getStatusForCga()) ;
 
 	    if (isLokSabha) {
 	        builder
@@ -1056,32 +1055,40 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    return builder.build();
 	}
 
-	private String getStatusForMinistry (ImplementationRequest impl, Boolean mopaFlag) {
-		
-		if (!mopaFlag) return impl.getStatusForMinistry();
-		
-		String status = impl.getStatusForMinistry();
-		
-		String returnStatus = null;
-		switch (status) {
-		
-			case "Returned" :
-				returnStatus = MinistryStatus.RETURNED.getValue();
-				break;
-			case "Submitted" :
-				if (StringUtils.isEmpty(impl.getSendTo())) returnStatus = MinistryStatus.RECEIVED.getValue();
-				else returnStatus = MinistryStatus.IN_PROGRESS.getValue();
-				break;
-			case "Accepted":
-				returnStatus = MinistryStatus.ACCEPTED.getValue();
-				break;
-			default:
-				break;
-		};
-		
-		return returnStatus;
-		
-	}
+//	private String getStatusForMinistry (ImplementationRequest impl, String requestedBy) {
+//		
+//		requestedBy = StringUtils.isEmpty(requestedBy) ? Entities.MINISTRY.getValue() : requestedBy;
+//		
+//		if (Entities.MINISTRY.getValue().equalsIgnoreCase(requestedBy)) {
+//			return impl.getStatusForMinistry();
+//		} else if (Entities.MOPA.getValue().equalsIgnoreCase(requestedBy)) {
+//			return impl.getStatusForMopa();
+//		} else {
+//			return impl.getStatusForCga();
+//		}
+//		
+//		String status = impl.getStatusForMinistry();
+//		
+//		String returnStatus = null;
+//		switch (status) {
+//		
+//			case "Returned" :
+//				returnStatus = MinistryStatus.RETURNED.getValue();
+//				break;
+//			case "Submitted" :
+//				if (StringUtils.isEmpty(impl.getSendTo())) returnStatus = MinistryStatus.RECEIVED.getValue();
+//				else returnStatus = MinistryStatus.IN_PROGRESS.getValue();
+//				break;
+//			case "Accepted":
+//				returnStatus = MinistryStatus.ACCEPTED.getValue();
+//				break;
+//			default:
+//				break;
+//		};
+//		
+//		return returnStatus;
+//		
+//	}
 
 
 	@Override
@@ -1127,24 +1134,26 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	@Override
 	public List<AssuranceImplementationDTO> getReturnRequestsFromCGA(String houseAbbr) {
 	    List<ImplementationRequest> implRequests = implementationRequestRepository
-	        .findByStatusForMinistryAndReturnFrom("Returned", "CGA");
+		        .findByStatusForMopa("Returned");
+
+//	        .findByStatusForMinistryAndReturnFrom("Returned", "CGA");
 
 	    List<AssuranceImplementationDTO> dtoList = new ArrayList<>();
 
-	    Long filterHouseId = null;
-	    if ("LS".equalsIgnoreCase(houseAbbr)) {
-	        filterHouseId = 2L;
-	    } else if ("RS".equalsIgnoreCase(houseAbbr)) {
-	        filterHouseId = 1L;
-	    }
+//	    Long filterHouseId = null;
+//	    if ("LS".equalsIgnoreCase(houseAbbr)) {
+//	        filterHouseId = 2L;
+//	    } else if ("RS".equalsIgnoreCase(houseAbbr)) {
+//	        filterHouseId = 1L;
+//	    }
 
 	    for (ImplementationRequest impl : implRequests) {
 	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
 	        if (assurance != null) {
-	            Long houseId = getHouseIdFromAssurance(assurance);
-	            if (filterHouseId != null && !filterHouseId.equals(houseId)) continue;
+//	            Long houseId = getHouseIdFromAssurance(assurance);
+//	            if (filterHouseId != null && !filterHouseId.equals(houseId)) continue;
 
-	            dtoList.add(buildImplementationDTO(assurance, impl, false));
+	            dtoList.add(buildImplementationDTO(assurance, impl));
 	        }
 	    }
 
