@@ -60,6 +60,7 @@ import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
+import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.Entities;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.eunms.RequestType;
@@ -539,6 +540,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		    
 		    // Update status fields
 		    er.setStatusForMinistry(MinistryStatus.SUBMITTED.getValue());
+		    er.setStatusForCga(CgaStatus.RECEIVED.getValue());
 
 		    Assurance assurance = null;
 		    if (er.getAssuranceId() != null) {

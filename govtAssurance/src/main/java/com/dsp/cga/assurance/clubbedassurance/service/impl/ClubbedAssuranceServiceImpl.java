@@ -35,6 +35,7 @@ import com.dsp.cga.assurance.repository.MasterLSSRepository;
 import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
+import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.mapper.ClubbedAssuranceMapper;
 import com.dsp.cga.response.GenericResponse;
@@ -395,6 +396,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 
 		    // Update status fields
 		    clubbed.setStatusForMinistry(MinistryStatus.SUBMITTED.getValue());
+		    clubbed.setStatusForCga(CgaStatus.RECEIVED.getValue());
 		    
 		    if (dto.getAssuranceId() != null) {
 		        clubbed.setAssuranceId(dto.getAssuranceId());

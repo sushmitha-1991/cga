@@ -762,8 +762,14 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    
 	    // Update status fields
 	    implReq.setStatusForMinistry(MinistryStatus.SUBMITTED.getValue());
+	    
+	    if (Entities.MOPA.getValue().equals(implReq.getReturnFrom())) {
+	    	implReq.setStatusForMopa(MopaStatus.RECEIVED.getValue());
+	    } else if (Entities.CGA.getValue().equals(implReq.getReturnFrom())) {
+	    	implReq.setStatusForMopa(CgaStatus.RECEIVED.getValue());
+	    }	
 	    implReq.setReturnFrom(null);
-	    	    
+	    
 	    Assurance assurance = assuranceRepository.findById(implReq.getAssuranceId()).orElse(null);
 	    if (assurance == null) return null;
 
@@ -1023,7 +1029,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .memberName(memberName)
 	        .ministryName(ministryName)
 	        .departmentName(departmentName)
-	        .subject(assurance.getSubject())
+	        .subject(getSubject(assurance))
 	        .questionNo(assurance.getQuestionNo())
 	        .status(codeRepository.findCodeById(assurance.getStatusId()))
 	        .dueDateOfImplementation(impl.getDueDateOfImplementation())
@@ -1055,6 +1061,25 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    return builder.build();
 	}
 
+	
+	private String getSubject (Assurance assurance) {
+		
+		System.out.println("Part Details: " + assurance.getPartDetails());
+		
+	    String subject = (!StringUtils.isEmpty(assurance.getSubject()))
+	            ? assurance.getSubject()
+	            : (!assurance.getPartDetails().isEmpty()
+	                ? assurance.getPartDetails().stream()
+	                    .sorted(Comparator.comparing(PartDetails::getId).reversed())
+	                    .map(PartDetails::getSubject)
+	                    .filter(Objects::nonNull)
+	                    .findFirst()
+	                    .orElse(null)
+	                : null);
+	    return subject;
+		
+	}
+	
 //	private String getStatusForMinistry (ImplementationRequest impl, String requestedBy) {
 //		
 //		requestedBy = StringUtils.isEmpty(requestedBy) ? Entities.MINISTRY.getValue() : requestedBy;

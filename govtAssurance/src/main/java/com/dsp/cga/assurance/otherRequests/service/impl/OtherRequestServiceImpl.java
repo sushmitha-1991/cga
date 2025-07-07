@@ -394,8 +394,8 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	    
 	    // Update status fields
 	    existing.setStatusForMinistry(MinistryStatus.SUBMITTED.getValue());
-	    existing.setStatusForCga(Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
-	    
+	    existing.setStatusForCga(CgaStatus.RECEIVED.getValue());
+
 	    // Only update fields if they are not null (optional update)
 	    if (dto.getAssuranceId() != null) {
 	        existing.setAssuranceId(dto.getAssuranceId());
