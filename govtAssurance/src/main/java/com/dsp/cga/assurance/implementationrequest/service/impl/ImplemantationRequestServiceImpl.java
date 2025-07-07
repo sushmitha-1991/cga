@@ -716,6 +716,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .implementationTypeId(codeRepository.findCodeById(implementationRequest.getImplementationTypeId()))
 	        .supplementaryId(implementationRequest.getSupplementaryId())
 	        .statusForMinistry(implementationRequest.getStatusForMinistry())
+	        .statusForCga(implementationRequest.getStatusForCga())
+	        .statusForMopa(implementationRequest.getStatusForMopa())
 	        .partId(implementationRequest.getPartId())
 	        .applicationId(implementationRequest.getApplicationId())
 	        .applicationNo(implementationRequest.getApplicationNo())

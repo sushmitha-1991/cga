@@ -96,7 +96,11 @@ public class CommonRequestResponseDTO {
 	private String subject;
 	private String departmentName;
 	private String rajyaSabhaSessionNumber;
+
 	private String statusForMinistry;
+	private String statusForCga;
+	private String statusForMopa;
+	
 	private List<Long> clubbedAssuranceIds;
 	private String AssuranceNo;
 	private List<AssuranceIdNoPairDTO> clubbedAssurances;

@@ -63,6 +63,7 @@ import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.Entities;
 import com.dsp.cga.eunms.MinistryStatus;
+import com.dsp.cga.eunms.MopaStatus;
 import com.dsp.cga.eunms.RequestType;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ExtensionRequestMapper;
@@ -804,6 +805,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                                    .ministryRefDate(req.getMinistryRefDate())
 	                                    .statusId(req.getStatusId())
 	                                    .statusForMinistry(req.getStatusForMinistry())
+	                                    .statusForCga(req.getStatusForCga())
 	                                    .draftStatus(req.getDraftStatus())
 	                                   .extensionFiles(req.getExtensionFiles())
 	                                    .fromMinistry(req.getFromMinistry())
@@ -841,6 +843,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                                    .requestedDate(req.getRequestedDate())
 	                                    .statusId(req.getStatusId())
 	                                    .statusForMinistry(req.getStatusForMinistry())
+	                                    .statusForCga(req.getStatusForCga())
 	                                    .fileUrl(req.getFileUrl())
 	                                    .fromMinistry(req.getFromMinistry())
 	                                    .date(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null)
@@ -891,6 +894,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                                    .assuranceNo(assurance.getAssuranceNo())
 	                                    .remarks(req.getRemarks())
 	                                    .statusForMinistry(req.getStatusForMinistry())
+	                                    .statusForCga(req.getStatusForCga())
 	                                    .droppingFiles(req.getDroppingFiles())
 	                                    .draftStatus(req.getDraftStatus())
 	                                    .fromMinistry(req.getFromMinistry())
@@ -925,6 +929,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                                    .clubbedAssuranceIds(req.getClubbedAssuranceIds())
 	                                    .fromMinistry(req.getFromMinistry())
 	                                    .statusForMinistry(req.getStatusForMinistry())
+	                                    .statusForCga(req.getStatusForCga())
 	                                    .subject(assurance.getSubject())
 	                                    .questionNo(assurance.getQuestionNo())
 	                                    .date(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null)
@@ -971,6 +976,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                                    .subject(assurance.getSubject())
 	                                    .questionNo(assurance.getQuestionNo())
 	                                    .statusForMinistry(req.getStatusForMinistry())
+	                                    .statusForCga(req.getStatusForCga())
 	                                    .date(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null)
 	                                    .status(assuranceDetails != null ? assuranceDetails.getStatus() : null)
 	                                    .lokSabhaNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaNumber() : null)
@@ -995,6 +1001,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	    @Override
 	    public CommonRequestResponseDTO updateRequest(Long id, String requestType, CommonRequestResponseDTO updateDto) {
 	    	System.out.println(requestType);
+	    	
+	    	String updatedStatus = updateDto.getStatusForMinistry();
+	    	
 	        switch (requestType) {
 	            case "Extension Request":
 	                return extenionRequestRepository.findById(id).map(entity -> {
@@ -1002,7 +1011,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                  
 	                    if (updateDto.getStatusForMinistry() != null) {
 	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    	entity.setStatusForCga(Utils.getStatusForCga(updateDto.getStatusForMinistry()));
+	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
 	                    }	                  
 	                    extenionRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
@@ -1013,7 +1022,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                    if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
 	                    if (updateDto.getStatusForMinistry() != null) {
 	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    	entity.setStatusForCga(Utils.getStatusForCga(updateDto.getStatusForMinistry()));
+	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
 	                    }	                    
 	                    otherRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
@@ -1025,7 +1034,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                    if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
 	                    if (updateDto.getStatusForMinistry() != null) {
 	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    	entity.setStatusForCga(Utils.getStatusForCga(updateDto.getStatusForMinistry()));
+	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
 	                    }
 	                   
 	                    droppingRequestRepository.save(entity);
@@ -1036,7 +1045,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                return clubbedAssuranceRepository.findById(id).map(entity -> {
 	                    if (updateDto.getStatusForMinistry() != null) {
 	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    	entity.setStatusForCga(Utils.getStatusForCga(updateDto.getStatusForMinistry()));
+	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
                         }
 	                    
 	                    // Add more fields if required
@@ -1047,11 +1056,19 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	            case "Implementation Request":  // New case added
 	                return implementationRequestRepository.findById(id).map(entity -> {
 	                    if (updateDto.getStatusForMinistry() != null) {
-	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    	entity.setStatusForCga(Utils.getStatusForCga(updateDto.getStatusForMinistry()));
+	                    	
+	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
+	                    	
+	                    	if (CgaStatus.ACCEPTED.getValue().equals(updatedStatus)) {
+		                    	entity.setStatusForMopa(MopaStatus.ACCEPTED.getValue());
+		                    	entity.setStatusForCga(CgaStatus.ACCEPTED.getValue());
+		                    } else {
+	                    		// Returned
+		                    	entity.setStatusForMopa(MopaStatus.RECEIVED.getValue());
+			                    entity.setReturnFrom("CGA");
+	                    	}                 	
                         }
 
-	                    entity.setReturnFrom("CGA");
 	                    implementationRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
