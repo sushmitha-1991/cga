@@ -275,16 +275,16 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	    }
 
 	    // 🔹 Determine houseId (Lok Sabha = 2, Rajya Sabha = 1)
-//	    Long houseId = getHouseId(); // You should have this implemented
+	    Long houseId = getHouseId(); // You should have this implemented
 
 	    if (sessionNo == null) {
-//	        sessionNo = (houseId == 1)
-//	            ? rssRepo.findLatestByCreatedAt()
-//	            : lssRepo.findLatestByCreatedAt();
+	        sessionNo = (houseId == 1)
+	            ? rssRepo.findLatestByCreatedAt()
+	            : lssRepo.findLatestByCreatedAt();
 	    	
-	    	SessionDTO session = util.getCurrentSession();
-	    	sessionNo = session.getLokSabhaSessionNoId() != null 
-	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();
+//	    	SessionDTO session = util.getCurrentSession();
+//	    	sessionNo = session.getLokSabhaSessionNoId() != null 
+//	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();
 	    }
 
 	    Long finalSessionNo = sessionNo;

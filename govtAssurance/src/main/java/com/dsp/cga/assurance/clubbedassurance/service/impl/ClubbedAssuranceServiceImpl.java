@@ -170,12 +170,18 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	    }
 
 	    String houseAbbr = util.getHouseAbbr();
-
+	    
+	    Long houseId = Utils.getHouseId();
+	    
 	    // 🔹 Get latest session if sessionNo is null
 	    if (sessionNo == null) {
-	    	SessionDTO session = util.getCurrentSession();
-	    	sessionNo = session.getLokSabhaSessionNoId() != null 
-	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();	
+	        sessionNo = (houseId == 1)
+	                ? rssRepo.findLatestByCreatedAt()
+	                : lssRepo.findLatestByCreatedAt();
+	        
+//	    	SessionDTO session = util.getCurrentSession();
+//	    	sessionNo = session.getLokSabhaSessionNoId() != null 
+//	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();	
 	    }
 	    Long finalSessionNo = sessionNo;
 

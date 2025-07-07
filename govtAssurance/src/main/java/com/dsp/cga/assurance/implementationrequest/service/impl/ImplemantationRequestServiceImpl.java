@@ -466,13 +466,13 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        ministryId = null;
 	    }
 
-//	    Long houseId = getHouseId(); 
+	    Long houseId = getHouseId(); 
 	    if (sessionNo == null) {
-//	        sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
+	        sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
 	    
-	    	SessionDTO session = util.getCurrentSession();
-	    	sessionNo = session.getLokSabhaSessionNoId() != null 
-	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();
+//	    	SessionDTO session = util.getCurrentSession();
+//	    	sessionNo = session.getLokSabhaSessionNoId() != null 
+//	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();
 	    }
 
 	    final Long finalSessionNo = sessionNo;
