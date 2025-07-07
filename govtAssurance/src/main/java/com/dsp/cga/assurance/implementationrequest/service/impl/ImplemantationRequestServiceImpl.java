@@ -1029,7 +1029,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .memberName(memberName)
 	        .ministryName(ministryName)
 	        .departmentName(departmentName)
-	        .subject(getSubject(assurance))
+	        .subject(assurance.getSubject())
 	        .questionNo(assurance.getQuestionNo())
 	        .status(codeRepository.findCodeById(assurance.getStatusId()))
 	        .dueDateOfImplementation(impl.getDueDateOfImplementation())
