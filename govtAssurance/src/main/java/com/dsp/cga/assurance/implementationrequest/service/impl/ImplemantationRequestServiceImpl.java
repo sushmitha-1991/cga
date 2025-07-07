@@ -763,9 +763,9 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    // Update status fields
 	    implReq.setStatusForMinistry(MinistryStatus.SUBMITTED.getValue());
 	    
-	    if (Entities.MOPA.getValue().equals(implReq.getReturnFrom())) {
+	    if (Entities.MOPA.getValue().equalsIgnoreCase(implReq.getReturnFrom())) {
 	    	implReq.setStatusForMopa(MopaStatus.RECEIVED.getValue());
-	    } else if (Entities.CGA.getValue().equals(implReq.getReturnFrom())) {
+	    } else if (Entities.CGA.getValue().equalsIgnoreCase(implReq.getReturnFrom())) {
 	    	implReq.setStatusForMopa(CgaStatus.RECEIVED.getValue());
 	    }	
 	    implReq.setReturnFrom(null);
