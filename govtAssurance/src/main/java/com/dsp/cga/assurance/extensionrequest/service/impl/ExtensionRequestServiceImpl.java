@@ -547,8 +547,6 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		    if (er.getAssuranceId() != null) {
 		        assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
 		    }
-		    
-		    
 
 		    // Update ExtensionRequest fields only if non-null
 		    if (requestDTO.getExtensionNo() != null) {
@@ -744,44 +742,6 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 //	        Long houseId = getHouseId(); // Current houseId
 	        String houseAbbr = util.getHouseAbbr();
 	        
-	        // Fetch assurance details by ID and return a partial DTO for merging
-	        Function<Assurance, CommonRequestResponseDTO> buildAssuranceDetails = (assurance) -> {
-	            if (assurance == null) return null;
-
-	            String status = codeRepository.findCodeById(assurance.getStatusId());
-	            String lokSabhaSessionNumber = lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo());
-	            String lokSabhaNumber = lssRepo.findLokSabhaNumberById(assurance.getLokSabhaNo());
-	            String rajyaSabhaSessionNumber = rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo());
-                 
-	            String memberName = null;
-	            String departmentName = null;
-	            String ministryName = null;
-
-	            if (assurance.getMemberId() != null) {
-	                memberName = personalDetailsRepository.findMemberNameByMemberId(assurance.getMemberId());
-	            }
-	            if (assurance.getDepartmentId() != null) {
-	                departmentName = departmentRepository.findById(assurance.getDepartmentId())
-	                        .map(Departments::getDepartmentName)
-	                        .orElse(null);
-	            }
-	            if (assurance.getMinistryId() != null) {
-	                ministryName = ministryRepository.findById(assurance.getMinistryId())
-	                        .map(Ministries::getMinistryName)
-	                        .orElse(null);
-	            }
-
-	            return CommonRequestResponseDTO.builder()
-	                    .status(status)
-	                    .lokSabhaNumber(lokSabhaNumber)
-	                    .lokSabhaSessionNumber(lokSabhaSessionNumber)
-	                    .rajyaSabhaSessionNumber(rajyaSabhaSessionNumber)
-	                    .memberName(memberName)
-	                    .departmentName(departmentName)
-	                    .ministryName(ministryName)
-	                    .build();
-	        };
-
 	        switch (requestType) {
 	            case "Extension Request":
 	                return extenionRequestRepository.findById(id)
@@ -791,38 +751,12 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                    .map(req -> {
 	                        Assurance assurance = getAssurance(req.getAssuranceId());
 	                        if (isValidForHouse(houseAbbr, assurance)) {
-	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
-	                            return CommonRequestResponseDTO.builder()
-	                                    .id(req.getId())
-	                                    .assuranceNo(assurance.getAssuranceNo())
-	                                    .requestType(RequestType.EXTENSION_REQ.getValue()).assuranceId(req.getAssuranceId())
-	                                    .subject(req.getSubject())
-	                                    .remarks(req.getRemarks())
-	                                    .extensionNo(req.getExtensionNo())
-	                                    .extRequestedTillDate(req.getExtRequestedTillDate())
-	                                    .extGrantedTillDate(req.getExtGrantedTillDate())
-	                                    .ministryRefNo(req.getMinistryRefNo())
-	                                    .ministryRefDate(req.getMinistryRefDate())
-	                                    .statusId(req.getStatusId())
-	                                    .statusForMinistry(req.getStatusForMinistry())
-	                                    .statusForCga(req.getStatusForCga())
-	                                    .draftStatus(req.getDraftStatus())
-	                                   .extensionFiles(req.getExtensionFiles())
-	                                    .fromMinistry(req.getFromMinistry())
-	                                    .date(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null)
-	                                    // Merge assurance details
-	                                    .status(assuranceDetails != null ? assuranceDetails.getStatus() : null)
-	                                    .lokSabhaNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaNumber() : null)
-	                                    .lokSabhaSessionNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaSessionNumber() : null)
-	                                    .rajyaSabhaSessionNumber(assuranceDetails != null ? assuranceDetails.getRajyaSabhaSessionNumber() : null)
-	                                    .memberName(assuranceDetails != null ? assuranceDetails.getMemberName() : null)
-	                                    .departmentName(assuranceDetails != null ? assuranceDetails.getDepartmentName() : null)
-	                                    .ministryName(assuranceDetails != null ? assuranceDetails.getMinistryName() : null)
-	                                    .build();
+	                        	
+	                            CommonRequestResponseDTO assuranceDetails = buildDTO(assurance, req);
+	                            return assuranceDetails;
 	                        }
 	                        return null;
-	                    })
-	                    .orElse(null);
+	                    }).orElse(null);
 
 	            case "Other Request":
 	                return otherRequestRepository.findById(id)
@@ -832,29 +766,10 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                    .map(req -> {
 	                        Assurance assurance = getAssurance(req.getAssuranceId());
 	                        if (isValidForHouse(houseAbbr, assurance)) {
-	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
-	                            return CommonRequestResponseDTO.builder()
-	                                    .id(req.getId())
-	                                    .requestType(RequestType.OTHER_REQ.getValue())
-	                                    .assuranceId(req.getAssuranceId())
-	                                    .assuranceNo(assurance.getAssuranceNo())
-	                                    .subject(req.getSubject())
-	                                    .remarks(req.getRemarks())
-	                                    .requestedDate(req.getRequestedDate())
-	                                    .statusId(req.getStatusId())
-	                                    .statusForMinistry(req.getStatusForMinistry())
-	                                    .statusForCga(req.getStatusForCga())
-	                                    .fileUrl(req.getFileUrl())
-	                                    .fromMinistry(req.getFromMinistry())
-	                                    .date(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null)
-	                                    .status(assuranceDetails != null ? assuranceDetails.getStatus() : null)
-	                                    .lokSabhaNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaNumber() : null)
-	                                    .lokSabhaSessionNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaSessionNumber() : null)
-	                                    .rajyaSabhaSessionNumber(assuranceDetails != null ? assuranceDetails.getRajyaSabhaSessionNumber() : null)
-	                                    .memberName(assuranceDetails != null ? assuranceDetails.getMemberName() : null)
-	                                    .departmentName(assuranceDetails != null ? assuranceDetails.getDepartmentName() : null)
-	                                    .ministryName(assuranceDetails != null ? assuranceDetails.getMinistryName() : null)
-	                                    .build();
+
+	                            CommonRequestResponseDTO assuranceDetails = buildDTO(assurance, req);
+	                            return assuranceDetails;
+
 	                        }
 	                        return null;
 	                    })
@@ -868,45 +783,10 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                    .map(req -> {
 	                        Assurance assurance = getAssurance(req.getAssuranceId());
 	                        if (isValidForHouse(houseAbbr, assurance)) {
-	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
-	                            return CommonRequestResponseDTO.builder()
-	                                    .id(req.getId())
-	                                    .assuranceNo(assurance.getAssuranceNo())
-	                                    .requestType(RequestType.DROPPING_REQ.getValue())
-	                                    .assuranceId(req.getAssuranceId())
-	                                    .subject(req.getSubject())
-	                                    .droppingType(codeRepository.findCodeById(req.getDroppingType()))
-	                                    .supplementaryId(req.getSupplementaryId())
-	                                    .partId(req.getPartId())
-	                                    .dropRequestDate(req.getDropRequestDate())
-	                                    .actualDropDate(req.getActualDropDate())
-	                                    .ministryRefNo(req.getMinistryRefNo())
-	                                    .ministryRefDate(req.getMinistryRefDate())
-	                                    .acceptedId(req.getAcceptedId())
-	                                    .type(req.getType())
-	                                    .communicationDate(req.getCommunicationDate())
-	                                    .droppingFiles(req.getDroppingFiles())
-	                                    .session(req.getSession())
-	                                    .meetingNo(req.getMeetingNo())
-	                                    .meetingDate(req.getMeetingDate())
-	                                    .subject(assurance.getSubject())
-	                                    .questionNo(assurance.getQuestionNo())
-	                                    .assuranceNo(assurance.getAssuranceNo())
-	                                    .remarks(req.getRemarks())
-	                                    .statusForMinistry(req.getStatusForMinistry())
-	                                    .statusForCga(req.getStatusForCga())
-	                                    .droppingFiles(req.getDroppingFiles())
-	                                    .draftStatus(req.getDraftStatus())
-	                                    .fromMinistry(req.getFromMinistry())
-	                                    .date(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null)
-	                                    .status(assuranceDetails != null ? assuranceDetails.getStatus() : null)
-	                                    .lokSabhaNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaNumber() : null)
-	                                    .lokSabhaSessionNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaSessionNumber() : null)
-	                                    .rajyaSabhaSessionNumber(assuranceDetails != null ? assuranceDetails.getRajyaSabhaSessionNumber() : null)
-	                                    .memberName(assuranceDetails != null ? assuranceDetails.getMemberName() : null)
-	                                    .departmentName(assuranceDetails != null ? assuranceDetails.getDepartmentName() : null)
-	                                    .ministryName(assuranceDetails != null ? assuranceDetails.getMinistryName() : null)
-	                                    .build();
+	                            
+	                            CommonRequestResponseDTO assuranceDetails = buildDTO(assurance, req);
+                            	return assuranceDetails;
+
 	                        }
 	                        return null;
 	                    })
@@ -920,27 +800,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                    .map(req -> {
 	                        Assurance assurance = getAssurance(req.getAssuranceId());
 	                        if (isValidForHouse(houseAbbr, assurance)) {
-	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
-	                            return CommonRequestResponseDTO.builder()
-	                                    .id(req.getId())
-	                                    .requestType(RequestType.CLUB_REQ.getValue())
-	                                    .assuranceId(req.getAssuranceId())
-	                                    .assuranceNo(assurance.getAssuranceNo())
-	                                    .clubbedAssuranceIds(req.getClubbedAssuranceIds())
-	                                    .fromMinistry(req.getFromMinistry())
-	                                    .statusForMinistry(req.getStatusForMinistry())
-	                                    .statusForCga(req.getStatusForCga())
-	                                    .subject(assurance.getSubject())
-	                                    .questionNo(assurance.getQuestionNo())
-	                                    .date(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null)
-	                                    .status(assuranceDetails != null ? assuranceDetails.getStatus() : null)
-	                                    .lokSabhaNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaNumber() : null)
-	                                    .lokSabhaSessionNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaSessionNumber() : null)
-	                                    .rajyaSabhaSessionNumber(assuranceDetails != null ? assuranceDetails.getRajyaSabhaSessionNumber() : null)
-	                                    .memberName(assuranceDetails != null ? assuranceDetails.getMemberName() : null)
-	                                    .departmentName(assuranceDetails != null ? assuranceDetails.getDepartmentName() : null)
-	                                    .ministryName(assuranceDetails != null ? assuranceDetails.getMinistryName() : null)
-	                                    .build();
+
+	                            CommonRequestResponseDTO assuranceDetails = buildDTO(assurance, req);
+	                            return assuranceDetails;
 	                        }
 	                        return null;
 	                    })
@@ -950,42 +812,18 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                return implementationRequestRepository.findById(id)
 	                    .filter(req -> Boolean.TRUE.equals(req.getFromMinistry()) &&
 	                    		 (
-	                    	                ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
-	                    	                "Returned".equalsIgnoreCase(req.getStatusForMinistry())) &&
-	                    	                "CGA".equalsIgnoreCase(req.getReturnFrom())
-	                    	            )
+                	                ("Submitted".equalsIgnoreCase(req.getStatusForMinistry()) ||
+                	                "Returned".equalsIgnoreCase(req.getStatusForMinistry())) &&
+                	                "CGA".equalsIgnoreCase(req.getReturnFrom())
+                	            )
 	                    	        )
 	                    .map(req -> {
 	                        Assurance assurance = getAssurance(req.getAssuranceId());
 	                        if (isValidForHouse(houseAbbr, assurance)) {
-	                            CommonRequestResponseDTO assuranceDetails = buildAssuranceDetails.apply(assurance);
-	                            return CommonRequestResponseDTO.builder()
-	                                    .id(req.getId())
-	                                    .requestType(RequestType.IMPLEMENTATION_REQ.getValue())
-	                                    .assuranceId(req.getAssuranceId())
-	                                    .assuranceNo(assurance.getAssuranceNo())
-	                                    .fromMinistry(req.getFromMinistry())
-	                                    .dueDateOfImplementation(req.getDueDateOfImplementation())
-	                                    .dateOfImplementation(req.getDateOfImplementation())
-	                                    .detailsOfImplementation(req.getDetailsOfImplementation())
-	                                    .layingDate(req.getLayingDate())
-	                                    .partId(req.getPartId())
-	                                    .supplementaryId(req.getSupplementaryId())
-	                                    .implementationReportFiles(req.getImplementationReportFiles())
-	                                    .partReportFiles(req.getPartReportFiles())
-	                                    .subject(assurance.getSubject())
-	                                    .questionNo(assurance.getQuestionNo())
-	                                    .statusForMinistry(req.getStatusForMinistry())
-	                                    .statusForCga(req.getStatusForCga())
-	                                    .date(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null)
-	                                    .status(assuranceDetails != null ? assuranceDetails.getStatus() : null)
-	                                    .lokSabhaNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaNumber() : null)
-	                                    .lokSabhaSessionNumber(assuranceDetails != null ? assuranceDetails.getLokSabhaSessionNumber() : null)
-	                                    .rajyaSabhaSessionNumber(assuranceDetails != null ? assuranceDetails.getRajyaSabhaSessionNumber() : null)
-	                                    .memberName(assuranceDetails != null ? assuranceDetails.getMemberName() : null)
-	                                    .departmentName(assuranceDetails != null ? assuranceDetails.getDepartmentName() : null)
-	                                    .ministryName(assuranceDetails != null ? assuranceDetails.getMinistryName() : null)
-	                                    .build();
+	                        	
+	                            CommonRequestResponseDTO assuranceDetails = buildDTO(assurance, req);
+	                            return assuranceDetails;
+
 	                        }
 	                        return null;
 	                    })
@@ -1062,6 +900,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                    	if (CgaStatus.ACCEPTED.getValue().equals(updatedStatus)) {
 		                    	entity.setStatusForMopa(MopaStatus.ACCEPTED.getValue());
 		                    	entity.setStatusForCga(CgaStatus.ACCEPTED.getValue());
+		                    	entity.setStatusForMinistry(MinistryStatus.ACCEPTED.getValue());
 		                    } else {
 	                    		// Returned
 		                    	entity.setStatusForMopa(MopaStatus.RECEIVED.getValue());
@@ -1264,14 +1103,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
 		clubbedAssuranceRepository.findAll(spec).forEach(req -> {
-			
-//			String recordStatus = Entities.CGA.getValue().equalsIgnoreCase(reqBy) ? req.getStatusForCga() : req.getStatusForMinistry(); 
-//
-//			response.add(buildDTO(req.getId(), "Clubbed Assurance", req.getAssuranceId(), req.getAssurance().getSubject(),
-//					req.getAssurance().getRemarks(), req.getFromMinistry(), 
-//					recordStatus, //req.getStatusForMinistry(), 
-//					req.getAssurance(), req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
-			
+
 			response.add(buildDTO(req.getAssurance(), req));
 
 		});
@@ -1360,6 +1192,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 			spec = spec.and(ImplementationRequestSpec.hasMemberId(memberId));
 		}
 		
+		if (!StringUtils.isEmpty(statusFor)) {
+			spec = spec.and(ImplementationRequestSpec.hasMemberId(memberId));
+		}
 		return spec;
 	}
 	
@@ -1375,28 +1210,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
 		implementationRequestRepository.findAll(spec).forEach(req -> {
-			
-//			String recordStatus = null; 
-//			
-//			switch (reqBy) {
-//				case "cga":
-//					recordStatus = req.getStatusForCga();
-//					break;
-//				case "mopa":
-//					recordStatus = req.getStatusForMopa();
-//					break;
-//				case "ministry":
-//					recordStatus = req.getStatusForMinistry();
-//					break;
-//				default:
-//					recordStatus = null;
-//			}
-//			
-//			response.add(buildDTO(req.getId(), "Implementation Request", req.getAssuranceId(), req.getAssurance().getSubject(),
-//					req.getRemarks(), req.getFromMinistry(), 
-//					recordStatus, //req.getStatusForMinistry(), 
-//					req.getAssurance(), req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
-			
+
 			response.add(buildDTO(req.getAssurance(), req));
 		
 		});
@@ -1405,85 +1219,133 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	}
 	
 	
-	private CommonRequestResponseDTO buildDTO(Assurance assurance, DroppingRequest dr) {
+	private CommonRequestResponseDTO buildDTO(Assurance assurance, DroppingRequest req) {
 
 		if (assurance == null) return null;
 		
 		CommonRequestResponseDTO dto = populateCommonParams(assurance);
-		dto.setId(dr.getId());
+		dto.setId(req.getId());
 		dto.setRequestType(RequestType.DROPPING_REQ.getValue());
-		dto.setSubject(assurance.getSubject());
-		dto.setRemarks(dr.getRemarks());
-		dto.setFromMinistry(dr.getFromMinistry());
-		dto.setStatusForMinistry(dr.getStatusForMinistry());
-		dto.setStatusForCga(dr.getStatusForCga());
+		dto.setRemarks(req.getRemarks());
+		dto.setFromMinistry(req.getFromMinistry());
+		dto.setStatusForMinistry(req.getStatusForMinistry());
+		dto.setStatusForCga(req.getStatusForCga());
+		dto.setDate(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null);
 		
+		dto.setSubject(assurance.getSubject());
+
+		dto.setDroppingType(codeRepository.findCodeById(req.getDroppingType()));
+		dto.setSupplementaryId(req.getSupplementaryId());
+		dto.setPartId(req.getPartId());
+        dto.setDropRequestDate(req.getDropRequestDate());
+        dto.setActualDropDate(req.getActualDropDate());
+        dto.setMinistryRefNo(req.getMinistryRefNo());
+        dto.setMinistryRefDate(req.getMinistryRefDate());
+        dto.setAcceptedId(req.getAcceptedId());
+        dto.setType(req.getType());
+        dto.setCommunicationDate(req.getCommunicationDate());
+        dto.setDroppingFiles(req.getDroppingFiles());
+        dto.setSession(req.getSession());
+        dto.setMeetingNo(req.getMeetingNo());
+        dto.setMeetingDate(req.getMeetingDate());
+        dto.setDroppingFiles(req.getDroppingFiles());
+        dto.setDraftStatus(req.getDraftStatus());
+ 
 		return dto;
 	
 	}
 	
 	
-	private CommonRequestResponseDTO buildDTO(Assurance assurance, ClubbedAssurance cr) {
+	private CommonRequestResponseDTO buildDTO(Assurance assurance, ClubbedAssurance req) {
 
 		if (assurance == null) return null;
 		
 		CommonRequestResponseDTO dto = populateCommonParams(assurance);
-		dto.setId(cr.getId());
+		dto.setId(req.getId());
 		dto.setRequestType(RequestType.CLUB_REQ.getValue());
-		dto.setSubject(assurance.getSubject());
-		dto.setFromMinistry(cr.getFromMinistry());
-		dto.setStatusForMinistry(cr.getStatusForMinistry());
-		dto.setStatusForCga(cr.getStatusForCga());
-		
+		dto.setFromMinistry(req.getFromMinistry());
+		dto.setStatusForMinistry(req.getStatusForMinistry());
+		dto.setStatusForCga(req.getStatusForCga());
+		dto.setDate(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null);
+
+		dto.setClubbedAssuranceIds(req.getClubbedAssuranceIds());
+
 		return dto;
 	}	
 
-	private CommonRequestResponseDTO buildDTO(Assurance assurance, OtherRequests otr) {
+	private CommonRequestResponseDTO buildDTO(Assurance assurance, OtherRequests req) {
 
 		if (assurance == null) return null;
 		
 		CommonRequestResponseDTO dto = populateCommonParams(assurance);
-		dto.setId(otr.getId());
+		dto.setId(req.getId());
 		dto.setRequestType(RequestType.OTHER_REQ.getValue());
-		dto.setRemarks(otr.getRemarks());
-		dto.setSubject(assurance.getSubject());
-		dto.setFromMinistry(otr.getFromMinistry());
-		dto.setStatusForMinistry(otr.getStatusForMinistry());
-		dto.setStatusForCga(otr.getStatusForCga());
+		dto.setRemarks(req.getRemarks());
+		dto.setFromMinistry(req.getFromMinistry());
+		dto.setStatusForMinistry(req.getStatusForMinistry());
+		dto.setStatusForCga(req.getStatusForCga());
+		dto.setDate(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null);
+
+		dto.setRequestedDate(req.getRequestedDate());
+		dto.setSubject(req.getSubject());
+		dto.setStatusId(req.getStatusId());
+
+		dto.setFileUrl(req.getFileUrl());
 		
 		return dto;
 	}	
 	
-	private CommonRequestResponseDTO buildDTO(Assurance assurance, ExtensionRequest exr) {
+	private CommonRequestResponseDTO buildDTO(Assurance assurance, ExtensionRequest req) {
 
 		if (assurance == null) return null;
 		
 		CommonRequestResponseDTO dto = populateCommonParams(assurance);
-		dto.setId(exr.getId());
+		dto.setId(req.getId());
 		dto.setRequestType(RequestType.EXTENSION_REQ.getValue());
-		dto.setRemarks(exr.getRemarks());
-		dto.setSubject(assurance.getSubject());
-		dto.setFromMinistry(exr.getFromMinistry());
-		dto.setStatusForMinistry(exr.getStatusForMinistry());
-		dto.setStatusForCga(exr.getStatusForCga());
+		dto.setRemarks(req.getRemarks());
+		dto.setFromMinistry(req.getFromMinistry());
+		dto.setStatusForMinistry(req.getStatusForMinistry());
+		dto.setStatusForCga(req.getStatusForCga());
+		dto.setDate(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null);
+
+		dto.setSubject(req.getSubject());
+		dto.setStatusId(req.getStatusId());
+	
+		dto.setExtensionNo(req.getExtensionNo());
+		dto.setExtensionFiles(req.getExtensionFiles());
+		dto.setExtRequestedTillDate(req.getExtRequestedTillDate());
+		dto.setExtGrantedTillDate(req.getExtGrantedTillDate());
+		dto.setMinistryRefNo(req.getMinistryRefNo());
+		dto.setMinistryRefDate(req.getMinistryRefDate());
 		
 		return dto;
 	}	
 	
-	private CommonRequestResponseDTO buildDTO(Assurance assurance, ImplementationRequest imr) {
+	private CommonRequestResponseDTO buildDTO(Assurance assurance, ImplementationRequest req) {
 
 		if (assurance == null) return null;
 		
 		CommonRequestResponseDTO dto = populateCommonParams(assurance);
-		dto.setId(imr.getId());
+		dto.setId(req.getId());
 		dto.setRequestType(RequestType.IMPLEMENTATION_REQ.getValue());
-		dto.setRemarks(imr.getRemarks());
-		dto.setSubject(assurance.getSubject());
-		dto.setFromMinistry(imr.getFromMinistry());
-		dto.setStatusForMinistry(imr.getStatusForMinistry());
-		dto.setStatusForCga(imr.getStatusForCga());
-		dto.setStatusForMopa(imr.getStatusForMopa());
+		dto.setRemarks(req.getRemarks());
+		dto.setFromMinistry(req.getFromMinistry());
+		dto.setStatusForMinistry(req.getStatusForMinistry());
+		dto.setStatusForCga(req.getStatusForCga());
+		dto.setStatusForMopa(req.getStatusForMopa());
+		dto.setDate(req.getCreatedAt().toLocalDate());
 		
+		dto.setSubject(assurance.getSubject());
+
+		dto.setDueDateOfImplementation(req.getDueDateOfImplementation());
+		dto.setDateOfImplementation(req.getDateOfImplementation());
+		dto.setDetailsOfImplementation(req.getDetailsOfImplementation());
+		dto.setLayingDate(req.getLayingDate());
+		dto.setPartId(req.getPartId());
+		dto.setSupplementaryId(req.getSupplementaryId());
+		dto.setImplementationReportFiles(req.getImplementationReportFiles());
+		dto.setPartReportFiles(req.getPartReportFiles());
+        
 		return dto;
 	}	
 	
@@ -1523,12 +1385,14 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 											.assuranceId(assurance.getId())
 											.subject(assurance.getSubject())
 											.assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
+											.questionNo(assurance.getQuestionNo())
 											.lokSabhaSessionNumber(lokSabhaSessionNumber)
 											.lokSabhaNumber(lokSabhaNumber)
 											.rajyaSabhaSessionNumber(rajyasabhaSessionNumber)
 											.memberName(memberName)
 											.departmentName(departmentName)
 											.ministryName(ministryName)
+											.status(status)
 											.build();
 		return dto;	
 	}

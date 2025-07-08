@@ -403,10 +403,18 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 
 		@Override
 		public DroppingRequestDTO createDroppingRequest(DroppingRequestDTO droppingRequestDTO) {
-			  DroppingRequest entity = DroppingRequestMapper.toEntity(droppingRequestDTO);
-		        DroppingRequest saved = droppingRequestRepository.save(entity);
-		        return DroppingRequestMapper.toDTO(saved);
-		    }
+			
+			// New to be created. Validate if dropping exists for the assurance
+			Long count = droppingRequestRepository.countByAssuranceId(droppingRequestDTO.getAssuranceId());
+			
+			if (count > 0) {
+				return null;
+			}
+			
+			DroppingRequest entity = DroppingRequestMapper.toEntity(droppingRequestDTO);
+	        DroppingRequest saved = droppingRequestRepository.save(entity);
+	        return DroppingRequestMapper.toDTO(saved);
+		}
 		
 		private List<MemberDTO> fetchClubbedMembersData(List<Long> clubbedMembers) {
 			// Check if the list is not empty

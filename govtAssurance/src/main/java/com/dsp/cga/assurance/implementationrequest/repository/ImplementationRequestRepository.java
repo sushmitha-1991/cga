@@ -51,7 +51,12 @@ public interface ImplementationRequestRepository extends JpaRepository<Implement
 
 		List<ImplementationRequest> findAllByOrderByUpdatedAtDesc();
 
-
+		@Query(value = """
+			    SELECT COUNT(*) FROM cga.implementation_requests d
+			    JOIN cga.assurance a ON d.assurance_id = a.id
+			    WHERE a.assurance_id = :assuranceId
+			    """, nativeQuery = true)
+			Long countByAssuranceId(@Param("assuranceId") Long assuranceId);
 
 
 

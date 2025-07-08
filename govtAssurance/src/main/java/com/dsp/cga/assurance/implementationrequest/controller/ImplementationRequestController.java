@@ -46,10 +46,20 @@ public class ImplementationRequestController {
 	 public ResponseEntity<GenericResponse<ImplementationRequestDTO>> createImplementationRequest(@RequestBody ImplementationRequestDTO implementationRequestDTO) {
 		System.out.println(implementationRequestDTO);
 		ImplementationRequestDTO createdImplementationRequest = implementationRequestService.createImplementationRequest(implementationRequestDTO);
-	        GenericResponse<ImplementationRequestDTO> response = new GenericResponse<>(HttpStatus.CREATED.value(), true,
+
+		if (createdImplementationRequest == null) {
+			GenericResponse<ImplementationRequestDTO> response = new GenericResponse<>(HttpStatus.FAILED_DEPENDENCY.value(), 
+					true,
+	                "Implementation Request cannot be created as another Implementation Request exists for the Assurance", null);
+			return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).body(response);			
+		} 	
+		
+		GenericResponse<ImplementationRequestDTO> response = new GenericResponse<>(HttpStatus.CREATED.value(), true,
 	                "Assurance item created successfully", createdImplementationRequest);
-	        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-	    }
+	
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	 
+	}
 
 	 @PostMapping("/create-or-update")
 	    @Operation(summary = "Create or update an Assurance")

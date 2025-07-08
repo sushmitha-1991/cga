@@ -156,7 +156,16 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	
 	@Override
 	public ImplementationRequestDTO createImplementationRequest(ImplementationRequestDTO implementationRequestDTO) {
-	    // Convert DTO to Entity
+
+		// New to be created. Validate if implementation exists for the assurance
+		Long count = implementationRequestRepository.countByAssuranceId(implementationRequestDTO.getAssuranceId());
+		
+		if (count > 0) {
+			return null;
+		}
+		
+		
+		// Convert DTO to Entity
 	    ImplementationRequest implementationRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
 	    System.out.println("Implementation request created");
 	    
@@ -336,6 +345,15 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        savedRequest = implementationRequestRepository.save(existingRequest);
 	    } else {
 	        // Create new entity
+	    	
+			// New to be created. Validate if implementation exists for the assurance
+			Long count = implementationRequestRepository.countByAssuranceId(implementationRequestDTO.getAssuranceId());
+			
+			if (count > 0) {
+				return new GenericResponse<>(HttpStatus.FAILED_DEPENDENCY.value(), false,
+						"Implementation Request cannot be created as another Implementation Request exists for the Assurance", null);
+			}			
+			
 	        ImplementationRequest newRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
 	        savedRequest = implementationRequestRepository.save(newRequest);
 	    }
