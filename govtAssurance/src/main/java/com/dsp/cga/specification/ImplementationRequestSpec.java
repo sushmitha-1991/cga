@@ -9,6 +9,7 @@ import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.Entities;
 import com.dsp.cga.eunms.MinistryStatus;
+import com.dsp.cga.eunms.MopaStatus;
 import com.dsp.cga.util.Utils;
 
 
@@ -66,6 +67,28 @@ public class ImplementationRequestSpec {
 		}
 		
 		if (Entities.MOPA.getValue().equalsIgnoreCase(statusFor)) {
+			
+			if (MopaStatus.RETURNED_TO_MINISTRY.getValue().equalsIgnoreCase(status)) {
+				System.out.println("RETURNED TO MINISTRY");
+				Specification<ImplementationRequest> hasReturnedStatus = (root, query, cb) -> 
+									cb.equal(root.get("statusForMinistry"), MinistryStatus.RETURNED.getValue());
+				
+				System.out.println(hasReturnedStatus);
+				return hasReturnedStatus;					
+			}
+			
+			if (MopaStatus.RETURNED.getValue().equals(status)) {
+				// RETURNED - if Returned from CGA, to be selected
+				// RETURNED - If Returned by MoPA to Ministry, not to be selected
+				Specification<ImplementationRequest> hasReturnedStatus = (root, query, cb) ->
+							cb.equal(root.get("statusForMopa"), MopaStatus.RETURNED.getValue());
+							
+				Specification<ImplementationRequest> hasMinistryStatus = (root, query, cb) ->
+							cb.equal(root.get("statusForCga"), CgaStatus.RETURNED.getValue());
+				
+				return hasReturnedStatus.and(hasMinistryStatus);
+			} 
+			
 			return (root, query, criteriaBuilder) -> status != null 
 						? criteriaBuilder.equal(root.get("statusForMopa"), status)
 						: criteriaBuilder.conjunction();		
@@ -80,17 +103,26 @@ public class ImplementationRequestSpec {
 		statusFor = StringUtils.isEmpty(statusFor) ? Entities.MINISTRY.getValue() : statusFor;
 		
 		if (Entities.MOPA.getValue().equalsIgnoreCase(statusFor)) {
+			
 			Specification<ImplementationRequest> hasReceivedStatus = (root, query, cb) -> 
-			cb.equal(root.get("statusForCga"), CgaStatus.RECEIVED.getValue());
+			cb.equal(root.get("statusForMopa"), MopaStatus.RECEIVED.getValue());
 
 			Specification<ImplementationRequest> hasProgressStatus = (root, query, cb) -> 
-			cb.equal(root.get("statusForCga"), CgaStatus.IN_PROGRESS.getValue());
+			cb.equal(root.get("statusForMopa"), MopaStatus.IN_PROGRESS.getValue());
+
+			// RETURNED - if Returned from CGA, to be selected
+			// RETURNED - If Returned by MoPA to Ministry, not to be selected. For this we check if CGA status is RETURNED
+			Specification<ImplementationRequest> hasReturnedStatus = (root, query, cb) ->
+						cb.equal(root.get("statusForMopa"), MopaStatus.RETURNED.getValue());
+						
+			Specification<ImplementationRequest> hasMinistryStatus = (root, query, cb) ->
+						cb.equal(root.get("statusForCga"), CgaStatus.RETURNED.getValue());
 			
-//			Specification<ImplementationRequest> hasReturnedStatus = (root, query, cb) ->
-//						cb.equal(root.get("statusForCga"), CgaStatus.RETURNED.getValue());
-			
-			Specification<ImplementationRequest> combinedSpec = hasReceivedStatus.or(hasProgressStatus);
-//																	.or(hasReturnedStatus);
+			Specification<ImplementationRequest> returnedSpec = hasReturnedStatus.and(hasMinistryStatus);
+						
+			Specification<ImplementationRequest> combinedSpec = hasReceivedStatus
+																	.or(hasProgressStatus)
+																	.or(returnedSpec);
 			return combinedSpec;
 			
 		} 

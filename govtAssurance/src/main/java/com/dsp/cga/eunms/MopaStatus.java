@@ -6,7 +6,9 @@ public enum MopaStatus {
 	RECEIVED ("Received"),
 	ACCEPTED ("Accepted"),
 	IN_PROGRESS ("In Progress"),
-	RETURNED ("Returned");
+	RETURNED ("Returned"),
+	RETURNED_TO_MINISTRY ("ReturnedToMinistry");
+
 
 	private final String value;
 

@@ -931,14 +931,17 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 		// Implementation Request
 		assurances.addAll(getImplementationRequests(fromDate, toDate, ministryId, memberId, status, statusFor));
-		// ExtensionRequest
-		assurances.addAll(getExtensionRequests(fromDate, toDate, ministryId, memberId, status, statusFor));
-		// OtherRequests
-		assurances.addAll(getOtherRequests(fromDate, toDate, ministryId, memberId, status, statusFor));
-		// ClubbedAssurance
-		assurances.addAll(getClubbedAssurances(fromDate, toDate, ministryId, memberId, status, statusFor));
-		// DroppingRequest
-		assurances.addAll(getDroppingRequests(fromDate, toDate, ministryId, memberId, status, statusFor));
+
+		if (!Entities.MOPA.getValue().equals(statusFor)) {
+			// ExtensionRequest
+			assurances.addAll(getExtensionRequests(fromDate, toDate, ministryId, memberId, status, statusFor));
+			// OtherRequests
+			assurances.addAll(getOtherRequests(fromDate, toDate, ministryId, memberId, status, statusFor));
+			// ClubbedAssurance
+			assurances.addAll(getClubbedAssurances(fromDate, toDate, ministryId, memberId, status, statusFor));
+			// DroppingRequest
+			assurances.addAll(getDroppingRequests(fromDate, toDate, ministryId, memberId, status, statusFor));
+		}
 
 		assurances.sort(Comparator.comparing(CommonRequestResponseDTO::getDate,
 				Comparator.nullsLast(Comparator.reverseOrder())));

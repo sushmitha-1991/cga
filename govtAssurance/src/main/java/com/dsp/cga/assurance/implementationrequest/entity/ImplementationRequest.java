@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -24,6 +25,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString (exclude = "assurance")
 @Table(name = "implementation_requests", schema = "cga")
 public class ImplementationRequest extends ApplicationInstance {
 
@@ -35,7 +37,7 @@ public class ImplementationRequest extends ApplicationInstance {
 	@Column(name = "assurance_id", nullable = false)
 	private Long assuranceId;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "assurance_id", nullable = false, insertable = false,updatable = false)
 	private Assurance assurance;
 	

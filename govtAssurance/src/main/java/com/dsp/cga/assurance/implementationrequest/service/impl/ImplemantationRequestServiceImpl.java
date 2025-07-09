@@ -1174,34 +1174,27 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		}
 	
 
-	@Override
-	public List<AssuranceImplementationDTO> getRequestsReturnedToMinistry(String houseAbbr) {
-	    List<ImplementationRequest> implRequests = implementationRequestRepository
-		        .findByStatusForMopa("Returned");
-
-//	        .findByStatusForMinistryAndReturnFrom("Returned", "CGA");
-
-	    List<AssuranceImplementationDTO> dtoList = new ArrayList<>();
-
-//	    Long filterHouseId = null;
-//	    if ("LS".equalsIgnoreCase(houseAbbr)) {
-//	        filterHouseId = 2L;
-//	    } else if ("RS".equalsIgnoreCase(houseAbbr)) {
-//	        filterHouseId = 1L;
+//	@Override
+//	public List<AssuranceImplementationDTO> getRequestsReturnedToMinistry(String houseAbbr) {
+//
+//		List<ImplementationRequest> implRequests = implementationRequestRepository
+//													.findByStatusForMinistryAndReturnFrom("Returned", "CGA");
+//
+//	    List<AssuranceImplementationDTO> dtoList = new ArrayList<>();
+//
+//	    for (ImplementationRequest impl : implRequests) {
+//	        
+//	    	Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
+//	        
+//	    	if (assurance != null) {
+//
+//	        	dtoList.add(buildImplementationDTO(assurance, impl));
+//	        
+//	        }
 //	    }
-
-	    for (ImplementationRequest impl : implRequests) {
-	        Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
-	        if (assurance != null) {
-//	            Long houseId = getHouseIdFromAssurance(assurance);
-//	            if (filterHouseId != null && !filterHouseId.equals(houseId)) continue;
-
-	            dtoList.add(buildImplementationDTO(assurance, impl));
-	        }
-	    }
-
-	    return dtoList;
-	}
+//
+//	    return dtoList;
+//	}
 
 	@Override
 	public AssuranceImplementationDTO sendToCga (ImplementationRequestDTO dto) {
