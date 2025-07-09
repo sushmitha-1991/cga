@@ -49,7 +49,7 @@ public class ImplementationRequestController {
 
 		if (createdImplementationRequest == null) {
 			GenericResponse<ImplementationRequestDTO> response = new GenericResponse<>(HttpStatus.FAILED_DEPENDENCY.value(), 
-					true,
+					true,  
 	                "Implementation Request cannot be created as another Implementation Request exists for the Assurance", null);
 			return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).body(response);			
 		} 	
@@ -128,7 +128,7 @@ public class ImplementationRequestController {
 	     GenericResponse<List<AssuranceImplementationDTO>> response = new GenericResponse<>(HttpStatus.OK.value(),
 	             true, "Implementation details fetched successfully", implementations);
 
-	     return ResponseEntity.ok(response);
+	     return ResponseEntity.ok(response); 
 	 }
 
 	 @GetMapping("/implementation-details/{id}")

@@ -113,7 +113,7 @@ public class DroppingRequestController {
 	    public ResponseEntity<GenericResponse<DroppingRequestDTO>> createDroppingRequest(@RequestBody DroppingRequestDTO droppingRequestDTO) {
 	        DroppingRequestDTO createdRequest = droppingRequestService.createDroppingRequest(droppingRequestDTO);
 	        
-	        if (createdRequest == null) {
+	        if (createdRequest == null){
 	        	new GenericResponse<>(HttpStatus.FAILED_DEPENDENCY.value(), false,
 						"Dropping Request cannot be created as another Dropping Request exists for the Assurance", null);
 	        }

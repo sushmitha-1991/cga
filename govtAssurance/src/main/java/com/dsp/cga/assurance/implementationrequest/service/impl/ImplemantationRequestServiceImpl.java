@@ -160,7 +160,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		// New to be created. Validate if implementation exists for the assurance
 		Long count = implementationRequestRepository.countByAssuranceId(implementationRequestDTO.getAssuranceId());
 		
-		if (count > 0) {
+		if (count > 0)  {
 			return null;
 		}
 		
@@ -505,7 +505,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    List<ImplementationRequest> implementationRequests = implementationRequestRepository
 	            .findAll(spec, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-	    if (CollectionUtils.isEmpty(implementationRequests)) {
+	    if (CollectionUtils.isEmpty(implementationRequests)) { 
 	        return List.of();
 	    }
 

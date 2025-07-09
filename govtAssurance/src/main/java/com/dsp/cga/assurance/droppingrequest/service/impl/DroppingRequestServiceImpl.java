@@ -408,7 +408,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 			Long count = droppingRequestRepository.countByAssuranceId(droppingRequestDTO.getAssuranceId());
 			
 			if (count > 0) {
-				return null;
+				return null;  
 			}
 			
 			DroppingRequest entity = DroppingRequestMapper.toEntity(droppingRequestDTO);

@@ -547,6 +547,8 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		    if (er.getAssuranceId() != null) {
 		        assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
 		    }
+		    
+		    
 
 		    // Update ExtensionRequest fields only if non-null
 		    if (requestDTO.getExtensionNo() != null) {
@@ -1063,7 +1065,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		
 		Specification<ClubbedAssurance> spec = Specification.where(null);
 		spec = spec.and(ClubbedAssuranceRequestSpec.isActive(true));
-		spec = spec.and(ClubbedAssuranceRequestSpec.hasHouse(util.getHouseAbbr()));
+		spec = spec.and(ClubbedAssuranceRequestSpec.hasHouse(util.getHouseAbbr())); 
 		spec = spec.and(ClubbedAssuranceRequestSpec.isFromMinistry(true));
 
 		if (fromDate != null || toDate != null) {
@@ -1337,7 +1339,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		
 		dto.setSubject(assurance.getSubject());
 
-		dto.setDueDateOfImplementation(req.getDueDateOfImplementation());
+		dto.setDueDateOfImplementation(req.getDueDateOfImplementation()); 
 		dto.setDateOfImplementation(req.getDateOfImplementation());
 		dto.setDetailsOfImplementation(req.getDetailsOfImplementation());
 		dto.setLayingDate(req.getLayingDate());
