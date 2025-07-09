@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -155,7 +156,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 
 	@Override
 	public List<AssuranceResponseDTO> getFilteredClubbedAssurances(Long sessionNo, LocalDate assuranceDate,
-	                                                               Long statusId, Integer ministryCode) {
+	                                                               String statusForMinistry, Integer ministryCode) {
 
 	    // 🔹 Get ministryId from ministryCode
 	    final Long ministryId;
@@ -197,7 +198,11 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	            if (assurance == null) return false;
 
 	            if (assuranceDate != null && !assuranceDate.equals(assurance.getAssuranceDate())) return false;
-	            if (statusId != null && !statusId.equals(assurance.getStatusId())) return false;
+	            
+	            //if (statusId != null && !statusId.equals(assurance.getStatusId())) return false;
+	            if (!StringUtils.isEmpty(statusForMinistry) && 
+	            		!statusForMinistry.equals(clubbed.getStatusForMinistry())) return false;
+	            
 	            if (ministryId != null && !ministryId.equals(assurance.getMinistryId())) return false;
 
 //	            if (houseId == 1 && !finalSessionNo.equals(assurance.getRajyaSabhaSessionNo())) return false;

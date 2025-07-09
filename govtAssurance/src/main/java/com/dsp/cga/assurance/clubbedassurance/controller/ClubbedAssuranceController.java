@@ -124,11 +124,11 @@ public class ClubbedAssuranceController {
 	 public ResponseEntity<GenericResponse<List<AssuranceResponseDTO>>> getAssurances(
 	         @RequestParam(required = false) Long sessionNo,
 	         @RequestParam(required = false) LocalDate assuranceDate,
-	         @RequestParam(required = false) Long statusId,
+	         @RequestParam(required = false) String statusForMinistry,
 	         @RequestParam(required = false) Integer ministryCode) {
 
 	     List<AssuranceResponseDTO> response = clubbedAssuranceService.getFilteredClubbedAssurances(
-	             sessionNo, assuranceDate, statusId, ministryCode
+	             sessionNo, assuranceDate, statusForMinistry, ministryCode
 	     );
 
 	     if (response.isEmpty()) {

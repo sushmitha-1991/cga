@@ -15,7 +15,7 @@ public interface ClubbedAssuranceService {
 
 	List<ClubbedAssuranceDTO> getClubbedAssurancesByAssuranceId(Long assuranceId);
 
-	List<AssuranceResponseDTO> getFilteredClubbedAssurances(Long sessionNo, LocalDate assuranceDate, Long statusId,
+	List<AssuranceResponseDTO> getFilteredClubbedAssurances(Long sessionNo, LocalDate assuranceDate, String statusForMinistry,
 			Integer ministryCode);
 
 	ClubbedAssuranceDTO createClubbedAssurance(ClubbedAssuranceDTO dto);
