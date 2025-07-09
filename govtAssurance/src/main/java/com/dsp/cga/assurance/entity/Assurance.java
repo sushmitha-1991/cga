@@ -31,12 +31,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString (exclude = "partDetails")
 @Table(name = "assurance", schema = "cga")
 public class Assurance extends Auditable {
 

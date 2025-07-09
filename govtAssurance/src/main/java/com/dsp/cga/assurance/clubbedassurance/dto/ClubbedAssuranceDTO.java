@@ -27,5 +27,6 @@ public class ClubbedAssuranceDTO {
 	private List<MemberDTO> clubbedMembersData;
 	private List<MemberDTO> supplementaryClubbedMembersData;
 	private String statusForCga;
+	private Boolean fromMinistry;
 
 }

@@ -236,12 +236,12 @@ public class ImplementationRequestController {
 	     );
 	 }
 
-	 @GetMapping("/return-from-cga")
+	 @GetMapping("/returned-to-ministry")
 	 @Operation(summary = "Get Return Requests From CGA")
 	 public ResponseEntity<GenericResponse<List<AssuranceImplementationDTO>>> getReturnRequestsFromCGA(
 	     @RequestParam(required = false) String houseAbbr) {
 
-	     List<AssuranceImplementationDTO> list = implementationRequestService.getReturnRequestsFromCGA(houseAbbr);
+	     List<AssuranceImplementationDTO> list = implementationRequestService.getRequestsReturnedToMinistry(houseAbbr);
 	     return ResponseEntity.ok(
 	         new GenericResponse<>(HttpStatus.OK.value(), true, "Filtered implementation details fetched successfully", list)
 	     );

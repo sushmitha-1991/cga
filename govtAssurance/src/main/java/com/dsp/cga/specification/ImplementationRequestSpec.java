@@ -86,11 +86,11 @@ public class ImplementationRequestSpec {
 			Specification<ImplementationRequest> hasProgressStatus = (root, query, cb) -> 
 			cb.equal(root.get("statusForCga"), CgaStatus.IN_PROGRESS.getValue());
 			
-			Specification<ImplementationRequest> hasReturnedStatus = (root, query, cb) ->
-						cb.equal(root.get("statusForCga"), CgaStatus.RETURNED.getValue());
+//			Specification<ImplementationRequest> hasReturnedStatus = (root, query, cb) ->
+//						cb.equal(root.get("statusForCga"), CgaStatus.RETURNED.getValue());
 			
-			Specification<ImplementationRequest> combinedSpec = hasReceivedStatus.or(hasProgressStatus)
-																	.or(hasReturnedStatus);
+			Specification<ImplementationRequest> combinedSpec = hasReceivedStatus.or(hasProgressStatus);
+//																	.or(hasReturnedStatus);
 			return combinedSpec;
 			
 		} 

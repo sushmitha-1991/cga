@@ -22,12 +22,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString (exclude = "assurance")
 @Table(name= "clubbed_assurances", schema="cga")
 public class ClubbedAssurance extends Auditable{
 
@@ -41,7 +43,7 @@ public class ClubbedAssurance extends Auditable{
 	@Column(name = "assurance_id", nullable = false)
 	private Long assuranceId;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "assurance_id", nullable = false, insertable = false,updatable = false)
 	private Assurance assurance;	
 	

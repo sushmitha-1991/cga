@@ -295,6 +295,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 		                .date(dto.getDate())
 			             .statusForMinistry(MinistryStatus.SUBMITTED.getValue())
 			             .statusForCga(Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
+			             .fromMinistry(true)
 		                .build();
 
 		        ClubbedAssurance saved = clubbedAssuranceRepository.save(entity);
@@ -306,6 +307,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 		                .date(saved.getDate())
 		                .statusForMinistry(saved.getStatusForMinistry())
 		                .statusForCga(saved.getStatusForCga())
+		                .fromMinistry(saved.getFromMinistry())
 		                .build();
 		    }
 

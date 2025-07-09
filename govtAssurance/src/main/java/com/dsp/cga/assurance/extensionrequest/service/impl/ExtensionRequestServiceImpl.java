@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.dsp.cga.assurance.clubbedassurance.entity.ClubbedAssurance;
@@ -905,7 +906,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		                    	entity.setStatusForMinistry(MinistryStatus.ACCEPTED.getValue());
 		                    } else {
 	                    		// Returned
-		                    	entity.setStatusForMopa(MopaStatus.RECEIVED.getValue());
+		                    	entity.setStatusForMopa(MopaStatus.RETURNED.getValue());
 			                    entity.setReturnFrom("CGA");
 	                    	}                 	
                         }
@@ -921,6 +922,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<CommonRequestResponseDTO> getAllRequests(
 				LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, 
 				String status, String statusFor) {
@@ -1106,6 +1108,8 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 		clubbedAssuranceRepository.findAll(spec).forEach(req -> {
 
+			System.out.println(req);
+			
 			response.add(buildDTO(req.getAssurance(), req));
 
 		});

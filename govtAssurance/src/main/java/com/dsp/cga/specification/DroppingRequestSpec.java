@@ -38,11 +38,11 @@ public class DroppingRequestSpec {
 	public static Specification<DroppingRequest> hasDateBetween(LocalDate startDate, LocalDate endDate) {
 		return (root, query, criteriaBuilder) -> {
 			if (startDate != null && endDate != null) {
-				return criteriaBuilder.between(root.get("inputDate"), startDate, endDate);
+				return criteriaBuilder.between(root.get("createdAt"), startDate, endDate);
 			} else if (startDate != null) {
-				return criteriaBuilder.greaterThanOrEqualTo(root.get("inputDate"), startDate);
+				return criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startDate);
 			} else if (endDate != null) {
-				return criteriaBuilder.lessThanOrEqualTo(root.get("inputDate"), endDate);
+				return criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endDate);
 			} else {
 				return criteriaBuilder.conjunction();
 			}

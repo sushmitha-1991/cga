@@ -1175,7 +1175,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	
 
 	@Override
-	public List<AssuranceImplementationDTO> getReturnRequestsFromCGA(String houseAbbr) {
+	public List<AssuranceImplementationDTO> getRequestsReturnedToMinistry(String houseAbbr) {
 	    List<ImplementationRequest> implRequests = implementationRequestRepository
 		        .findByStatusForMopa("Returned");
 
