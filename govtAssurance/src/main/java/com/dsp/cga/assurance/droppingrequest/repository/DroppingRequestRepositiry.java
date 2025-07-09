@@ -20,7 +20,7 @@ public interface DroppingRequestRepositiry extends JpaRepository<DroppingRequest
 	@Query(value = """
 		    SELECT COUNT(*) FROM cga.dropping_requests d
 		    JOIN cga.assurance a ON d.assurance_id = a.id
-		    WHERE a.assurance_id = :assuranceId
+		    WHERE d.assurance_id = :assuranceId
 		    """, nativeQuery = true)
 		Long countByAssuranceId(@Param("assuranceId") Long assuranceId);
 		
