@@ -195,11 +195,13 @@ public class ExtensionRequestController {
 		    @RequestParam(required = false) Long ministryId,
 			@RequestParam(required = false) Long memberId,
 		    @RequestParam(required = false) String status,
-		    @RequestParam(required = false) String requestedBy) {
+		    @RequestParam(required = false) String requestedBy,
+		    @RequestParam(required = false) String houseAbbr
+			) {
 	
 		List<CommonRequestResponseDTO> responseList = extensionRequestService.getAllRequests(
 															fromDate, toDate, ministryId, memberId, status,
-															requestedBy);
+															requestedBy, houseAbbr);
 		
 	    GenericResponse<List<CommonRequestResponseDTO>> response = new GenericResponse<>(
 	            HttpStatus.OK.value(),

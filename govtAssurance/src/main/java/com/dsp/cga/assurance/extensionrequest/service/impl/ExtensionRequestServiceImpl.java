@@ -929,12 +929,12 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	@Transactional(readOnly = true)
 	public List<CommonRequestResponseDTO> getAllRequests(
 				LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, 
-				String status, String statusFor) {
+				String status, String statusFor, String houseAbbr) {
 	    
 		List<CommonRequestResponseDTO> assurances = new ArrayList<>();
 
 		// Implementation Request
-		assurances.addAll(getImplementationRequests(fromDate, toDate, ministryId, memberId, status, statusFor));
+		assurances.addAll(getImplementationRequests(fromDate, toDate, ministryId, memberId, status, statusFor, houseAbbr));
 
 		if (!Entities.MOPA.getValue().equals(statusFor)) {
 			// ExtensionRequest
@@ -1180,11 +1180,16 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	
 	private Specification<ImplementationRequest> createImplementationSpecification(
 			LocalDate fromDate, LocalDate toDate, Long ministryId, Long memberId, 
-			String status, String statusFor) {
+			String status, String statusFor, String houseAbbr) {
 		
 		Specification<ImplementationRequest> spec = Specification.where(null);
 		spec = spec.and(ImplementationRequestSpec.isActive(true));
-//		spec = spec.and(ImplementationRequestSpec.hasHouse(util.getHouseAbbr()));
+		
+		if (!Entities.MOPA.getValue().equalsIgnoreCase(statusFor) ||
+			!StringUtils.isEmpty(houseAbbr)) {
+			spec = spec.and(ImplementationRequestSpec.hasHouse(util.getHouseAbbr()));
+		}
+		
 		spec = spec.and(ImplementationRequestSpec.isFromMinistry(true));
 
 		if (fromDate != null || toDate != null) {
@@ -1213,12 +1218,12 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	
 	
 	private List<CommonRequestResponseDTO> getImplementationRequests (LocalDate fromDate, LocalDate toDate, Long ministryId,
-			Long memberId, String status, String statusFor) {
+			Long memberId, String status, String statusFor, String houseAbbr) {
 
 		String reqBy = StringUtils.isEmpty(statusFor) ? Entities.MINISTRY.getValue() : statusFor;
 
-		Specification<ImplementationRequest> spec = createImplementationSpecification(fromDate, toDate, ministryId, memberId,
-				status, reqBy);
+		Specification<ImplementationRequest> spec = createImplementationSpecification(fromDate, toDate, ministryId, 
+								memberId, status, reqBy, houseAbbr);
 
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
