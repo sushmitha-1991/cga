@@ -69,6 +69,7 @@ import com.dsp.cga.eunms.RequestType;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ExtensionRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
+import com.dsp.cga.repository.HousesRepository;
 import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.specification.ClubbedAssuranceRequestSpec;
 import com.dsp.cga.specification.DroppingRequestSpec;
@@ -128,6 +129,9 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
     @Autowired
     private Utils util;
 
+    @Autowired
+    private HousesRepository houseRepository;
+    
 @Autowired
 private DroppingRequestRepositiry droppingRequestRepository;
 
@@ -1180,7 +1184,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		
 		Specification<ImplementationRequest> spec = Specification.where(null);
 		spec = spec.and(ImplementationRequestSpec.isActive(true));
-		spec = spec.and(ImplementationRequestSpec.hasHouse(util.getHouseAbbr()));
+//		spec = spec.and(ImplementationRequestSpec.hasHouse(util.getHouseAbbr()));
 		spec = spec.and(ImplementationRequestSpec.isFromMinistry(true));
 
 		if (fromDate != null || toDate != null) {
@@ -1241,8 +1245,6 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		dto.setStatusForCga(req.getStatusForCga());
 		dto.setDate(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null);
 		
-		dto.setSubject(assurance.getSubject());
-
 		dto.setDroppingType(codeRepository.findCodeById(req.getDroppingType()));
 		dto.setSupplementaryId(req.getSupplementaryId());
 		dto.setPartId(req.getPartId());
@@ -1296,7 +1298,6 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		dto.setDate(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null);
 
 		dto.setRequestedDate(req.getRequestedDate());
-		dto.setSubject(req.getSubject());
 		dto.setStatusId(req.getStatusId());
 
 		dto.setFileUrl(req.getFileUrl());
@@ -1317,7 +1318,6 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		dto.setStatusForCga(req.getStatusForCga());
 		dto.setDate(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null);
 
-		dto.setSubject(req.getSubject());
 		dto.setStatusId(req.getStatusId());
 	
 		dto.setExtensionNo(req.getExtensionNo());
@@ -1343,8 +1343,6 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		dto.setStatusForCga(req.getStatusForCga());
 		dto.setStatusForMopa(req.getStatusForMopa());
 		dto.setDate(req.getCreatedAt().toLocalDate());
-		
-		dto.setSubject(assurance.getSubject());
 
 		dto.setDueDateOfImplementation(req.getDueDateOfImplementation()); 
 		dto.setDateOfImplementation(req.getDateOfImplementation());
@@ -1354,7 +1352,11 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		dto.setSupplementaryId(req.getSupplementaryId());
 		dto.setImplementationReportFiles(req.getImplementationReportFiles());
 		dto.setPartReportFiles(req.getPartReportFiles());
-        
+		
+		// House
+        if (assurance.getHouseId() != null) {
+        	dto.setHouse(houseRepository.findHouseNameById(assurance.getHouseId()));
+        }
 		return dto;
 	}	
 	
@@ -1392,7 +1394,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		
 		CommonRequestResponseDTO dto = CommonRequestResponseDTO.builder()
 											.assuranceId(assurance.getId())
-											.subject(assurance.getSubject())
+											.subject(getSubject(assurance))
 											.assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
 											.questionNo(assurance.getQuestionNo())
 											.lokSabhaSessionNumber(lokSabhaSessionNumber)
@@ -1404,5 +1406,23 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 											.status(status)
 											.build();
 		return dto;	
+	}
+	
+	
+	private String getSubject(Assurance assurance) {
+		
+		if (!StringUtils.isEmpty(assurance.getSubject())) return assurance.getSubject();
+		
+        if (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()) {
+              return assurance.getPartDetails().stream()
+                    .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+                    .map(PartDetails::getSubject)
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
+        }
+        
+        return null;
+
 	}
 }

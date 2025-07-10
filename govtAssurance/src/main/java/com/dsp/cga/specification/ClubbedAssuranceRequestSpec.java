@@ -12,6 +12,8 @@ import com.dsp.cga.eunms.Entities;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.util.Utils;
 
+import jakarta.persistence.criteria.Expression;
+
 
 public class ClubbedAssuranceRequestSpec {
 	
@@ -37,14 +39,19 @@ public class ClubbedAssuranceRequestSpec {
 	
 	public static Specification<ClubbedAssurance> hasDateBetween(LocalDate startDate, LocalDate endDate) {
 		return (root, query, criteriaBuilder) -> {
-			if (startDate != null && endDate != null) {
-				return criteriaBuilder.between(root.get("date"), startDate, endDate);
+			Expression<java.sql.Date> createdAtDate = criteriaBuilder.function(
+				    "date", java.sql.Date.class, root.get("createdAt"));
+			
+			if (startDate != null && endDate != null) {				
+				 return criteriaBuilder.between(
+					        createdAtDate, java.sql.Date.valueOf(startDate), java.sql.Date.valueOf(endDate)
+					    );				
 			} else if (startDate != null) {
-				return criteriaBuilder.greaterThanOrEqualTo(root.get("date"), startDate);
+				return criteriaBuilder.greaterThanOrEqualTo(createdAtDate, java.sql.Date.valueOf(startDate));
 			} else if (endDate != null) {
-				return criteriaBuilder.lessThanOrEqualTo(root.get("date"), endDate);
+			    return criteriaBuilder.lessThanOrEqualTo(createdAtDate, java.sql.Date.valueOf(endDate));
 			} else {
-				return null;
+				return criteriaBuilder.conjunction();
 			}
 		};
 	}

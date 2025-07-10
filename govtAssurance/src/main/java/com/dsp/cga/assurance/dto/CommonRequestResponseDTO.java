@@ -111,6 +111,8 @@ public class CommonRequestResponseDTO {
 	private String reason;
 
 	private Long implementationTypeId;
+	
+	private String house;
 
 	private LocalDate dueDateOfImplementation;
 	private String detailsOfImplementation;
