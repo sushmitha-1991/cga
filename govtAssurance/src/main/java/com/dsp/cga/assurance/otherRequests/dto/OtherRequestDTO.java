@@ -48,6 +48,6 @@ public class OtherRequestDTO {
 	
 	private String statusForCga;
 	
-	
+	private Boolean draftStatus;
 
 }

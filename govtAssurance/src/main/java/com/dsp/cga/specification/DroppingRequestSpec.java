@@ -102,7 +102,10 @@ public class DroppingRequestSpec {
 			Specification<DroppingRequest> hasReturnedStatus = (root, query, cb) ->
 						cb.equal(root.get("statusForMinistry"), MinistryStatus.RETURNED.getValue());
 			
-			Specification<DroppingRequest> combinedSpec = hasSubmittedStatus.or(hasReturnedStatus);
+			Specification<DroppingRequest> hasDraftStatus = (root, query, cb) ->
+						cb.equal(root.get("statusForMinistry"), MinistryStatus.DRAFT.getValue());
+						
+			Specification<DroppingRequest> combinedSpec = hasSubmittedStatus.or(hasReturnedStatus).or(hasDraftStatus);
 			return combinedSpec;
 		} 
 		

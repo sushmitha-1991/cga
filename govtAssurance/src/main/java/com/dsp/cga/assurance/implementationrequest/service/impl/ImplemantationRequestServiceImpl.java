@@ -36,7 +36,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
-import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
+import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepository;
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.CommitteeDecisionDTO;
 import com.dsp.cga.assurance.dto.ImplementationTypeDTO;
@@ -123,7 +123,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	private ExtensionRequestRepository extensionRepo;
 	
 	@Autowired
-	private DroppingRequestRepositiry droppingRepo;
+	private DroppingRequestRepository droppingRepo;
 	
 	@Autowired 
 	private ClubbedAssuranceRepository clubbedRepo;
@@ -712,7 +712,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .departmentName(departmentName)
 	        .status(codeRepository.findCodeById(assurance.getStatusId()))
 	        .dueDateOfImplementation(implementationRequest.getDueDateOfImplementation())
-	       // .subject(assurance.getSubject())
 	        .subject(assurance.getSubject() != null 
             ? assurance.getSubject() 
             : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
@@ -743,7 +742,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .clubbedMembersData(clubbedMembersData)
             .supplementaryClubbedMembersData(supplementaryClubbedMembersData) // ✅ Added
 	        .currentStatus(implementationRequest.getCurrentStatus())
-	        //.refId(implementationRequest.getRefId())
 	        .id(implementationRequest.getId())
 	    .applicationInstanceId(implementationRequest.getId());
 
@@ -1058,7 +1056,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .remarks(assurance.getRemarks())
 	        .reason(impl.getReason())
 	        .layingDate(impl.getLayingDate())
-//	        .statusForMinistry(impl.getStatusForMinistry())
 	        .implementationTypeId(codeRepository.findCodeById(impl.getImplementationTypeId()))
 	        .supplementaryId(impl.getSupplementaryId())
 	        .partId(impl.getPartId())
@@ -1100,41 +1097,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		
 	}
 	
-//	private String getStatusForMinistry (ImplementationRequest impl, String requestedBy) {
-//		
-//		requestedBy = StringUtils.isEmpty(requestedBy) ? Entities.MINISTRY.getValue() : requestedBy;
-//		
-//		if (Entities.MINISTRY.getValue().equalsIgnoreCase(requestedBy)) {
-//			return impl.getStatusForMinistry();
-//		} else if (Entities.MOPA.getValue().equalsIgnoreCase(requestedBy)) {
-//			return impl.getStatusForMopa();
-//		} else {
-//			return impl.getStatusForCga();
-//		}
-//		
-//		String status = impl.getStatusForMinistry();
-//		
-//		String returnStatus = null;
-//		switch (status) {
-//		
-//			case "Returned" :
-//				returnStatus = MinistryStatus.RETURNED.getValue();
-//				break;
-//			case "Submitted" :
-//				if (StringUtils.isEmpty(impl.getSendTo())) returnStatus = MinistryStatus.RECEIVED.getValue();
-//				else returnStatus = MinistryStatus.IN_PROGRESS.getValue();
-//				break;
-//			case "Accepted":
-//				returnStatus = MinistryStatus.ACCEPTED.getValue();
-//				break;
-//			default:
-//				break;
-//		};
-//		
-//		return returnStatus;
-//		
-//	}
-
 
 	@Override
 	public AssuranceImplementationDTO updateImplementationRequestforMinistryStatusById(Long id,

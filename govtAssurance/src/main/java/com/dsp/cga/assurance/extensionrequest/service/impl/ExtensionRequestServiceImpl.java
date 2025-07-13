@@ -30,7 +30,7 @@ import org.springframework.web.client.RestTemplate;
 import com.dsp.cga.assurance.clubbedassurance.entity.ClubbedAssurance;
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
 import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
-import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
+import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepository;
 import com.dsp.cga.assurance.dto.CommonRequestResponseDTO;
 import com.dsp.cga.assurance.dto.MemberDTO;
 import com.dsp.cga.assurance.dto.SessionDTO;
@@ -133,7 +133,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
     private HousesRepository houseRepository;
     
 @Autowired
-private DroppingRequestRepositiry droppingRequestRepository;
+private DroppingRequestRepository droppingRequestRepository;
 
 @Autowired
 private ClubbedAssuranceRepository clubbedAssuranceRepository;
@@ -1165,14 +1165,9 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
 		droppingRequestRepository.findAll(spec).forEach(req -> {
-			
-//			response.add(buildDTO(req.getId(), "Dropping Request", req.getAssuranceId(), req.getAssurance().getSubject(),
-//					req.getRemarks(), req.getFromMinistry(), 
-//					recordStatus, // req.getStatusForMinistry(), 
-//					req.getAssurance(),
-//					req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
-			
+
 			response.add(buildDTO(req.getAssurance(), req));
+		
 		});
 		return response;
 	}

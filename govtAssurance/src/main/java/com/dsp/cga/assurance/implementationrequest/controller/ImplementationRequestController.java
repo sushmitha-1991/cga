@@ -39,8 +39,8 @@ public class ImplementationRequestController {
 	private AssuranceService assuranceService;
 	
 	@PostMapping("/create")
-	 @Operation(summary = "Create a new Assurance")
-		@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Assurance created successfully"),
+	 @Operation(summary = "Create a new Implementation Request")
+		@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Implementation Request created successfully"),
 				@ApiResponse(responseCode = "400", description = "Invalid input data"),
 				@ApiResponse(responseCode = "500", description = "Internal server error") })
 	 public ResponseEntity<GenericResponse<ImplementationRequestDTO>> createImplementationRequest(@RequestBody ImplementationRequestDTO implementationRequestDTO) {
@@ -62,7 +62,7 @@ public class ImplementationRequestController {
 	}
 
 	 @PostMapping("/create-or-update")
-	    @Operation(summary = "Create or update an Assurance")
+	    @Operation(summary = "Create or update an Implementation Request")
 	    @ApiResponses(value = { 
 	        @ApiResponse(responseCode = "200", description = "Assurance created or updated successfully"),
 	        @ApiResponse(responseCode = "400", description = "Invalid input data"),
@@ -79,7 +79,7 @@ public class ImplementationRequestController {
 	    }
 	 
 	 @GetMapping("/{id}")
-		@Operation(summary = "Get Assurance by ID")
+		@Operation(summary = "Get Implementation Request by Assurance ID")
 		@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
 				@ApiResponse(responseCode = "404", description = "Assurance not found"),
 				@ApiResponse(responseCode = "500", description = "Internal server error") })

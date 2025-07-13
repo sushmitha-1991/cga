@@ -30,7 +30,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
-import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
+import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepository;
 import com.dsp.cga.assurance.dto.AssuranceCategory;
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
@@ -171,7 +171,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 	private ExtensionRequestRepository extensionRepo;
 	
 	@Autowired
-	private DroppingRequestRepositiry droppingRepo;
+	private DroppingRequestRepository droppingRepo;
 	
 	@Autowired
 	private ClubbedAssuranceRepository clubbedAssuranceRepo;

@@ -88,6 +88,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	@Override
 	public OtherRequestDTO createOtherRequest(OtherRequestDTO dto) {
 		System.out.println(dto.getAssuranceId());
+
 		OtherRequests entity = OtherRequests.builder()
 				.assuranceId(dto.getAssuranceId())
 				//.subject(dto.getSubject())
@@ -96,8 +97,9 @@ public class OtherRequestServiceImpl implements OtherRequestService {
                 .remarks(dto.getRemarks())
                 .fileUrl(dto.getFileUrl())
                 .fromMinistry(true)
-	            .statusForMinistry(MinistryStatus.SUBMITTED.getValue())
-	            .statusForCga(CgaStatus.RECEIVED.getValue())
+				.draftStatus(dto.getDraftStatus())
+				.statusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue())
+				.statusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
                 .build();
 
         OtherRequests saved = otherRequestRepo.save(entity);
@@ -111,6 +113,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
                 .remarks(saved.getRemarks())
                 .fileUrl(saved.getFileUrl())
                 .fileUrl(saved.getFileUrl())
+                .draftStatus(saved.getDraftStatus())
                 .statusForMinistry(saved.getStatusForMinistry())
                 .statusForCga(saved.getStatusForCga())
                 .build();
@@ -415,6 +418,12 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	    if (dto.getFileUrl() != null) {
 	        existing.setFileUrl(dto.getFileUrl());
 	    }
+
+	    existing.setDraftStatus(dto.getDraftStatus());
+		existing.setStatusForMinistry(
+				dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
+		existing.setStatusForCga(
+				dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
 
 	    OtherRequests updated = otherRequestRepo.save(existing);
 

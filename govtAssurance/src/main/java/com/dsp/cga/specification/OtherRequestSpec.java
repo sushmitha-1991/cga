@@ -104,8 +104,11 @@ public class OtherRequestSpec {
 
 			Specification<OtherRequests> hasReturnedStatus = (root, query, cb) ->
 						cb.equal(root.get("statusForMinistry"), MinistryStatus.RETURNED.getValue());
-			
-			Specification<OtherRequests> combinedSpec = hasSubmittedStatus.or(hasReturnedStatus);
+
+			Specification<OtherRequests> hasDraftStatus = (root, query, cb) ->
+						cb.equal(root.get("statusForMinistry"), MinistryStatus.DRAFT.getValue());
+						
+			Specification<OtherRequests> combinedSpec = hasSubmittedStatus.or(hasReturnedStatus).or(hasDraftStatus);
 			return combinedSpec;
 		} 
 		

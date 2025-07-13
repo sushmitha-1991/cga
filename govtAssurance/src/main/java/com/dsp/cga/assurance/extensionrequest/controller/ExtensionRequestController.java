@@ -166,22 +166,6 @@ public class ExtensionRequestController {
 	    return ResponseEntity.ok(response);
 	}
 
-//	@GetMapping("getAllRequests")
-//	@Operation(summary = "Get all requests")
-//	@ApiResponses(value = {
-//	    @ApiResponse(responseCode = "200", description = "Requests fetched successfully"),
-//	    @ApiResponse(responseCode = "500", description = "Internal server error")
-//	})
-//	public ResponseEntity<GenericResponse<List<CommonRequestResponseDTO>>> getAllRequests() {
-//	    List<CommonRequestResponseDTO> responseList = extensionRequestService.getAllRequests();
-//	    GenericResponse<List<CommonRequestResponseDTO>> response = new GenericResponse<>(
-//	            HttpStatus.OK.value(),
-//	            true,
-//	            "Requests fetched successfully",
-//	            responseList
-//	    );
-//	    return ResponseEntity.ok(response);
-//	}
 
 	@GetMapping("/getAllRequests")
 	@Operation(summary = "Get all requests")

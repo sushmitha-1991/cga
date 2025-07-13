@@ -102,7 +102,10 @@ public class ClubbedAssuranceRequestSpec {
 			Specification<ClubbedAssurance> hasReturnedStatus = (root, query, cb) ->
 						cb.equal(root.get("statusForMinistry"), MinistryStatus.RETURNED.getValue());
 			
-			Specification<ClubbedAssurance> combinedSpec = hasSubmittedStatus.or(hasReturnedStatus);
+			Specification<ClubbedAssurance> hasDrfatStatus = (root, query, cb) ->
+						cb.equal(root.get("statusForMinistry"), MinistryStatus.DRAFT.getValue());
+						
+			Specification<ClubbedAssurance> combinedSpec = hasSubmittedStatus.or(hasReturnedStatus).or(hasDrfatStatus);
 			return combinedSpec;
 		} 
 		

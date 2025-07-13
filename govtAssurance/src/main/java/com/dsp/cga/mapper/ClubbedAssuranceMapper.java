@@ -2,6 +2,8 @@ package com.dsp.cga.mapper;
 
 import com.dsp.cga.assurance.clubbedassurance.dto.ClubbedAssuranceDTO;
 import com.dsp.cga.assurance.clubbedassurance.entity.ClubbedAssurance;
+import com.dsp.cga.eunms.MinistryStatus;
+import com.dsp.cga.util.Utils;
 
 public class ClubbedAssuranceMapper {
 
@@ -13,7 +15,8 @@ public class ClubbedAssuranceMapper {
 	                .id(entity.getId())
 	                .assuranceId(entity.getAssuranceId())
 	                .clubbedAssuranceIds(entity.getClubbedAssuranceIds())
-	               
+	                .statusForCga(entity.getStatusForCga())
+	                .statusForMinistry(entity.getStatusForMinistry())
 	                .build();
 	    }
 
@@ -23,8 +26,10 @@ public class ClubbedAssuranceMapper {
 	        return ClubbedAssurance.builder()
 	                .id(dto.getId())
 	                .assuranceId(dto.getAssuranceId())
-	                .clubbedAssuranceIds(dto.getClubbedAssuranceIds())
-	                
+	                .clubbedAssuranceIds(dto.getClubbedAssuranceIds())	          
+					.fromMinistry(true)
+					.statusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue())
+					.statusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
 	                .build();
 	    }
 	    

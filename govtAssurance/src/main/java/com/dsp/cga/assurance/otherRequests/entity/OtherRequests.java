@@ -71,6 +71,8 @@ public class OtherRequests extends Auditable{
 		@Convert(converter = JsonMapConverter.class)
 		private List<Map<String, Object>> fileUrl;
 
+		@Column(name = "draft_status")
+		private Boolean draftStatus;
 	    
 	}
 	

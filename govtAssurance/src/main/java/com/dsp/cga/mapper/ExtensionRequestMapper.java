@@ -69,7 +69,7 @@ public class ExtensionRequestMapper {
 	                .extensionFiles(dto.getExtensionFiles())
 	                .fromMinistry(true)
 		             .statusForMinistry(MinistryStatus.SUBMITTED.getValue())
-		             .statusForCga(Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
+					.statusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
 	                .statusId(dto.getStatusId())
 	                .build();
 	    }

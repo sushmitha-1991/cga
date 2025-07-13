@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
 
 @Repository
-public interface DroppingRequestRepositiry extends JpaRepository<DroppingRequest, Long>, JpaSpecificationExecutor
+public interface DroppingRequestRepository extends JpaRepository<DroppingRequest, Long>, JpaSpecificationExecutor
 <DroppingRequest> {
 
 	Optional<DroppingRequest> findByAssuranceId(Long id);

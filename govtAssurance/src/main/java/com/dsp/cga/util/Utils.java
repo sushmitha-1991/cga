@@ -29,7 +29,9 @@ import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.repository.MyUserRepository;
 import com.dsp.cga.entity.BaseUser;
+import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.MinistryStatus;
+import com.dsp.cga.eunms.MopaStatus;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -98,14 +100,14 @@ public class Utils {
 		switch (statusForMinistry) {
 		
 			case "Returned" :
-				returnStatus = MinistryStatus.RETURNED.getValue();
+				returnStatus = MopaStatus.RETURNED.getValue();
 				break;
 			case "Submitted" :
-				if (StringUtils.isEmpty(sendTo)) returnStatus = MinistryStatus.RECEIVED.getValue();
-				else returnStatus = MinistryStatus.IN_PROGRESS.getValue();
+				if (StringUtils.isEmpty(sendTo)) returnStatus = MopaStatus.RECEIVED.getValue();
+				else returnStatus = MopaStatus.IN_PROGRESS.getValue();
 				break;
 			case "Accepted":
-				returnStatus = MinistryStatus.ACCEPTED.getValue();
+				returnStatus = MopaStatus.ACCEPTED.getValue();
 				break;
 			default:
 				break;
@@ -122,14 +124,17 @@ public class Utils {
 		switch (statusForMinistry) {
 		
 			case "Returned" :
-				returnStatus = MinistryStatus.RETURNED.getValue();
+				returnStatus = CgaStatus.RETURNED.getValue();
 				break;
 			case "Submitted" :
-				returnStatus = MinistryStatus.RECEIVED.getValue();
+				returnStatus = CgaStatus.RECEIVED.getValue();
 				break;
 			case "Accepted":
-				returnStatus = MinistryStatus.ACCEPTED.getValue();
+				returnStatus = CgaStatus.ACCEPTED.getValue();
 				break;
+			case "Draft":
+				returnStatus = null;
+				break;	
 			default:
 				returnStatus = statusForMinistry; 
 				break;

@@ -40,7 +40,7 @@ public class DroppingRequestController {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
 			@ApiResponse(responseCode = "404", description = "Assurance not found"),
 			@ApiResponse(responseCode = "500", description = "Internal server error") })
-	public ResponseEntity<GenericResponse<DroppingRequestDTO>> getImplementationRequestByAssuranceId(@PathVariable Long id) {
+	public ResponseEntity<GenericResponse<DroppingRequestDTO>> getDroppingRequestByAssuranceId(@PathVariable Long id) {
 		//try {
 			DroppingRequestDTO request = droppingRequestService.getDroppingRequestByAssuranceId(id);
 
@@ -112,6 +112,8 @@ public class DroppingRequestController {
 	    })
 	    public ResponseEntity<GenericResponse<DroppingRequestDTO>> createDroppingRequest(@RequestBody DroppingRequestDTO droppingRequestDTO) {
 	        DroppingRequestDTO createdRequest = droppingRequestService.createDroppingRequest(droppingRequestDTO);
+	        
+	        System.out.println("Created dropping: " + createdRequest);
 	        
 	        if (createdRequest == null){
 	        	new GenericResponse<>(HttpStatus.FAILED_DEPENDENCY.value(), false,

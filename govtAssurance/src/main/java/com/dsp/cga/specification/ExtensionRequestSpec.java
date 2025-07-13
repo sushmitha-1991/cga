@@ -102,7 +102,10 @@ public class ExtensionRequestSpec {
 			Specification<ExtensionRequest> hasReturnedStatus = (root, query, cb) ->
 						cb.equal(root.get("statusForMinistry"), MinistryStatus.RETURNED.getValue());
 			
-			Specification<ExtensionRequest> combinedSpec = hasSubmittedStatus.or(hasReturnedStatus);
+			Specification<ExtensionRequest> hasDrfatStatus = (root, query, cb) ->
+						cb.equal(root.get("statusForCga"), MinistryStatus.DRAFT.getValue());
+															
+			Specification<ExtensionRequest> combinedSpec = hasSubmittedStatus.or(hasReturnedStatus).or(hasDrfatStatus);
 			return combinedSpec;
 		} 
 		

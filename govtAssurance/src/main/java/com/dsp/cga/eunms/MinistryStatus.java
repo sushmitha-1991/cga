@@ -4,11 +4,8 @@ public enum MinistryStatus {
 	
 	SUBMITTED ("Submitted"),
 	RETURNED ("Returned"),
-	
-	/** Status for MOPA Interface */
-	RECEIVED ("Received"),
-	ACCEPTED ("Accepted"),
-	IN_PROGRESS ("In Progress");
+	DRAFT ("Draft"),
+	ACCEPTED ("Accepted");
 
 	private final String value;
 

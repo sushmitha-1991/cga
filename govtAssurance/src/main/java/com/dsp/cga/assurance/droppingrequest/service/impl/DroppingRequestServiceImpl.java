@@ -27,7 +27,7 @@ import com.dsp.cga.assurance.droppingrequest.dto.AssuranceDroppingRequestDTO;
 import com.dsp.cga.assurance.droppingrequest.dto.AssuranceDroppingResponseDTO;
 import com.dsp.cga.assurance.droppingrequest.dto.DroppingRequestDTO;
 import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
-import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositiry;
+import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepository;
 import com.dsp.cga.assurance.droppingrequest.service.DroppingRequestService;
 import com.dsp.cga.assurance.dto.AcceptedDTO;
 import com.dsp.cga.assurance.dto.DroppingTypeDTO;
@@ -70,7 +70,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	private String memberServiceUrl;
 
 	@Autowired
-	private DroppingRequestRepositiry droppingRequestRepository;
+	private DroppingRequestRepository droppingRequestRepository;
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -295,7 +295,6 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	    };
 
 	
-	  //  List<DroppingRequest> filteredList = droppingRequestRepository.findAll(specification).stream()
 	    List<DroppingRequest> filteredList = droppingRequestRepository.findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt")).stream()
 
 	    .filter(dr -> {
@@ -406,13 +405,15 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 			
 			// New to be created. Validate if dropping exists for the assurance
 			Long count = droppingRequestRepository.countByAssuranceId(droppingRequestDTO.getAssuranceId());
-			
+			System.out.println("Droppings Existing for assurance ID: " + count);
 			if (count > 0) {
 				return null;  
 			}
 			
+			System.out.println(droppingRequestDTO);
 			DroppingRequest entity = DroppingRequestMapper.toEntity(droppingRequestDTO);
-	        DroppingRequest saved = droppingRequestRepository.save(entity);
+			System.out.println(entity);
+			DroppingRequest saved = droppingRequestRepository.save(entity);
 	        return DroppingRequestMapper.toDTO(saved);
 		}
 		

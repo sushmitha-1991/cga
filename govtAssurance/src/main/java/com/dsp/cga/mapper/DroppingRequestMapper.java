@@ -36,8 +36,8 @@ public class DroppingRequestMapper {
 				.issueLetterMinistry(dto.getIssueLetterMinistry())
 				.communicationDate(dto.getCommunicationDate())
 				.fromMinistry(true)
-				.statusForMinistry(MinistryStatus.SUBMITTED.getValue())
-				.statusForCga(Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
+				.statusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue())
+				.statusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
 				.session(dto.getSession())
 				.build();
 	    }
@@ -74,26 +74,33 @@ public class DroppingRequestMapper {
 	                .build();
 	    }
 
-	    public static void updateEntityFromDTO(DroppingRequestDTO dto, DroppingRequest entity) {
-	        if (dto != null && entity != null) {
-	            entity.setDroppingType(dto.getDroppingType());
-	            entity.setSupplementaryId(dto.getSupplementaryId());
-	            entity.setPartId(dto.getPartId());
-	            entity.setDropRequestDate(dto.getDropRequestDate());
-	            entity.setActualDropDate(dto.getActualDropDate());
-	            entity.setAcceptedId(dto.getAcceptedId());
-	            entity.setMinistryRefDate(dto.getMinistryRefDate());
-	            entity.setMinistryRefNo(dto.getMinistryRefNo());
-	            entity.setSubject(dto.getSubject());
-	            entity.setMeetingNo(dto.getMeetingNo());
-	            entity.setMeetingDate(dto.getMeetingDate());
-	            entity.setDroppingFiles(dto.getDroppingFiles());
-	            entity.setIssueLetterMinistry(dto.getIssueLetterMinistry());
-	           entity.setCommunicationDate(dto.getCommunicationDate());
-	           entity.setDroppingFiles(dto.getDroppingFiles());
-	            entity.setSession(dto.getSession());
-	            entity.setRemarks(dto.getRemarks());
-	        }
-	    }
+		public static void updateEntityFromDTO(DroppingRequestDTO dto, DroppingRequest entity) {
+			
+			if (dto != null && entity != null) {
+				entity.setDroppingType(dto.getDroppingType());
+				entity.setSupplementaryId(dto.getSupplementaryId());
+				entity.setPartId(dto.getPartId());
+				entity.setDropRequestDate(dto.getDropRequestDate());
+				entity.setActualDropDate(dto.getActualDropDate());
+				entity.setAcceptedId(dto.getAcceptedId());
+				entity.setMinistryRefDate(dto.getMinistryRefDate());
+				entity.setMinistryRefNo(dto.getMinistryRefNo());
+				entity.setSubject(dto.getSubject());
+				entity.setMeetingNo(dto.getMeetingNo());
+				entity.setMeetingDate(dto.getMeetingDate());
+				entity.setDroppingFiles(dto.getDroppingFiles());
+				entity.setIssueLetterMinistry(dto.getIssueLetterMinistry());
+				entity.setCommunicationDate(dto.getCommunicationDate());
+				entity.setDroppingFiles(dto.getDroppingFiles());
+				entity.setSession(dto.getSession());
+				entity.setRemarks(dto.getRemarks());
+				entity.setDraftStatus(entity.getDraftStatus());
+				entity.setStatusForMinistry(
+						dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
+				entity.setStatusForCga(
+						dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+
+			}
+		}
 
 }
