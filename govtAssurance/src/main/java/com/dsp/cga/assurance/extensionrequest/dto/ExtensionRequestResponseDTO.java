@@ -21,6 +21,7 @@ public class ExtensionRequestResponseDTO {
 
 	private Long id;
 	private String assuranceNo;
+	private Long assuranceId;
     private String lokSabhaNo;
     private Long sessionNo;
     private String extensionNo;
@@ -41,4 +42,5 @@ public class ExtensionRequestResponseDTO {
     private List<Map<String, Object>> extensionFiles;
     private List<MemberDTO> clubbedMembersData;
     private List<MemberDTO> supplementaryClubbedMembersData;
+
 }

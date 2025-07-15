@@ -44,4 +44,6 @@ public class AssuranceDroppingResponseDTO {
 	private List<MemberDTO> clubbedMembersData;
 
 	private List<MemberDTO> supplementaryClubbedMembersData;
+	private Long assuranceId;
+
 }

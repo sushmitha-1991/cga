@@ -849,7 +849,8 @@ public class AssuranceServiceImpl implements AssuranceService {
 	                            updatedClubbedMembers.stream()
 	                                    .noneMatch(newMember ->
 	                                            newMember.getClubbedMember().equals(existing.getClubbedMember()) &&
-	                                            newMember.getPageNumber().equals(existing.getPageNumber()))
+	                                            StringUtils.equalsIgnoreCase(newMember.getPageNumber(), existing.getPageNumber()))
+//	                                            newMember.getPageNumber().equals(existing.getPageNumber()))
 	                    );
 
 	                    existingSupp.getClubbedMembers().addAll(
@@ -857,7 +858,8 @@ public class AssuranceServiceImpl implements AssuranceService {
 	                                    .filter(newMember -> existingSupp.getClubbedMembers().stream()
 	                                            .noneMatch(existing ->
 	                                                    existing.getClubbedMember().equals(newMember.getClubbedMember()) &&
-	                                                    existing.getPageNumber().equals(newMember.getPageNumber()))
+	    	                                            StringUtils.equalsIgnoreCase(newMember.getPageNumber(), existing.getPageNumber()))
+//	                                                    existing.getPageNumber().equals(newMember.getPageNumber()))
 	                                    )
 	                                    .collect(Collectors.toList())
 	                    );

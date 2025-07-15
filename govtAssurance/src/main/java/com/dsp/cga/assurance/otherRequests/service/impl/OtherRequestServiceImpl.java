@@ -205,7 +205,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .questionNo(assurance.getQuestionNo())
 	            .requestedDate(or.getRequestedDate())
 	            .remarks(or.getRemarks())
-	            //.subject(assurance.getSubject())
+	            .assuranceId(or.getAssuranceId())
 	            .subject(assurance.getSubject() != null 
                 ? assurance.getSubject() 
                 : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
@@ -217,7 +217,6 @@ public class OtherRequestServiceImpl implements OtherRequestService {
                         .orElse(null)
                     : null))
 	            .statusForMinistry(or.getStatusForMinistry())
-	            //.subject(assurance.getSubject())
 	            .lokSabhaSessionNumber(assurance != null
 	                ? lssRepo.findSessionNumberById(assurance.getLokSabhaSessionNo())
 	                : null)
@@ -298,8 +297,8 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	        return OtherRequestDTO.builder()
 	            .id(or.getId())
 	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
+	            .assuranceId(or.getAssuranceId())
 	            .status(codeRepository.findCodeById(or.getStatusId()))
-	           // .subject(assurance.getSubject())
 	            .subject(assurance.getSubject() != null 
                 ? assurance.getSubject() 
                 : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()

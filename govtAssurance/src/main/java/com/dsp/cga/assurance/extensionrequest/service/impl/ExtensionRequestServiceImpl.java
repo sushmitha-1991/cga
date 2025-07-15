@@ -350,6 +350,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	        Assurance assurance = assuranceRepository.findById(er.getAssuranceId()).orElse(null);
 	        return ExtensionRequestResponseDTO.builder()
 	                .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
+	                .assuranceId(er.getAssuranceId())
 	                .questionNo(assurance.getQuestionNo())
 	                .extensionNo(er.getExtensionNo())
 	                .status(codeRepository.findCodeById(
@@ -454,6 +455,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 	    return ExtensionRequestResponseDTO.builder()
 	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
+	            .assuranceId(er.getAssuranceId())
 	            .extensionNo(er.getExtensionNo())
 	            .questionNo(assurance != null ? assurance.getQuestionNo() : null)
 	           // .subject(assurance != null ? assurance.getSubject() : null)
@@ -997,16 +999,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 				
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 		extenionRequestRepository.findAll(spec).forEach(req -> {
-			
-//			String reqStatus = Entities.CGA.getValue().equalsIgnoreCase(reqBy) 
-//										? req.getStatusForCga() : req.getStatusForMinistry(); 
-			
-//			response.add(buildDTO(req.getId(), "Extension Request", req.getAssuranceId(), req.getAssurance().getSubject(),
-//					req.getRemarks(), req.getFromMinistry(), 
-//					reqStatus,  //req.getStatusForMinistry(), 
-//					req.getAssurance(), req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
-		
-			response.add(buildDTO(req.getAssurance(), req));
+		response.add(buildDTO(req.getAssurance(), req));
 		});
 
 		System.out.println("Number of records: " + response.size());
@@ -1056,13 +1049,6 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
 		otherRequestRepository.findAll(spec).forEach(req -> {
-
-//			String recordStatus = Entities.CGA.getValue().equalsIgnoreCase(reqBy) ? req.getStatusForCga() : req.getStatusForMinistry(); 
-//
-//			response.add(buildDTO(req.getId(), "Other Request", req.getAssuranceId(), req.getAssurance().getSubject(),
-//					req.getRemarks(), req.getFromMinistry(), 
-//					recordStatus, //req.getStatusForMinistry(), 
-//					req.getAssurance(), req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null));
 
 			response.add(buildDTO(req.getAssurance(), req));
 		});

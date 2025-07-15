@@ -101,34 +101,34 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	
 	@Override
 	public DroppingRequestDTO getDroppingRequestByAssuranceId(Long id) {
-		DroppingRequest Request = droppingRequestRepository.findByAssuranceId(id).orElse(null);
+		DroppingRequest request = droppingRequestRepository.findByAssuranceId(id).orElse(null);
 
 		// If no record is found, return a null DTO and log the message
-		if (Request == null) {
+		if (request == null) {
 			log.debug("No ImplementationRequest found for Assurance ID: {}", id);
 			return null; // Return null to handle it at the controller level with custom message
 		}
 
 		// Log and map the entity to DTO if found
-		log.debug("Fetched ImplementationRequest: {}", Request);
+		log.debug("Fetched ImplementationRequest: {}", request);
 
 		Assurance assurance = assuranceRepository.findById(id).orElse(null);
 		String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
 		Long lokshabaNo = (assurance != null) ? assurance.getLokSabhaNo() : null;
 		
 
-		DroppingRequestDTO dto = DroppingRequestMapper.toDTO(Request);
+		DroppingRequestDTO dto = DroppingRequestMapper.toDTO(request);
 		dto.setAssuranceNo(assuranceNo);
 
 		// Populate additional data if available
 		// dto.setStatusDTO(fetchStatusData(Request.getDropStatusId()));
 		// System.out.println("$$$$$$$$$$$" + Request.getDropStatusId());
-		if (Request.getDroppingType() != null) {
-		    dto.setDroppingTypeDTO(fetchDroppingTypeData(Request.getDroppingType()));
+		if (request.getDroppingType() != null) {
+		    dto.setDroppingTypeDTO(fetchDroppingTypeData(request.getDroppingType()));
 		}
 
-		if (Request.getAcceptedId() != null) {
-			dto.setAcceptedDTO(fetchAcceptdData(Request.getAcceptedId()));
+		if (request.getAcceptedId() != null) {
+			dto.setAcceptedDTO(fetchAcceptdData(request.getAcceptedId()));
 		}
 
 		log.debug("Returning ImplementationRequestDTO: {}", dto);
@@ -384,6 +384,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	                                : null)
 	                        .remarks(dr.getRemarks())
 	                        .id(dr.getId())
+	                        .assuranceId(dr.getAssuranceId())
 	                        .build();
 	            })
 	            
@@ -527,6 +528,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		                    ? rssRepo.findSessionNumberById(assurance.getRajyaSabhaSessionNo())
 		                    : null)
 		            .assuranceNo(assurance.getAssuranceNo())
+                    .assuranceId(dr.getAssuranceId())
 		            .subject(assurance.getSubject())
 		            .questionNo(assurance.getQuestionNo())
 		            .partId(dr.getPartId())

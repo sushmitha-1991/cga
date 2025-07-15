@@ -548,7 +548,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                .assuranceNo(assurance.getAssuranceNo())
 	                .id(impl.getId())
 	                .questionNo(assurance.getQuestionNo())
-	               // .subject(assurance.getSubject())
 	                .subject(assurance.getSubject() != null 
                     ? assurance.getSubject() 
                     : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
@@ -573,6 +572,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	                .memberName(memberName)
 	                .departmentName(departmentName)
 	                .ministryName(ministryName)
+	                .assuranceId(impl.getAssuranceId())
 	                .creationDate(impl.getCreatedAt().toLocalDate());
 
 	        if (Utils.RAJYA_SABHA.equals(houseAbbr)) {
@@ -707,6 +707,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    
 	    AssuranceImplementationDTO.AssuranceImplementationDTOBuilder builder = AssuranceImplementationDTO.builder()
 	        .assuranceNo(assurance.getAssuranceNo())
+            .assuranceId(implementationRequest.getAssuranceId())
 	        .memberName(memberName)
 	        .ministryName(ministryName)
 	        .departmentName(departmentName)
@@ -1044,6 +1045,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    AssuranceImplementationDTO.AssuranceImplementationDTOBuilder builder = AssuranceImplementationDTO.builder()
 	        .id(impl.getId())
 	        .assuranceNo(assurance.getAssuranceNo())
+            .assuranceId(impl.getAssuranceId())
 	        .memberName(memberName)
 	        .ministryName(ministryName)
 	        .departmentName(departmentName)

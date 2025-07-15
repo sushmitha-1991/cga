@@ -21,6 +21,8 @@ import lombok.NoArgsConstructor;
 public class AssuranceImplementationDTO {
 	
 	 private String assuranceNo;
+	 private Long assuranceId;
+
 	   // private Long lokSabhaNo;
 	    //private Long lokSabhaSessionNo;
 	  //  private Long statusId;
