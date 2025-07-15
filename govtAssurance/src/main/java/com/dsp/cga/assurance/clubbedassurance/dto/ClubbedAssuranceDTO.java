@@ -28,6 +28,7 @@ public class ClubbedAssuranceDTO {
 	private List<MemberDTO> supplementaryClubbedMembersData;
 	private String statusForCga;
 	private Boolean fromMinistry;
-	private Boolean draftStatus;
+	@Builder.Default
+	private Boolean draftStatus = Boolean.FALSE;
 
 }

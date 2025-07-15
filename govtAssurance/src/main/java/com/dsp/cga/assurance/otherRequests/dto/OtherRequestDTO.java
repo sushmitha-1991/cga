@@ -48,6 +48,7 @@ public class OtherRequestDTO {
 	
 	private String statusForCga;
 	
-	private Boolean draftStatus;
+	@Builder.Default
+	private Boolean draftStatus = Boolean.FALSE;
 
 }

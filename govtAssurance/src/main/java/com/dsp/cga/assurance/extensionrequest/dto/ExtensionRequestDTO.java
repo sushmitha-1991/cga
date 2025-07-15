@@ -31,7 +31,8 @@ public class ExtensionRequestDTO {
 	private Long statusId;
 	private StatusDTO statusDTO;
 	//private String extensionFiles;
-	private Boolean draftStatus;
+	@Builder.Default
+	private Boolean draftStatus = Boolean.FALSE;
 	private String assuranceNo;
     private List<Map<String, Object>> extensionFiles;
     private String statusForMinistry;

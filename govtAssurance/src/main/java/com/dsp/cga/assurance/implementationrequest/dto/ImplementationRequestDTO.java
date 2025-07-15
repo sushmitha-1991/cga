@@ -45,7 +45,8 @@ public class ImplementationRequestDTO {
 	private List<Map<String, Object>> implementationReportFiles;
 	private List<Map<String, Object>> partReportFiles;
 	private List<Map<String, Object>> otherFiles;
-	private Boolean draftStatus; // Make sure this is handled correctly in your application logic
+	@Builder.Default
+	private Boolean draftStatus = Boolean.FALSE; // Make sure this is handled correctly in your application logic
 	private String statusForCga;
 	private String statusForMopa;
 
