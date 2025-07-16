@@ -119,4 +119,35 @@ public class OtherRequestController {
 	      );
 	  }
 
+	  @PostMapping("/create-or-update")
+	  @Operation(summary = "Update an existing Other Request by ID")
+	  @ApiResponses(value = {
+	      @ApiResponse(responseCode = "200", description = "Other Request updated successfully"),
+	      @ApiResponse(responseCode = "404", description = "Other Request not found"),
+	      @ApiResponse(responseCode = "400", description = "Invalid input")
+	  })
+	  public ResponseEntity<GenericResponse<OtherRequestDTO>> updateOtherRequestById(
+	          @RequestBody OtherRequestDTO dto) {
+
+		  if (dto == null) {
+			  
+		  }
+		  
+		  OtherRequestDTO otherDto = null;
+		  
+		  if (dto.getId() == null) { // create
+			  otherDto = otherRequestService.createOtherRequest(dto);
+		  } else { // update
+			  otherDto = otherRequestService.updateOtherRequestById(dto.getId(), dto);
+		  }
+		  
+	      if (otherDto == null) {
+	          return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                  .body(new GenericResponse<>(HttpStatus.NOT_FOUND.value(), false, "Other Request not found", null));
+	      }
+
+	      return ResponseEntity.ok(
+	              new GenericResponse<>(HttpStatus.OK.value(), true, "Other Request created/updated successfully", otherDto)
+	      );
+	  }
 }

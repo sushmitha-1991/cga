@@ -68,7 +68,6 @@ public class ExtensionRequestController {
 	}
 
 
-	
 	@PostMapping("/create-or-update")
 	@Operation(summary = "Create or update one or more ExtensionRequests")
 	@ApiResponses(value = {
