@@ -38,5 +38,6 @@ public class GovtAssuranceResponseDTO {
         private String questionHtml;
         private String qtype;
         private int qno;
+        private int rsSession;
     }
 }
