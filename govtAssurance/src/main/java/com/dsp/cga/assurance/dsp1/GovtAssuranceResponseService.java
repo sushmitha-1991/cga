@@ -2,6 +2,8 @@ package com.dsp.cga.assurance.dsp1;
 
 import java.util.List;
 import java.util.Map;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +16,20 @@ public class GovtAssuranceResponseService {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    public GovtAssuranceResponseDTO getGovtAssuranceList(String mpCode) {
-
-        String sql = """
+    public GovtAssuranceResponseDTO getGovtAssuranceList(
+            String mpCode,
+            String loksabha,
+            String session,
+            String subject,
+            String member,
+            String ministry,
+            String qType,
+            String status,
+            String catg,
+            LocalDate dateFrom,
+            LocalDate dateTo
+    ) {
+        StringBuilder sql = new StringBuilder("""
             SELECT
                 a.assurance_no AS assuNo,
                 lm.lok_sabha_number::int AS loksabha,
@@ -47,12 +60,53 @@ public class GovtAssuranceResponseService {
             LEFT JOIN master.lok_sabha_masters lm ON lm.id = a.lok_sabha_no
             WHERE a.is_active = true AND a.is_deleted = false
               AND pd.mp_code = :mpCode
-        """;
+        """);
 
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("mpCode", mpCode);
 
-        List<GovtAssuranceResponseDTO.Record> records = jdbcTemplate.query(sql, paramMap, (rs, rowNum) -> {
+        if (loksabha != null) {
+            sql.append(" AND lm.lok_sabha_number = :loksabha");
+            paramMap.put("loksabha", loksabha);
+        }
+        if (session != null) {
+            sql.append(" AND lsm.session_number_int = :session");
+            paramMap.put("session", session);
+        }
+        if (subject != null && !subject.isBlank()) {
+            sql.append(" AND LOWER(a.subject) LIKE LOWER(:subject)");
+            paramMap.put("subject", "%" + subject + "%");
+        }
+        if (member != null && !member.isBlank()) {
+            sql.append(" AND LOWER(CONCAT(pd.first_name, ' ', pd.last_name)) LIKE LOWER(:member)");
+            paramMap.put("member", "%" + member + "%");
+        }
+        if (ministry != null && !ministry.isBlank()) {
+            sql.append(" AND LOWER(mm.ministry_name) LIKE LOWER(:ministry)");
+            paramMap.put("ministry", "%" + ministry + "%");
+        }
+        if (qType != null && !qType.isBlank()) {
+            sql.append(" AND qt.code = :qType");
+            paramMap.put("qType", qType);
+        }
+        if (status != null && !status.isBlank()) {
+            sql.append(" AND stat.code = :status");
+            paramMap.put("status", status);
+        }
+        if (catg != null && !catg.isBlank()) {
+            sql.append(" AND cat.code = :catg");
+            paramMap.put("catg", catg);
+        }
+        if (dateFrom != null) {
+            sql.append(" AND a.assurance_date >= :dateFrom");
+            paramMap.put("dateFrom", Date.valueOf(dateFrom));
+        }
+        if (dateTo != null) {
+            sql.append(" AND a.assurance_date <= :dateTo");
+            paramMap.put("dateTo", Date.valueOf(dateTo));
+        }
+
+        List<GovtAssuranceResponseDTO.Record> records = jdbcTemplate.query(sql.toString(), paramMap, (rs, rowNum) -> {
             GovtAssuranceResponseDTO.Record record = new GovtAssuranceResponseDTO.Record();
             record.setAssuNo(rs.getString("assuNo"));
             record.setLoksabha(rs.getInt("loksabha"));
@@ -78,12 +132,11 @@ public class GovtAssuranceResponseService {
         GovtAssuranceResponseDTO dto = new GovtAssuranceResponseDTO();
         dto.setRecords(records);
 
-        // Set metadata
         GovtAssuranceResponseDTO.Metadata metadata = new GovtAssuranceResponseDTO.Metadata();
-        metadata.setCurrentPageNumber(1);  // static for now
-        metadata.setPerPageSize(records.size()); // or set to 10 if paginated
+        metadata.setCurrentPageNumber(1);
+        metadata.setPerPageSize(records.size());
         metadata.setTotalElements(records.size());
-        metadata.setTotalPages(1);  // static for now, can calculate if using pagination
+        metadata.setTotalPages(1);
 
         dto.set_metadata(metadata);
 
