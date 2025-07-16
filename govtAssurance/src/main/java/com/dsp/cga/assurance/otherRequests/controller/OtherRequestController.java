@@ -130,13 +130,14 @@ public class OtherRequestController {
 	          @RequestBody OtherRequestDTO dto) {
 
 		  if (dto == null) {
-			  
+	          return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                  .body(new GenericResponse<>(HttpStatus.NOT_FOUND.value(), false, "Other Request not found", null));
 		  }
 		  
 		  OtherRequestDTO otherDto = null;
 		  
 		  if (dto.getId() == null) { // create
-			  otherDto = otherRequestService.createOtherRequest(dto);
+			  otherDto = otherRequestService.createOtherRequest(dto); 
 		  } else { // update
 			  otherDto = otherRequestService.updateOtherRequestById(dto.getId(), dto);
 		  }
