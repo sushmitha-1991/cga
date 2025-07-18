@@ -32,7 +32,7 @@ public class GovtAssuranceController {
         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<GenericResponse<GovtAssuranceResponseDTO>> getAssuranceList(
-            @RequestParam (required = false)String mpCode,
+            @RequestParam (required = true)String mpCode,
             @RequestParam(required = false) String loksabha,
             @RequestParam(required = false) String session,
             @RequestParam(required = false) String subject,
