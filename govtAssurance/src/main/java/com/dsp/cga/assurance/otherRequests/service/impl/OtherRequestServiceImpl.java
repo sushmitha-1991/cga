@@ -377,7 +377,6 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	}
 	
 	@Override
-	
 	public OtherRequestDTO updateOtherRequestById(Long id, OtherRequestDTO dto) {
 	    Optional<OtherRequests> optional = otherRequestRepo.findById(id);
 	    if (optional.isEmpty()) {
@@ -385,15 +384,15 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	    }
 
 	    OtherRequests existing = optional.get();
-	    
-	   
 
 	    // Check statusForMinistry before allowing update
-	    if (existing.getStatusForMinistry() == null || 
-	        !existing.getStatusForMinistry().equalsIgnoreCase("Returned")) {
-	        throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
+	    if (!Utils.isTrue(existing.getDraftStatus())) {
+		    if (existing.getStatusForMinistry() == null || 
+		        !existing.getStatusForMinistry().equalsIgnoreCase("Returned")) {
+		        throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
+		    }
 	    }
-	    
+
 	    // Update status fields
 	    existing.setStatusForMinistry(MinistryStatus.SUBMITTED.getValue());
 	    existing.setStatusForCga(CgaStatus.RECEIVED.getValue());

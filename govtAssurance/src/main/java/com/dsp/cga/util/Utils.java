@@ -200,6 +200,12 @@ public class Utils {
 	    return null;
 	}
 	
+	public static Boolean isTrue (Boolean value) {
+		
+		if (value == null) return Boolean.FALSE;
+		
+		return value;
+	}
 		
 	
 }
