@@ -197,7 +197,7 @@ public class Utils {
 	    } catch (Exception e) {
 	        logger.error("Exception while fetching current session", e);
 	    }
-	    return null;
+	    return null; 
 	}
 	
 	public static Boolean isTrue (Boolean value) {

@@ -726,7 +726,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        .questionNo(assurance.getQuestionNo())
 	        .dateOfImplementation(implementationRequest.getDateOfImplementation())
 	        .detailsOfImplementation(implementationRequest.getDetailsOfImplementation())
-	        .remarks(implementationRequest.getRemarks())
+	        .remarks(implementationRequest.getRemarks()) 
 	        .reason(implementationRequest.getReason())
 	        .implementationReportFiles(implementationRequest.getImplementationReportFiles())
 	        .partReportFiles(implementationRequest.getPartReportFiles())
