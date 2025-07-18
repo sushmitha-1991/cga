@@ -27,8 +27,11 @@ public class GovtAssuranceResponseService {
             String status,
             String catg,
             LocalDate dateFrom,
-            LocalDate dateTo
+            LocalDate dateTo,
+            String  rsSession
     ) {
+    	
+    	System.out.println("  rsSession  "+rsSession);
         StringBuilder sql = new StringBuilder("""
             SELECT
                 a.assurance_no AS assuNo,
@@ -48,7 +51,8 @@ public class GovtAssuranceResponseService {
                 '' AS answerHtml,
                 '' AS questionHtml,
                 qt.code AS qtype,
-                a.question_no AS qno
+                a.question_no AS qno,
+                rssm.session_number AS rsSession
             FROM cga.assurance a
             LEFT JOIN master.ministries mm ON mm.id = a.ministry_id
             LEFT JOIN master.departments md ON md.id = a.department_id
@@ -58,12 +62,16 @@ public class GovtAssuranceResponseService {
             LEFT JOIN master.codes qt ON qt.id = a.question_type
             LEFT JOIN master.lok_sabha_session_masters lsm ON lsm.id = a.lok_sabha_session_no
             LEFT JOIN master.lok_sabha_masters lm ON lm.id = a.lok_sabha_no
+            LEFT JOIN master.rajya_sabha_session_master rssm 
+                ON rssm.id = a.rajya_sabha_session_no 
             WHERE a.is_active = true AND a.is_deleted = false
               AND pd.mp_code = :mpCode
         """);
 
         Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("mpCode", mpCode);
+       paramMap.put("mpCode", mpCode);
+        
+        
 
         if (loksabha != null) {
             sql.append(" AND lm.lok_sabha_number = :loksabha");
@@ -105,7 +113,11 @@ public class GovtAssuranceResponseService {
             sql.append(" AND a.assurance_date <= :dateTo");
             paramMap.put("dateTo", Date.valueOf(dateTo));
         }
-
+        if (rsSession != null) {
+            sql.append(" AND rssm.session_number = :rsSession");
+            paramMap.put("rsSession", rsSession);
+        }
+        System.out.println("  sql  "+sql);
         List<GovtAssuranceResponseDTO.Record> records = jdbcTemplate.query(sql.toString(), paramMap, (rs, rowNum) -> {
             GovtAssuranceResponseDTO.Record record = new GovtAssuranceResponseDTO.Record();
             record.setAssuNo(rs.getString("assuNo"));
@@ -126,6 +138,7 @@ public class GovtAssuranceResponseService {
             record.setQuestionHtml(""); // static
             record.setQtype(rs.getString("qtype"));
             record.setQno(rs.getInt("qno"));
+            record.setRsSession(rs.getInt("rsSession"));
             return record;
         });
 
