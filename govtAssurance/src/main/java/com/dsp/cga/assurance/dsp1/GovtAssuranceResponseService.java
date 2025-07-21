@@ -31,14 +31,13 @@ public class GovtAssuranceResponseService {
             String  rsSession
     ) {
     	
-    	System.out.println("  rsSession  "+rsSession);
         StringBuilder sql = new StringBuilder("""
             SELECT
                 a.assurance_no AS assuNo,
                 lm.lok_sabha_number::int AS loksabha,
                 lsm.session_number_int AS session,
                 a.assurance_date AS date,
-                mm.ministry_name AS ministry,
+                m.ministry_name AS ministry,
                 CONCAT(pd.first_name, ' ', pd.last_name) AS member,
                 a.subject AS subject,
                 md.department_name AS department,
@@ -54,7 +53,7 @@ public class GovtAssuranceResponseService {
                 a.question_no AS qno,
                 rssm.session_number AS rsSession
             FROM cga.assurance a
-            LEFT JOIN master.ministries mm ON mm.id = a.ministry_id
+            LEFT JOIN master.ministries m ON m.id = a.ministry_id
             LEFT JOIN master.departments md ON md.id = a.department_id
             LEFT JOIN members.personal_details pd ON pd.id = a.member_id
             LEFT JOIN master.codes cat ON cat.id = a.category_id
@@ -71,8 +70,6 @@ public class GovtAssuranceResponseService {
         Map<String, Object> paramMap = new HashMap<>();
        paramMap.put("mpCode", mpCode);
         
-        
-
         if (loksabha != null) {
             sql.append(" AND lm.lok_sabha_number = :loksabha");
             paramMap.put("loksabha", loksabha);
@@ -81,21 +78,22 @@ public class GovtAssuranceResponseService {
             sql.append(" AND lsm.session_number_int = :session");
             paramMap.put("session", session);
         }
-        if (subject != null && !subject.isBlank()) {
-            sql.append(" AND LOWER(a.subject) LIKE LOWER(:subject)");
-            paramMap.put("subject", "%" + subject + "%");
-        }
+       
         if (member != null && !member.isBlank()) {
             sql.append(" AND LOWER(CONCAT(pd.first_name, ' ', pd.last_name)) LIKE LOWER(:member)");
             paramMap.put("member", "%" + member + "%");
         }
         if (ministry != null && !ministry.isBlank()) {
-            sql.append(" AND LOWER(mm.ministry_name) LIKE LOWER(:ministry)");
+            sql.append(" AND LOWER(m.ministry_name) LIKE LOWER(:ministry)");
             paramMap.put("ministry", "%" + ministry + "%");
         }
         if (qType != null && !qType.isBlank()) {
             sql.append(" AND qt.code = :qType");
             paramMap.put("qType", qType);
+        }
+        if (subject != null && !subject.isBlank()) {
+            sql.append(" AND LOWER(a.subject) LIKE LOWER(:subject)");
+            paramMap.put("subject", "%" + subject + "%");
         }
         if (status != null && !status.isBlank()) {
             sql.append(" AND stat.code = :status");
@@ -117,7 +115,6 @@ public class GovtAssuranceResponseService {
             sql.append(" AND rssm.session_number = :rsSession");
             paramMap.put("rsSession", rsSession);
         }
-        System.out.println("  sql  "+sql);
         List<GovtAssuranceResponseDTO.Record> records = jdbcTemplate.query(sql.toString(), paramMap, (rs, rowNum) -> {
             GovtAssuranceResponseDTO.Record record = new GovtAssuranceResponseDTO.Record();
             record.setAssuNo(rs.getString("assuNo"));
