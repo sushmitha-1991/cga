@@ -58,6 +58,6 @@ public interface ExtensionRequestRepository extends JpaRepository<ExtensionReque
 			    
 			    """, nativeQuery = true)
 			ExtensionRequest getLatest(@Param("assuranceId") Long assuranceId);
-	
+	 
 
 }

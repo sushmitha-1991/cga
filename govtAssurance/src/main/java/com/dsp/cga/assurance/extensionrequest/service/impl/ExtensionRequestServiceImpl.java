@@ -945,7 +945,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 
 	    
     private void updateAssuranceOnAccept(ImplementationRequest entity) {
-    	
+    	 
     	System.out.println("IMP REQ: " + entity.getRemarks());
     	
     	Assurance assurance = entity.getAssurance();
