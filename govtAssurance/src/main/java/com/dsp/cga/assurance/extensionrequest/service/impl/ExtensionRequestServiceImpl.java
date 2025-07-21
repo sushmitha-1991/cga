@@ -132,11 +132,14 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
     @Autowired
     private HousesRepository houseRepository;
     
-@Autowired
-private DroppingRequestRepository droppingRequestRepository;
-
-@Autowired
-private ClubbedAssuranceRepository clubbedAssuranceRepository;
+	@Autowired
+	private DroppingRequestRepository droppingRequestRepository;
+	
+	@Autowired
+	private ClubbedAssuranceRepository clubbedAssuranceRepository;
+	
+	@Autowired
+	private ExtensionRequestRepository extensionRepository;
 
 	@Override
 	public ExtensionRequestDTO createExtensionRequest(ExtensionRequestDTO extensionRequestDTO) {
@@ -846,6 +849,7 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 
 	    // Used for updating Return & Accept status
 	    @Override
+	    @Transactional
 	    public CommonRequestResponseDTO updateRequest(Long id, String requestType, CommonRequestResponseDTO updateDto) {
 	    	System.out.println(requestType);
 	    	
@@ -861,6 +865,10 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
 	                    }	                  
 	                    extenionRequestRepository.save(entity);
+	                    
+	                    // Check if implementaion request exists. 
+	                    // If exists, change Due Date of Implementation to Extension Upto Date
+	                    
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
 
@@ -904,12 +912,21 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	                return implementationRequestRepository.findById(id).map(entity -> {
 	                    if (updateDto.getStatusForMinistry() != null) {
 	                    	
+                    		if (CgaStatus.ACCEPTED.getValue().equals(entity.getStatusForCga())) {
+                    			throw new IllegalArgumentException("ACCEPTED Implementation reqest cannot be ACCEPTED again");
+                    		}
+                    		
 	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
 	                    	
 	                    	if (CgaStatus.ACCEPTED.getValue().equals(updatedStatus)) {
 		                    	entity.setStatusForMopa(MopaStatus.ACCEPTED.getValue());
 		                    	entity.setStatusForCga(CgaStatus.ACCEPTED.getValue());
 		                    	entity.setStatusForMinistry(MinistryStatus.ACCEPTED.getValue());
+		                    	
+		                    	// Date of Implementation & Extended upto date should be updated with Date of Implementation,
+		                    	// Details of Implementation
+		                    	updateAssuranceOnAccept(entity);
+
 		                    } else {
 	                    		// Returned
 		                    	entity.setStatusForMopa(MopaStatus.RETURNED.getValue());
@@ -926,7 +943,31 @@ private ClubbedAssuranceRepository clubbedAssuranceRepository;
 	        }
 	    }
 
+	    
+    private void updateAssuranceOnAccept(ImplementationRequest entity) {
+    	
+    	System.out.println("IMP REQ: " + entity.getRemarks());
+    	
+    	Assurance assurance = entity.getAssurance();
 
+    	if (assurance != null) {
+        	log.debug ("ASSURANCE ID: " + assurance.getId());
+
+	    	assurance.setDueDateOfImplementation(entity.getDueDateOfImplementation());
+	    	assurance.setDateOfImplementation(entity.getDateOfImplementation());
+	    	assurance.setRemarks(entity.getRemarks());
+        	assuranceRepository.saveAndFlush(assurance);
+    	}
+    	
+    	// Get Extension by Assurance ID
+    	ExtensionRequest extRequest = extensionRepository.getLatest(assurance.getId());
+    	if (extRequest == null) return;
+    	
+    	extRequest.setExtRequestedTillDate(entity.getDueDateOfImplementation());
+    	extenionRequestRepository.saveAndFlush(extRequest);    	
+    }
+	
+    
 	@Override
 	@Transactional(readOnly = true)
 	public List<CommonRequestResponseDTO> getAllRequests(

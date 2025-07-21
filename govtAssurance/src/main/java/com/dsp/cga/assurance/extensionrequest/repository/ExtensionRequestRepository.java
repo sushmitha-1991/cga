@@ -50,7 +50,14 @@ public interface ExtensionRequestRepository extends JpaRepository<ExtensionReque
 
 
 
-
+		@Query(value = """
+			    SELECT er.* FROM cga.extension_requests er 
+			    left join cga.assurance a on er.assurance_id = er.id
+			    order by er.ext_requested_till_date desc 
+			    limit 1
+			    
+			    """, nativeQuery = true)
+			ExtensionRequest getLatest(@Param("assuranceId") Long assuranceId);
 	
 
 }
