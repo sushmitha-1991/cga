@@ -91,7 +91,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 
 		OtherRequests entity = OtherRequests.builder()
 				.assuranceId(dto.getAssuranceId())
-				//.subject(dto.getSubject())
+				.subject(dto.getSubject())
                 .requestedDate(dto.getRequestedDate())
                 .statusId(dto.getStatusId())
                 .remarks(dto.getRemarks())
@@ -299,16 +299,18 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
 	            .assuranceId(or.getAssuranceId())
 	            .status(codeRepository.findCodeById(or.getStatusId()))
-	            .subject(assurance.getSubject() != null 
-                ? assurance.getSubject() 
-                : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
-                    ? assurance.getPartDetails().stream()
-                        .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
-                        .map(PartDetails::getSubject)
-                        .filter(Objects::nonNull)
-                        .findFirst()
-                        .orElse(null)
-                    : null))
+	            .statusId(or.getStatusId())
+	            .subject(or.getSubject())
+//	            .subject(assurance.getSubject() != null 
+//                ? assurance.getSubject() 
+//                : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+//                    ? assurance.getPartDetails().stream()
+//                        .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+//                        .map(PartDetails::getSubject)
+//                        .filter(Objects::nonNull)
+//                        .findFirst()
+//                        .orElse(null)
+//                    : null))
 	            .memberName(memberName)
 	            .ministryName(ministryName)
 	            .departmentName(departmentName)

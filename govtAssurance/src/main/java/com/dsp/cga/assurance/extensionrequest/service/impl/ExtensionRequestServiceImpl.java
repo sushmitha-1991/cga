@@ -866,8 +866,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	                    }	                  
 	                    extenionRequestRepository.save(entity);
 	                    
-	                    // Check if implementaion request exists. 
-	                    // If exists, change Due Date of Implementation to Extension Upto Date
+                    	updateAssuranceOnAccept(entity);
 	                    
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
@@ -967,6 +966,19 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
     	extenionRequestRepository.saveAndFlush(extRequest);    	
     }
 	
+    private void updateAssuranceOnAccept(ExtensionRequest entity) {
+   	 
+    	System.out.println("EXT REQ: " + entity.getRemarks());
+    	
+    	Assurance assurance = entity.getAssurance();
+
+    	if (assurance != null) {
+        	log.debug ("ASSURANCE ID: " + assurance.getId());
+
+	    	assurance.setDateOfImplementation(entity.getExtGrantedTillDate());
+        	assuranceRepository.saveAndFlush(assurance);
+    	}
+    }
     
 	@Override
 	@Transactional(readOnly = true)
