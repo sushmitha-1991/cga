@@ -189,7 +189,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	    List<ExtensionRequestDTO> savedDTOs = new ArrayList<>();
 
 	    for (ExtensionRequestDTO dto : extensionRequestDTOList) {
-	        if (dto == null || dto.getAssuranceId() == null || dto.getExtensionNo() == null) {
+	        if (dto.getId() == null && (dto.getAssuranceId() == null || dto.getExtensionNo() == null)) {
 	            throw new IllegalArgumentException("Invalid input: AssuranceId and ExtensionNo cannot be null.");
 	        }
 

@@ -37,7 +37,6 @@ public class ExtensionRequestMapper {
 
 	 public static void updateEntityFromDTO(ExtensionRequestDTO dto, ExtensionRequest entity) {
 	        if (dto != null && entity != null) {
-	          //  entity.setQuestionNo(dto.getQuestionNo());
 	            entity.setExtensionNo(dto.getExtensionNo());
 	            entity.setSubject(dto.getSubject());
 	            entity.setExtRequestedTillDate(dto.getExtRequestedTillDate());
@@ -47,7 +46,9 @@ public class ExtensionRequestMapper {
 	            entity.setRemarks(dto.getRemarks());
 	            entity.setExtensionFiles(dto.getExtensionFiles());
 	            entity.setDraftStatus(dto.getDraftStatus());
-	           entity.setStatusId(dto.getStatusId());
+	            entity.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
+				entity.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+	            entity.setStatusId(dto.getStatusId());
 	        }
 	    }
 	    public static ExtensionRequest toEntity(ExtensionRequestDTO dto) {
