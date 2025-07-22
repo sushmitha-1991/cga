@@ -117,6 +117,10 @@ public class CommonRequestResponseDTO {
 	private LocalDate dueDateOfImplementation;
 	private String detailsOfImplementation;
 	private LocalDate dateOfImplementation;
+	
+	private String otherSubject; // Other request Subject
+	private String returnRemarks;
+
 
 	private CommitteeDecisionDTO committeeDecisionDTO;
 	private ImplementationTypeDTO implementationTypeDTO;

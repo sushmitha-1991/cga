@@ -858,7 +858,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	        switch (requestType) {
 	            case "Extension Request":
 	                return extenionRequestRepository.findById(id).map(entity -> {
-	                    if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
+	                    //if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
 	                  
 	                    if (updateDto.getStatusForMinistry() != null) {
 	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
@@ -873,7 +873,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 
 	            case "Other Request":
 	                return otherRequestRepository.findById(id).map(entity -> {
-	                    if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
+	                    //if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
 	                    if (updateDto.getStatusForMinistry() != null) {
 	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
 	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
@@ -885,7 +885,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	            case "Dropping Request":
 	                return droppingRequestRepository.findById(id).map(entity -> {
 	                    
-	                    if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
+	                    //if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
 	                    if (updateDto.getStatusForMinistry() != null) {
 	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
 	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
@@ -1339,6 +1339,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 		dto.setRequestedDate(req.getRequestedDate());
 		dto.setStatusId(req.getStatusId());
 
+		dto.setOtherSubject(dto.getSubject());
 		dto.setFileUrl(req.getFileUrl());
 		
 		return dto;
