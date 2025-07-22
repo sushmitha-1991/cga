@@ -975,7 +975,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
     	if (assurance != null) {
         	log.debug ("ASSURANCE ID: " + assurance.getId());
 
-	    	assurance.setDateOfImplementation(entity.getExtGrantedTillDate());
+	    	assurance.setDueDateOfImplementation(entity.getExtRequestedTillDate());
         	assuranceRepository.saveAndFlush(assurance);
     	}
     }
