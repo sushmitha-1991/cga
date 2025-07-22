@@ -10,6 +10,12 @@ import com.dsp.cga.response.GenericResponse;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<GenericResponse<Void>> handleGeneralException(Exception ex) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GenericResponse<>(
+				HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "An unexpected error occurred.", null));
+	}
+ 	
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<GenericResponse<Void>> handleResourceNotFoundException(ResourceNotFoundException ex) {
 		GenericResponse<Void> response = new GenericResponse<>(HttpStatus.NOT_FOUND.value(), false, ex.getMessage(),

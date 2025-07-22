@@ -69,9 +69,8 @@ public class ImplementationRequestMapper {
                 .session(dto.getSession())               
                 .fromMinistry(true)
                 .remarks(dto.getRemarks())
-	            .statusForMinistry(MinistryStatus.SUBMITTED.getValue())
-	            .statusForMopa(StringUtils.isEmpty(dto.getStatusForMopa()) ?
-            			Utils.getStatusForMopa(MinistryStatus.SUBMITTED.getValue(), dto.getSendTo()) : dto.getStatusForMopa())
+	            .statusForMinistry(getStatusForMinistry(dto.getDraftStatus()))
+	            .statusForMopa(getStatusForMopa(dto))
                 .build();
     }
     
@@ -102,7 +101,18 @@ public class ImplementationRequestMapper {
         
     }
     
+    private static String getStatusForMinistry(boolean draft) {
+    	
+    	return draft ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue();
+    }
     
-
+   private static String getStatusForMopa(ImplementationRequestDTO dto) {
+    	
+	   	if (dto.getDraftStatus()) return null;
+	   	
+	   	return StringUtils.isEmpty(dto.getStatusForMopa()) ?
+    			Utils.getStatusForMopa(MinistryStatus.SUBMITTED.getValue(), dto.getSendTo()) : dto.getStatusForMopa();
+    }
+    
 }
 

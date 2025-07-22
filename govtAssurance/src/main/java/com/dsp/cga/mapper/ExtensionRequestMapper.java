@@ -1,9 +1,11 @@
 package com.dsp.cga.mapper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
 import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
+import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.util.Utils;
@@ -68,7 +70,7 @@ public class ExtensionRequestMapper {
 	                .draftStatus(dto.getDraftStatus())
 	                .extensionFiles(dto.getExtensionFiles())
 	                .fromMinistry(true)
-		             .statusForMinistry(MinistryStatus.SUBMITTED.getValue())
+		             .statusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue())
 					.statusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
 	                .statusId(dto.getStatusId())
 	                .build();

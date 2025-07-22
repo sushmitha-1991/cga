@@ -41,6 +41,7 @@ public class OtherRequestDTO {
 	private String remarks;
 
 	private String subject;
+	private String otherSubject;
 
 	private List<Map<String, Object>> fileUrl;
 

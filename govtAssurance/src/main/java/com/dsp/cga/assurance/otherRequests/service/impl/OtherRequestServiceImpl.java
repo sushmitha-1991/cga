@@ -91,7 +91,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 
 		OtherRequests entity = OtherRequests.builder()
 				.assuranceId(dto.getAssuranceId())
-				.subject(dto.getSubject())
+				.subject(dto.getOtherSubject())
                 .requestedDate(dto.getRequestedDate())
                 .statusId(dto.getStatusId())
                 .remarks(dto.getRemarks())
@@ -107,7 +107,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
         return OtherRequestDTO.builder()
                 .id(saved.getId())
                 .assuranceId(saved.getAssuranceId())
-                .subject(saved.getSubject())
+                .otherSubject(saved.getSubject())
                 .requestedDate(saved.getRequestedDate())
                 .statusId(saved.getStatusId())
                 .remarks(saved.getRemarks())
@@ -206,6 +206,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .requestedDate(or.getRequestedDate())
 	            .remarks(or.getRemarks())
 	            .assuranceId(or.getAssuranceId())
+	            .otherSubject(or.getSubject())
 	            .subject(assurance.getSubject() != null 
                 ? assurance.getSubject() 
                 : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
@@ -300,17 +301,17 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .assuranceId(or.getAssuranceId())
 	            .status(codeRepository.findCodeById(or.getStatusId()))
 	            .statusId(or.getStatusId())
-	            .subject(or.getSubject())
-//	            .subject(assurance.getSubject() != null 
-//                ? assurance.getSubject() 
-//                : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
-//                    ? assurance.getPartDetails().stream()
-//                        .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
-//                        .map(PartDetails::getSubject)
-//                        .filter(Objects::nonNull)
-//                        .findFirst()
-//                        .orElse(null)
-//                    : null))
+	            .otherSubject(or.getSubject())
+	            .subject(assurance.getSubject() != null 
+                ? assurance.getSubject() 
+                : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+                    ? assurance.getPartDetails().stream()
+                        .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+                        .map(PartDetails::getSubject)
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(null)
+                    : null))
 	            .memberName(memberName)
 	            .ministryName(ministryName)
 	            .departmentName(departmentName)
@@ -418,7 +419,9 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	    if (dto.getFileUrl() != null) {
 	        existing.setFileUrl(dto.getFileUrl());
 	    }
-
+	    if (dto.getOtherSubject() != null) {
+	        existing.setSubject(dto.getOtherSubject());
+	    }
 	    existing.setDraftStatus(dto.getDraftStatus());
 		existing.setStatusForMinistry(
 				dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
@@ -430,7 +433,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	    return OtherRequestDTO.builder()
 	            .id(updated.getId())
 	            .assuranceId(updated.getAssuranceId())
-	            .subject(updated.getSubject())
+	            .otherSubject(updated.getSubject())
 	            .requestedDate(updated.getRequestedDate())
 	            .statusId(updated.getStatusId())
 	            .remarks(updated.getRemarks())

@@ -348,7 +348,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    	
 			// New to be created. Validate if implementation exists for the assurance
 			Long count = implementationRequestRepository.countByAssuranceId(implementationRequestDTO.getAssuranceId());
-			
+			System.out.println("Count of records: " + count);
 			if (count > 0) {
 				return new GenericResponse<>(HttpStatus.FAILED_DEPENDENCY.value(), false,
 						"Implementation Request cannot be created as another Implementation Request exists for the Assurance", null);
@@ -356,6 +356,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 			
 	        ImplementationRequest newRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
 	        savedRequest = implementationRequestRepository.save(newRequest);
+			System.out.println("New record saved");
+
 	    }
 
 	    // Fetch ImplementationType data from external service
@@ -380,6 +382,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    savedDTO.setCommitteeDecisionDTO(implementationRequestDTO.getCommitteeDecisionDTO());
 
 	    // Return response
+		System.out.println("Response returned");
+
 	    return new GenericResponse<>(HttpStatus.CREATED.value(), true, "Success", savedDTO);
 	}
 
