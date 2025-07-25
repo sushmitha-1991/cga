@@ -6,7 +6,6 @@
 package com.dsp.cga.config;
 
 import org.slf4j.Logger;
-
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -26,16 +26,21 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.dsp.cga.assurance.service.impl.CustomUserDetailsService;
+import com.dsp.cga.exception.CustomAccessDeniedHandler;
 import com.dsp.cga.filter.JwtFilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
 	@Autowired
 	private JwtFilter jwtFilter;
+
+	@Autowired
+	private CustomAccessDeniedHandler customAccessDeniedHandler;
 
 	@Bean
 	public UserDetailsService userDetailsService() {
@@ -69,12 +74,14 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		log.debug("Configuring SecurityFilterChain");
 
-		http.authorizeHttpRequests((authz) -> authz.requestMatchers("/cga/v3/api-docs/**", "/cga/swagger-ui/**",
-				"/cga/swagger-ui.html").permitAll().anyRequest().authenticated())
+		http.authorizeHttpRequests(
+				(authz) -> authz.requestMatchers("/cga/v3/api-docs/**", "/cga/swagger-ui/**", "/cga/swagger-ui.html")
+						.permitAll().requestMatchers("/**").hasRole("ADMIN").anyRequest().authenticated())
 				.csrf(AbstractHttpConfigurer::disable).authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-		http.exceptionHandling((ex) -> ex.authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
+		http.exceptionHandling((ex) -> ex.authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+				.accessDeniedHandler(customAccessDeniedHandler))
 				.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 		log.debug("SecurityFilterChain configured successfully");
