@@ -15,6 +15,7 @@ public class ClubbedAssuranceMapper {
 	                .id(entity.getId())
 	                .assuranceId(entity.getAssuranceId())
 	                .clubbedAssuranceIds(entity.getClubbedAssuranceIds())
+	                .fromMinistry(entity.getFromMinistry())
 	                .statusForCga(entity.getStatusForCga())
 	                .statusForMinistry(entity.getStatusForMinistry())
 	                .build();

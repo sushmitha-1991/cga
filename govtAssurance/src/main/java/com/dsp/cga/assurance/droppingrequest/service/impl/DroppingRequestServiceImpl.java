@@ -109,6 +109,11 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 			return null; // Return null to handle it at the controller level with custom message
 		}
 
+//		// If status != ACCEPTED, return null
+//		if (!request.getStatusForMinistry().equals(MinistryStatus.ACCEPTED.getValue())) {
+//			return null;
+//		}
+				
 		// Log and map the entity to DTO if found
 		log.debug("Fetched ImplementationRequest: {}", request);
 

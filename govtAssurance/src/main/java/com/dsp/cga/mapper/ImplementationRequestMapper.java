@@ -96,13 +96,13 @@ public class ImplementationRequestMapper {
         entity.setDetailsOfImplementation(dto.getDetailsOfImplementation());
         entity.setDueDateOfImplementation(dto.getDueDateOfImplementation());
         entity.setRemarks(dto.getRemarks());
-      
-        
+        entity.setStatusForMinistry(getStatusForMinistry(dto.getDraftStatus()));
+        entity.setStatusForMinistry(getStatusForMopa(dto));
         
     }
     
     private static String getStatusForMinistry(boolean draft) {
-    	
+    	System.out.println("Draft Status: " + draft);
     	return draft ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue();
     }
     

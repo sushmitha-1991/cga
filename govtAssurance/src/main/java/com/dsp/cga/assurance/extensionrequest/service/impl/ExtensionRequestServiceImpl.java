@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import com.dsp.cga.assurance.clubbedassurance.dto.AssuranceIdNoPairDTO;
 import com.dsp.cga.assurance.clubbedassurance.entity.ClubbedAssurance;
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
 import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
@@ -890,8 +891,11 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
 	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
 	                    }
-	                   
-	                    droppingRequestRepository.save(entity);
+	                    
+                    	if (CgaStatus.ACCEPTED.getValue().equals(updatedStatus)) {
+                    		entity.setActualDropDate(LocalDate.now());
+                    	}
+                    	droppingRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
 
@@ -1319,10 +1323,25 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 		dto.setDate(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null);
 
 		dto.setClubbedAssuranceIds(req.getClubbedAssuranceIds());
+		
+		// Fetch AssuranceId and AssuranceNo pairs for clubbedAssuranceIds
+		List<AssuranceIdNoPairDTO> clubbedPairs = req.getClubbedAssuranceIds().stream().map(id -> {
+			String no = fetchAssuranceNoById(id);
+			return AssuranceIdNoPairDTO.builder().id(id).no(no).build();
+		}).collect(Collectors.toList());
+		dto.setClubbedAssurances(clubbedPairs);
+
+		System.out.println(clubbedPairs);
 
 		return dto;
 	}	
 
+	// Fetch AssuranceNo by AssuranceId
+	private String fetchAssuranceNoById(Long assuranceId) {
+		Optional<Assurance> assurance = assuranceRepository.findById(assuranceId);
+		return assurance.map(Assurance::getAssuranceNo).orElse(null);
+	}
+	
 	private CommonRequestResponseDTO buildDTO(Assurance assurance, OtherRequests req) {
 
 		if (assurance == null) return null;
@@ -1339,7 +1358,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 		dto.setRequestedDate(req.getRequestedDate());
 		dto.setStatusId(req.getStatusId());
 
-		dto.setOtherSubject(dto.getSubject());
+		dto.setOtherSubject(req.getSubject());
 		dto.setFileUrl(req.getFileUrl());
 		
 		return dto;

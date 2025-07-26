@@ -337,10 +337,19 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	            .findByAssuranceId(implementationRequestDTO.getAssuranceId());
 
 	    ImplementationRequest savedRequest;
+	    ImplementationRequestDTO savedDTO = null;
 
 	    if (existingRequestOpt.isPresent()) {
-	        // Update existing entity
+	        if (implementationRequestDTO.getId() == null) {
+	        	// implies new Request, but another exists for the same assurance. So return error.
+				return new GenericResponse<>(HttpStatus.FAILED_DEPENDENCY.value(), false,
+						"Implementation Request cannot be created as another Implementation Request exists for the Assurance", null);
+			}			
+	        
+	    	// Else Update existing entity
 	        ImplementationRequest existingRequest = existingRequestOpt.get();
+			System.out.println("Existing IMPL req: " + existingRequest.getId());
+
 	        ImplementationRequestMapper.updateEntityFromDTO(implementationRequestDTO, existingRequest);
 	        savedRequest = implementationRequestRepository.save(existingRequest);
 	    } else {
@@ -354,32 +363,34 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 						"Implementation Request cannot be created as another Implementation Request exists for the Assurance", null);
 			}			
 			
-	        ImplementationRequest newRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
-	        savedRequest = implementationRequestRepository.save(newRequest);
+			savedDTO = createImplementationRequest(implementationRequestDTO);
+//			
+//	        ImplementationRequest newRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
+//	        savedRequest = implementationRequestRepository.save(newRequest);
 			System.out.println("New record saved");
 
 	    }
 
-	    // Fetch ImplementationType data from external service
-	    if (implementationRequestDTO.getImplementationTypeId() != null) {
-	        ImplementationTypeDTO implementationTypeDTO = fetchImplementationTypeData(
-	                implementationRequestDTO.getImplementationTypeId());
-	        implementationRequestDTO.setImplementationTypeDTO(implementationTypeDTO);
-	    }
-	    
-	    if (implementationRequestDTO.getCommitteeDecisionId() != null) {
-	        CommitteeDecisionDTO committeeDecisionDTO = fetchCommitteeDecisionData(
-	        		implementationRequestDTO.getCommitteeDecisionId());
-	        implementationRequestDTO.setCommitteeDecisionDTO(committeeDecisionDTO);
-	        
-	    }
-
-	    // Convert saved entity to DTO
-	    ImplementationRequestDTO savedDTO = ImplementationRequestMapper.toDTO(savedRequest);
-
-	    // Set fetched ImplementationTypeDTO in the response DTO
-	    savedDTO.setImplementationTypeDTO(implementationRequestDTO.getImplementationTypeDTO());
-	    savedDTO.setCommitteeDecisionDTO(implementationRequestDTO.getCommitteeDecisionDTO());
+//	    // Fetch ImplementationType data from external service
+//	    if (implementationRequestDTO.getImplementationTypeId() != null) {
+//	        ImplementationTypeDTO implementationTypeDTO = fetchImplementationTypeData(
+//	                implementationRequestDTO.getImplementationTypeId());
+//	        implementationRequestDTO.setImplementationTypeDTO(implementationTypeDTO);
+//	    }
+//	    
+//	    if (implementationRequestDTO.getCommitteeDecisionId() != null) {
+//	        CommitteeDecisionDTO committeeDecisionDTO = fetchCommitteeDecisionData(
+//	        		implementationRequestDTO.getCommitteeDecisionId());
+//	        implementationRequestDTO.setCommitteeDecisionDTO(committeeDecisionDTO);
+//	        
+//	    }
+//
+//	    // Convert saved entity to DTO
+//	    ImplementationRequestDTO savedDTO = ImplementationRequestMapper.toDTO(savedRequest);
+//
+//	    // Set fetched ImplementationTypeDTO in the response DTO
+//	    savedDTO.setImplementationTypeDTO(implementationRequestDTO.getImplementationTypeDTO());
+//	    savedDTO.setCommitteeDecisionDTO(implementationRequestDTO.getCommitteeDecisionDTO());
 
 	    // Return response
 		System.out.println("Response returned");

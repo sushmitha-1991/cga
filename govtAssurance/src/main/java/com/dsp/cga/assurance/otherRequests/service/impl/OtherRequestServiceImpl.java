@@ -302,16 +302,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .status(codeRepository.findCodeById(or.getStatusId()))
 	            .statusId(or.getStatusId())
 	            .otherSubject(or.getSubject())
-	            .subject(assurance.getSubject() != null 
-                ? assurance.getSubject() 
-                : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
-                    ? assurance.getPartDetails().stream()
-                        .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
-                        .map(PartDetails::getSubject)
-                        .filter(Objects::nonNull)
-                        .findFirst()
-                        .orElse(null)
-                    : null))
+	            .subject(getSubject(assurance))
 	            .memberName(memberName)
 	            .ministryName(ministryName)
 	            .departmentName(departmentName)
@@ -330,6 +321,24 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .build();
 	    }
 
+	
+	private String getSubject(Assurance assurance) {
+		
+		String subject = assurance.getSubject() != null 
+                ? assurance.getSubject() 
+                : (assurance.getPartDetails() != null && !assurance.getPartDetails().isEmpty()
+                    ? assurance.getPartDetails().stream()
+                        .sorted(Comparator.comparing(PartDetails::getId).reversed()) // latest by ID
+                        .map(PartDetails::getSubject)
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(null)
+                    : null);
+		
+		System.out.println("Other request Subject: " + subject);
+		
+		return subject;
+	}
 	
 	private List<MemberDTO> fetchClubbedMembersData(List<Long> clubbedMembers) {
 		// Check if the list is not empty
