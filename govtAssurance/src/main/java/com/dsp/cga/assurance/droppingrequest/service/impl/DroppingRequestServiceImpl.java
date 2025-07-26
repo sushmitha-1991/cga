@@ -105,7 +105,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 
 		// If no record is found, return a null DTO and log the message
 		if (request == null) {
-			log.debug("No ImplementationRequest found for Assurance ID: {}", id);
+			log.debug("No ImplementationRequest found for Assurance ID: {}", id); 
 			return null; // Return null to handle it at the controller level with custom message
 		}
 
@@ -140,7 +140,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		return dto;
 	}
 
-	private StatusDTO fetchStatusData(Long dropStatusId) {
+	private StatusDTO fetchStatusData(Long dropStatusId) { 
 		String statusServiceUrl = codeServiceUrl + dropStatusId;
 		log.debug("Calling master service URL for Status: {}", statusServiceUrl);
 

@@ -337,8 +337,8 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	            .findByAssuranceId(implementationRequestDTO.getAssuranceId());
 
 	    ImplementationRequest savedRequest;
-	    ImplementationRequestDTO savedDTO = null;
-
+	    ImplementationRequestDTO savedDTO = null;  
+ 
 	    if (existingRequestOpt.isPresent()) {
 	        if (implementationRequestDTO.getId() == null) {
 	        	// implies new Request, but another exists for the same assurance. So return error.
@@ -351,7 +351,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 			System.out.println("Existing IMPL req: " + existingRequest.getId());
 
 	        ImplementationRequestMapper.updateEntityFromDTO(implementationRequestDTO, existingRequest);
-	        savedRequest = implementationRequestRepository.save(existingRequest);
+	        savedRequest = implementationRequestRepository.save(existingRequest);  
 	    } else {
 	        // Create new entity
 	    	
