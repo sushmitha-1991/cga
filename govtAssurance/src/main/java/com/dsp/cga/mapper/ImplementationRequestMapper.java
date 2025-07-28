@@ -97,7 +97,7 @@ public class ImplementationRequestMapper {
         entity.setDueDateOfImplementation(dto.getDueDateOfImplementation());
         entity.setRemarks(dto.getRemarks());
         entity.setStatusForMinistry(getStatusForMinistry(dto.getDraftStatus()));
-        entity.setStatusForMinistry(getStatusForMopa(dto));
+        entity.setStatusForMopa(getStatusForMopa(dto));
         
     }
     
