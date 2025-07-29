@@ -351,7 +351,9 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 			System.out.println("Existing IMPL req: " + existingRequest.getId());
 
 	        ImplementationRequestMapper.updateEntityFromDTO(implementationRequestDTO, existingRequest);
+	        System.out.println("Updated: " + existingRequest);
 	        savedRequest = implementationRequestRepository.save(existingRequest);  
+	        
 	    } else {
 	        // Create new entity
 	    	
