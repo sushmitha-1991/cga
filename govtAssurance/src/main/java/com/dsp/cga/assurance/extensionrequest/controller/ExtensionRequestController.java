@@ -272,5 +272,25 @@ public class ExtensionRequestController {
 	    );
 	}
 
+	@GetMapping("/accepted-records/{assuranceId}")
+	@Operation(summary = "Get Accepted ExtensionRequest(s) by Assurance ID")
+	@ApiResponses(value = {
+	        @ApiResponse(responseCode = "200", description = "ExtensionRequest(s) fetched successfully"),
+	        @ApiResponse(responseCode = "404", description = "ExtensionRequest(s) not found"),
+	        @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<GenericResponse<List<ExtensionRequestDTO>>> getAcceptedExtensionRequest(@PathVariable Long assuranceId) {
+	    
+		List<ExtensionRequestDTO> requests = extensionRequestService.getAcceptedRequests(assuranceId);
 
+	    if (requests.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.OK)
+	                .body(new GenericResponse<>(HttpStatus.OK.value(), false, "No ExtensionRequest(s) found", null));
+	    }
+
+	    GenericResponse<List<ExtensionRequestDTO>> response = new GenericResponse<>(HttpStatus.OK.value(), true,
+	            "ExtensionRequest(s) fetched successfully", requests);
+
+	    return ResponseEntity.ok(response);
+	}
 }

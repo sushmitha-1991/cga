@@ -21,6 +21,7 @@ import com.dsp.cga.assurance.implementationrequest.dto.AssuranceImplementationDT
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceWithImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
+import com.dsp.cga.assurance.otherRequests.dto.OtherRequestDTO;
 import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.response.GenericResponse;
 
@@ -269,4 +270,25 @@ public class ImplementationRequestController {
 	             HttpStatus.OK.value(), true, "Implementation detail updated successfully", updatedDto));
 	 }
 
+		@GetMapping("/accepted-records/{assuranceId}")
+		@Operation(summary = "Get Accepted Implementation Requests by Assurance ID")
+		@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
+				@ApiResponse(responseCode = "404", description = "Assurance not found"),
+				@ApiResponse(responseCode = "500", description = "Internal server error") })
+		public ResponseEntity<GenericResponse<ImplementationRequestDTO>> getAcceptedOtherRequest(
+												@PathVariable Long assuranceId) {
+
+			ImplementationRequestDTO request = implementationRequestService.getAcceptedRequest(assuranceId);
+
+			if (request == null) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new GenericResponse<>(HttpStatus.OK.value(), false, "Other Request not found", null));
+			}
+
+			GenericResponse<ImplementationRequestDTO> response = new GenericResponse<>(HttpStatus.OK.value(), true,
+					"Implementation Request fetched successfully", request);
+
+			return ResponseEntity.ok(response);
+
+		}	 	 
 }

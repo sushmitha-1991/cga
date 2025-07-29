@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dsp.cga.assurance.droppingrequest.dto.DroppingRequestDTO;
 import com.dsp.cga.assurance.otherRequests.dto.OtherRequestDTO;
 import com.dsp.cga.assurance.otherRequests.service.OtherRequestService;
 import com.dsp.cga.response.GenericResponse;
@@ -151,4 +152,26 @@ public class OtherRequestController {
 	              new GenericResponse<>(HttpStatus.OK.value(), true, "Other Request created/updated successfully", otherDto)
 	      );
 	  }
+	  
+		@GetMapping("/accepted-records/{assuranceId}")
+		@Operation(summary = "Get Accepted Other Requests by ID")
+		@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
+				@ApiResponse(responseCode = "404", description = "Assurance not found"),
+				@ApiResponse(responseCode = "500", description = "Internal server error") })
+		public ResponseEntity<GenericResponse<OtherRequestDTO>> getAcceptedOtherRequest(
+												@PathVariable Long assuranceId) {
+
+			OtherRequestDTO request = otherRequestService.getAcceptedRequest(assuranceId);
+
+			if (request == null) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new GenericResponse<>(HttpStatus.OK.value(), false, "Other Request not found", null));
+			}
+
+			GenericResponse<OtherRequestDTO> response = new GenericResponse<>(HttpStatus.OK.value(), true,
+					"DroppingRequest fetched successfully", request);
+
+			return ResponseEntity.ok(response);
+
+		}	 	  
 }

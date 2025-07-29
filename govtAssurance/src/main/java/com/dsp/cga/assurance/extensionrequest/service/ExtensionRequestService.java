@@ -34,4 +34,7 @@ public interface ExtensionRequestService {
 
 	List<CommonRequestResponseDTO> getAllRequests(LocalDate fromDate, LocalDate toDate, 
 			Long ministryId, Long memberId, String status, String requestedBy, String houseAbbr);
+
+	List<ExtensionRequestDTO> getAcceptedRequests(Long assuranceId);
+
 }

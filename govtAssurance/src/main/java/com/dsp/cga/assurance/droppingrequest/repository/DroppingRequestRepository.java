@@ -51,7 +51,14 @@ public interface DroppingRequestRepository extends JpaRepository<DroppingRequest
 			Long countByMinistryId(@Param("ministryId") Long ministryId);
 
 
-
+		@Query(value = """
+			    SELECT e.* FROM cga.dropping_requests e
+			    where e.is_active = true and assurance_id = :assuranceId and 
+			    ((from_ministry = true and status_for_cga = 'Accepted') 
+			    or
+			    (from_ministry = false))
+			    """, nativeQuery = true)
+		DroppingRequest getAcceptedDroppingRequest(@Param("assuranceId") Long assuranceId);	
 
 
 

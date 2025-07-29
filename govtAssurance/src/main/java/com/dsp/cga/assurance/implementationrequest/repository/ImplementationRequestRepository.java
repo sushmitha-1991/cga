@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
+import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
 
 @Repository
 public interface ImplementationRequestRepository extends JpaRepository<ImplementationRequest, Long>, JpaSpecificationExecutor<ImplementationRequest> {
@@ -59,7 +60,12 @@ public interface ImplementationRequestRepository extends JpaRepository<Implement
 			Long countByAssuranceId(@Param("assuranceId") Long assuranceId);
 
 
-
-	
-
+		@Query(value = """
+			    SELECT e.* FROM cga.implementation_requests e
+			    where e.is_active = true and assurance_id = :assuranceId and 
+			    ((from_ministry = true and status_for_cga = 'Accepted') 
+			    or
+			    (from_ministry = false))
+			    """, nativeQuery = true)
+		ImplementationRequest getAcceptedRequest(@Param("assuranceId") Long assuranceId);
 }

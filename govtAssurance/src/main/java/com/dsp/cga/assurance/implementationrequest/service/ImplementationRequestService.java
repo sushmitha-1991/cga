@@ -45,5 +45,8 @@ public interface ImplementationRequestService {
 	//List<AssuranceImplementationDTO> getAllImplementationDetails();
 
 //	Map<String, Object> getRequestCounts(Integer ministryCode);
+	
+	ImplementationRequestDTO getAcceptedRequest(Long assuranceId);
+
 
 }

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +39,8 @@ import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.entity.Departments;
 import com.dsp.cga.assurance.entity.Ministries;
+import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
+import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
 import com.dsp.cga.assurance.implementationrequest.service.impl.ImplemantationRequestServiceImpl;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
@@ -53,6 +56,7 @@ import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.DroppingRequestMapper;
+import com.dsp.cga.mapper.ExtensionRequestMapper;
 import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.util.Utils;
 
@@ -610,4 +614,35 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		}
 
 
+		@Override
+		public DroppingRequestDTO getAcceptedRequest (Long assuranceId) {
+			
+		    // Fetch the list of ExtensionRequest entities by Assurance ID
+		    DroppingRequest droppingRequest = droppingRequestRepository.getAcceptedDroppingRequest(assuranceId);
+
+		    // If no records are found, log the message and return an empty list
+		    if (droppingRequest == null) {
+		        log.debug("No ExtensionRequest found for Assurance ID: {}", assuranceId);
+		        return null;
+		    }
+
+		    // Fetch Assurance to get the assuranceNo
+		    Assurance assurance = assuranceRepository.findById(assuranceId).orElse(null);
+		    String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
+
+		    // Map the list of entities to a list of DTOs and set the assuranceNo in DTO
+		    DroppingRequestDTO dto = DroppingRequestMapper.toDTO(droppingRequest);
+            dto.setAssuranceNo(assuranceNo);
+            
+    		if (droppingRequest.getDroppingType() != null) {
+    		    dto.setDroppingTypeDTO(fetchDroppingTypeData(droppingRequest.getDroppingType()));
+    		}
+
+    		if (droppingRequest.getAcceptedId() != null) {
+    			dto.setAcceptedDTO(fetchAcceptdData(droppingRequest.getAcceptedId()));
+    		}
+		                
+            return dto;
+ 
+		}			
 }

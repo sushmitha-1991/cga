@@ -170,4 +170,26 @@ public class DroppingRequestController {
 	     );
 	 }
 
+	@GetMapping("/accepted-records/{assuranceId}")
+	@Operation(summary = "Get Accepted Dropping Requests by ID")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
+			@ApiResponse(responseCode = "404", description = "Assurance not found"),
+			@ApiResponse(responseCode = "500", description = "Internal server error") })
+	public ResponseEntity<GenericResponse<DroppingRequestDTO>> getAcceptedDroppingRequest(
+											@PathVariable Long assuranceId) {
+
+		DroppingRequestDTO request = droppingRequestService.getAcceptedRequest(assuranceId);
+
+		if (request == null) {
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(new GenericResponse<>(HttpStatus.OK.value(), false, "Dropping Request not found", null));
+		}
+
+		GenericResponse<DroppingRequestDTO> response = new GenericResponse<>(HttpStatus.OK.value(), true,
+				"DroppingRequest fetched successfully", request);
+
+		return ResponseEntity.ok(response);
+
+	}	 
+
 }

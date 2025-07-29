@@ -20,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.dsp.cga.assurance.droppingrequest.dto.DroppingRequestDTO;
+import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
 import com.dsp.cga.assurance.dto.MemberDTO;
 import com.dsp.cga.assurance.dto.SessionDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
@@ -43,13 +45,16 @@ import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.exception.ResourceNotFoundException;
+import com.dsp.cga.mapper.DroppingRequestMapper;
 import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.util.Utils;
 
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class OtherRequestServiceImpl implements OtherRequestService {
 
 	@Autowired
@@ -104,21 +109,28 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 
         OtherRequests saved = otherRequestRepo.save(entity);
 
-        return OtherRequestDTO.builder()
-                .id(saved.getId())
-                .assuranceId(saved.getAssuranceId())
-                .otherSubject(saved.getSubject())
-                .requestedDate(saved.getRequestedDate())
-                .statusId(saved.getStatusId())
-                .remarks(saved.getRemarks())
-                .fileUrl(saved.getFileUrl())
-                .fileUrl(saved.getFileUrl())
-                .draftStatus(saved.getDraftStatus())
-                .statusForMinistry(saved.getStatusForMinistry())
-                .statusForCga(saved.getStatusForCga())
-                .build();
+        return toDTO(saved);
     }
 
+	private OtherRequestDTO toDTO (OtherRequests entity) {
+		
+	      return OtherRequestDTO.builder()
+	                .id(entity.getId())
+	                .assuranceId(entity.getAssuranceId())
+	                .otherSubject(entity.getSubject())
+	                .requestedDate(entity.getRequestedDate())
+	                .statusId(entity.getStatusId())
+	                .remarks(entity.getRemarks())
+	                .fileUrl(entity.getFileUrl())
+	                .fileUrl(entity.getFileUrl())
+	                .draftStatus(entity.getDraftStatus())
+	                .statusForMinistry(entity.getStatusForMinistry())
+	                .statusForCga(entity.getStatusForCga())
+	                .build();
+	
+	}
+	
+	
 	@Override
 	public List<OtherRequestDTO> getFilteredOtherRequests(Long sessionNo, LocalDate requestedDate,
 	                                                      String statusForMinistry, Integer ministryCode) {
@@ -450,6 +462,29 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .build();
 	}
 
+	@Override
+	public OtherRequestDTO getAcceptedRequest (Long assuranceId) {
+		
+	    // Fetch the list of ExtensionRequest entities by Assurance ID
+		OtherRequests otherRequest = otherRequestRepo.getAcceptedRequest(assuranceId);
+
+	    // If no records are found, log the message and return an empty list
+	    if (otherRequest == null) {
+	        log.debug("No Other Request found for Assurance ID: {}", assuranceId);
+	        return null;
+	    }
+
+	    // Fetch Assurance to get the assuranceNo
+	    Assurance assurance = assuranceRepository.findById(assuranceId).orElse(null);
+	    String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
+
+	    // Map the list of entities to a list of DTOs and set the assuranceNo in DTO
+	    OtherRequestDTO dto = toDTO(otherRequest);
+        dto.setAssuranceNo(assuranceNo);        
+		                
+        return dto;
+
+	}		
 
 
 

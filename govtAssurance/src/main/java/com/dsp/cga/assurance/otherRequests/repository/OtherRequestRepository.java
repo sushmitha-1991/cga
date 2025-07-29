@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
 import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
 
 @Repository
@@ -30,5 +31,14 @@ public interface OtherRequestRepository extends JpaRepository<OtherRequests, Lon
 		Long countByMinistryIdAndLokSabha(@Param("ministryId") Long ministryId);
 
 
+
+	@Query(value = """
+		    SELECT e.* FROM cga.other_requests e
+		    where e.is_active = true and assurance_id = :assuranceId and 
+		    ((from_ministry = true and status_for_cga = 'Accepted') 
+		    or
+		    (from_ministry = false))
+		    """, nativeQuery = true)
+	OtherRequests getAcceptedRequest(@Param("assuranceId") Long assuranceId);	
 
 }

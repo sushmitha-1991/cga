@@ -1484,4 +1484,40 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
         return null;
 
 	}
+	
+	
+	@Override
+	public List<ExtensionRequestDTO> getAcceptedRequests(Long assuranceId) {
+		
+	    // Fetch the list of ExtensionRequest entities by Assurance ID
+	    List<ExtensionRequest> extensionRequests = extenionRequestRepository.getAcceptedRequests(assuranceId);
+
+	    // If no records are found, log the message and return an empty list
+	    if (extensionRequests.isEmpty()) {
+	        log.debug("No ExtensionRequest found for Assurance ID: {}", assuranceId);
+	        return Collections.emptyList(); // Return an empty list
+	    }
+
+	    // Fetch Assurance to get the assuranceNo
+	    Assurance assurance = assuranceRepository.findById(assuranceId).orElse(null);
+	    String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
+
+	    // Map the list of entities to a list of DTOs and set the assuranceNo in each DTO
+	    List<ExtensionRequestDTO> dtos = extensionRequests.stream()
+	            .map(request -> {
+	                ExtensionRequestDTO dto = ExtensionRequestMapper.toDTO(request);
+	                dto.setAssuranceNo(assuranceNo);  // Set the assuranceNo in each DTO
+	                
+	                if (request.getStatusId() != null) {
+	                    StatusDTO statusDTO = fetchStatusData(request.getStatusId());
+	                    dto.setStatusDTO(statusDTO); // Add StatusDTO to the ExtensionRequestDTO
+	                }
+	                return dto;
+	            })
+	            .collect(Collectors.toList());
+
+	    log.debug("Returning ExtensionRequestDTOs: {}", dtos);
+	    return dtos;
+	}	
+	
 }

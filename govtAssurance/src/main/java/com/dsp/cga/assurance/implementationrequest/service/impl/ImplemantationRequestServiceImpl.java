@@ -58,6 +58,8 @@ import com.dsp.cga.assurance.implementationrequest.repository.ApplicationInstanc
 import com.dsp.cga.assurance.implementationrequest.repository.ApplicationRepository;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
+import com.dsp.cga.assurance.otherRequests.dto.OtherRequestDTO;
+import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
 import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
@@ -77,6 +79,7 @@ import com.dsp.cga.eunms.Entities;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.eunms.MopaStatus;
 import com.dsp.cga.exception.ResourceNotFoundException;
+import com.dsp.cga.mapper.DroppingRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.util.Utils;
@@ -1196,6 +1199,40 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    return getImplementationDetailById(dto.getId());
 	}
 
+	
+	@Override
+	public ImplementationRequestDTO getAcceptedRequest (Long assuranceId) {
+		
+	    // Fetch the list of ExtensionRequest entities by Assurance ID
+		ImplementationRequest implRequest = implementationRequestRepository.getAcceptedRequest(assuranceId);
+
+	    // If no records are found, log the message and return an empty list
+	    if (implRequest == null) {
+	        log.debug("No Other Request found for Assurance ID: {}", assuranceId);
+	        return null;
+	    }
+
+	    // Fetch Assurance to get the assuranceNo
+	    Assurance assurance = assuranceRepository.findById(assuranceId).orElse(null);
+	    String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
+
+	    // Map the list of entities to a list of DTOs and set the assuranceNo in DTO
+	    ImplementationRequestDTO dto = ImplementationRequestMapper.toDTO(implRequest);
+        dto.setAssuranceNo(assuranceNo);        
+
+	    if (implRequest.getImplementationTypeId() != null) {
+	    dto.setImplementationTypeDTO(fetchImplementationTypeData(implRequest.getImplementationTypeId()));
+	    }
+	    // Populate additional data if available
+	    if (implRequest.getCommitteeDecisionId() != null) {
+	    dto.setCommitteeDecisionDTO(fetchCommitteeDecisionData(implRequest.getCommitteeDecisionId()));
+	    }
+	    log.debug("Returning ImplementationRequestDTO: {}", dto);
+	    
+        return dto;
+
+	}		
+	
 }
 
 

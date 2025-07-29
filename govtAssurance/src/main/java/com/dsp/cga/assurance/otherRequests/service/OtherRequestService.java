@@ -16,4 +16,6 @@ public interface OtherRequestService {
 
 	OtherRequestDTO updateOtherRequestById(Long id, OtherRequestDTO dto);
 
+	OtherRequestDTO getAcceptedRequest(Long assuranceId);
+
 }
