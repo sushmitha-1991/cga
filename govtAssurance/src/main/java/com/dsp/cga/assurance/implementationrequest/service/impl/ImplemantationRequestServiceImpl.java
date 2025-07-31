@@ -31,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -1201,6 +1202,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	
 	@Override
+	@Transactional (readOnly = true)
 	public ImplementationRequestDTO getAcceptedRequest (Long assuranceId) {
 		
 	    // Fetch the list of ExtensionRequest entities by Assurance ID
@@ -1213,19 +1215,20 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    }
 
 	    // Fetch Assurance to get the assuranceNo
-	    Assurance assurance = assuranceRepository.findById(assuranceId).orElse(null);
-	    String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
+	    //Assurance assurance = assuranceRepository.findById(assuranceId).orElse(null);
+	    Assurance assurance = implRequest.getAssurance();
+	    	String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
 
 	    // Map the list of entities to a list of DTOs and set the assuranceNo in DTO
 	    ImplementationRequestDTO dto = ImplementationRequestMapper.toDTO(implRequest);
         dto.setAssuranceNo(assuranceNo);        
 
 	    if (implRequest.getImplementationTypeId() != null) {
-	    dto.setImplementationTypeDTO(fetchImplementationTypeData(implRequest.getImplementationTypeId()));
+	    	dto.setImplementationTypeDTO(fetchImplementationTypeData(implRequest.getImplementationTypeId()));
 	    }
 	    // Populate additional data if available
 	    if (implRequest.getCommitteeDecisionId() != null) {
-	    dto.setCommitteeDecisionDTO(fetchCommitteeDecisionData(implRequest.getCommitteeDecisionId()));
+	    	dto.setCommitteeDecisionDTO(fetchCommitteeDecisionData(implRequest.getCommitteeDecisionId()));
 	    }
 	    log.debug("Returning ImplementationRequestDTO: {}", dto);
 	    

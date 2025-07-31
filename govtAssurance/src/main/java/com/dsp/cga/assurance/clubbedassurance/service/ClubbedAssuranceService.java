@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.dsp.cga.assurance.clubbedassurance.dto.AssuranceResponseDTO;
 import com.dsp.cga.assurance.clubbedassurance.dto.ClubbedAssuranceDTO;
+import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.response.GenericResponse;
 
 public interface ClubbedAssuranceService {
@@ -24,6 +25,7 @@ public interface ClubbedAssuranceService {
 
 	AssuranceResponseDTO updateClubbedAssuranceById(Long id, ClubbedAssuranceDTO dto);
 	
-	
+	ClubbedAssuranceDTO getAcceptedRequest (Long assuranceId);
+
 
 }

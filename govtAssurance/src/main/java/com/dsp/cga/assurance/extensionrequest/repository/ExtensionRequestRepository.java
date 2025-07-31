@@ -59,13 +59,17 @@ public interface ExtensionRequestRepository extends JpaRepository<ExtensionReque
 			    """, nativeQuery = true)
 			ExtensionRequest getLatest(@Param("assuranceId") Long assuranceId);
 	 
-		@Query(value = """
-			    SELECT e.* FROM cga.extension_requests e
-			    where e.is_active = true and assurance_id = :assuranceId and 
-			    ((from_ministry = true and status_for_cga = 'Accepted') 
-			    or
-			    (from_ministry = false))
-			    """, nativeQuery = true)
+		
+		@Query("""
+			    FROM ExtensionRequest e
+			    WHERE e.isActive = true 
+			      AND e.assuranceId = :assuranceId 
+			      AND (
+			          (e.fromMinistry = true AND e.statusForCga = 'Accepted') 
+			          OR 
+			          (e.fromMinistry = false)
+			      )
+			""")		
 		List<ExtensionRequest> getAcceptedRequests(@Param("assuranceId") Long assuranceId);		
 
 }

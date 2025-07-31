@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dsp.cga.assurance.clubbedassurance.dto.AssuranceResponseDTO;
 import com.dsp.cga.assurance.clubbedassurance.dto.ClubbedAssuranceDTO;
+import com.dsp.cga.assurance.clubbedassurance.entity.ClubbedAssurance;
 import com.dsp.cga.assurance.clubbedassurance.service.ClubbedAssuranceService;
+import com.dsp.cga.assurance.droppingrequest.dto.DroppingRequestDTO;
+import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
 import com.dsp.cga.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -185,4 +188,26 @@ public class ClubbedAssuranceController {
 	         new GenericResponse<>(200, true, "Clubbed Assurance updated successfully", updated));
 	 }
 
+	 
+	@GetMapping("/accepted-records/{assuranceId}")
+	@Operation(summary = "Get Accepted Clubbed Assurances(s) by Assurance ID")
+	@ApiResponses(value = {
+	        @ApiResponse(responseCode = "200", description = "Clubbing Request(s) fetched successfully"),
+	        @ApiResponse(responseCode = "404", description = "Clubbing Request(s not found"),
+	        @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<GenericResponse<ClubbedAssuranceDTO>> getAcceptedRequest(@PathVariable Long assuranceId) {
+	    
+		ClubbedAssuranceDTO request = clubbedAssuranceService.getAcceptedRequest(assuranceId);
+
+		if (request == null) {
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(new GenericResponse<>(HttpStatus.OK.value(), false, "Dropping Request not found", null));
+		}
+
+		GenericResponse<ClubbedAssuranceDTO> response = new GenericResponse<>(HttpStatus.OK.value(), true,
+				"Clubbing request fetched successfully", request);
+
+		return ResponseEntity.ok(response);
+	}	 
 }

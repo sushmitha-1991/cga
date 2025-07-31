@@ -23,6 +23,8 @@ import com.dsp.cga.assurance.clubbedassurance.dto.ClubbedAssuranceDTO;
 import com.dsp.cga.assurance.clubbedassurance.entity.ClubbedAssurance;
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
 import com.dsp.cga.assurance.clubbedassurance.service.ClubbedAssuranceService;
+import com.dsp.cga.assurance.droppingrequest.dto.DroppingRequestDTO;
+import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
 import com.dsp.cga.assurance.dto.SessionDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
@@ -39,12 +41,15 @@ import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.mapper.ClubbedAssuranceMapper;
+import com.dsp.cga.mapper.DroppingRequestMapper;
 import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.util.Utils;
 
 import jakarta.persistence.criteria.Predicate;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 
 	@Autowired
@@ -439,4 +444,35 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 		            .build();
 		}
 
+	
+	@Override
+	public ClubbedAssuranceDTO getAcceptedRequest (Long assuranceId) {
+		
+	    // Fetch the list of ExtensionRequest entities by Assurance ID
+	    ClubbedAssurance clubRequest = clubbedAssuranceRepository.getAcceptedRequest(assuranceId);
+
+	    // If no records are found, log the message and return an empty list
+	    if (clubRequest == null) {
+	        log.debug("No Clubbing Request found for Assurance ID: {}", assuranceId);
+	        return null;
+	    }
+
+	    // Fetch Assurance to get the assuranceNo
+	    Assurance assurance = assuranceRepository.findById(assuranceId).orElse(null);
+	    String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
+
+	    // Map the list of entities to a list of DTOs and set the assuranceNo in DTO
+	    ClubbedAssuranceDTO dto = ClubbedAssuranceMapper.toDTO(clubRequest);
+        dto.setAssuranceNo(assuranceNo);
+        
+		// Fetch AssuranceId and AssuranceNo pairs for clubbedAssuranceIds
+		List<AssuranceIdNoPairDTO> clubbedPairs = clubRequest.getClubbedAssuranceIds().stream().map(id -> {
+			String no = fetchAssuranceNoById(id);
+			return AssuranceIdNoPairDTO.builder().id(id).no(no).build();
+		}).collect(Collectors.toList());
+		dto.setClubbedAssurances(clubbedPairs);
+	                
+        return dto;
+
+	}			
 }

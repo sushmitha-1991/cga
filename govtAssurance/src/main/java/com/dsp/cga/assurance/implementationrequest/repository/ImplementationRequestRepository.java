@@ -60,12 +60,24 @@ public interface ImplementationRequestRepository extends JpaRepository<Implement
 			Long countByAssuranceId(@Param("assuranceId") Long assuranceId);
 
 
-		@Query(value = """
-			    SELECT e.* FROM cga.implementation_requests e
-			    where e.is_active = true and assurance_id = :assuranceId and 
-			    ((from_ministry = true and status_for_cga = 'Accepted') 
-			    or
-			    (from_ministry = false))
-			    """, nativeQuery = true)
-		ImplementationRequest getAcceptedRequest(@Param("assuranceId") Long assuranceId);
+//		@Query(value = """
+//			    SELECT e.* FROM cga.implementation_requests e
+//			    where e.is_active = true and assurance_id = :assuranceId and 
+//			    ((from_ministry = true and status_for_cga = 'Accepted') 
+//			    or
+//			    (from_ministry = false))
+//			    """, nativeQuery = true)
+//		ImplementationRequest getAcceptedRequest(@Param("assuranceId") Long assuranceId);
+		
+		@Query("""
+			    FROM ImplementationRequest e
+			    WHERE e.isActive = true 
+			      AND e.assuranceId = :assuranceId 
+			      AND (
+			          (e.fromMinistry = true AND e.statusForCga = 'Accepted') 
+			          OR 
+			          (e.fromMinistry = false)
+			      )
+			""")
+			ImplementationRequest getAcceptedRequest(@Param("assuranceId") Long assuranceId);		
 }

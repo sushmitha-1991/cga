@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.dsp.cga.assurance.clubbedassurance.entity.ClubbedAssurance;
+import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
 @Repository
 public interface ClubbedAssuranceRepository extends JpaRepository<ClubbedAssurance, Long>, JpaSpecificationExecutor<ClubbedAssurance> {
 
@@ -49,6 +50,16 @@ public interface ClubbedAssuranceRepository extends JpaRepository<ClubbedAssuran
 			Long countByMinistryId(@Param("ministryId") Long ministryId);
 
   
-
+		@Query("""
+			    FROM ClubbedAssurance e
+			    WHERE e.isActive = true 
+			      AND e.assuranceId = :assuranceId 
+			      AND (
+			          (e.fromMinistry = true AND e.statusForCga = 'Accepted') 
+			          OR 
+			          (e.fromMinistry = false)
+			      )
+			""")		
+		ClubbedAssurance getAcceptedRequest(@Param("assuranceId") Long assuranceId);		
 
 }

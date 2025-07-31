@@ -32,13 +32,16 @@ public interface OtherRequestRepository extends JpaRepository<OtherRequests, Lon
 
 
 
-	@Query(value = """
-		    SELECT e.* FROM cga.other_requests e
-		    where e.is_active = true and assurance_id = :assuranceId and 
-		    ((from_ministry = true and status_for_cga = 'Accepted') 
-		    or
-		    (from_ministry = false))
-		    """, nativeQuery = true)
+	@Query("""
+		    FROM OtherRequests e
+		    WHERE e.isActive = true 
+		      AND e.assuranceId = :assuranceId 
+		      AND (
+		          (e.fromMinistry = true AND e.statusForCga = 'Accepted') 
+		          OR 
+		          (e.fromMinistry = false)
+		      )
+		""")	
 	OtherRequests getAcceptedRequest(@Param("assuranceId") Long assuranceId);	
 
 }
