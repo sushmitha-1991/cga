@@ -24,6 +24,6 @@ public interface DroppingRequestService {
 
 	AssuranceDroppingResponseDTO updateDroppingRequest(Long id, AssuranceDroppingRequestDTO requestDTO);
 
-	DroppingRequestDTO getAcceptedRequest(Long assuranceId);
+	DroppingRequestDTO getAcceptedRequest(Long assuranceId); 
 
 }

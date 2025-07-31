@@ -48,7 +48,7 @@ public interface DroppingRequestRepository extends JpaRepository<DroppingRequest
 			    JOIN cga.assurance a ON dr.assurance_id = a.id
 			    WHERE a.ministry_id = :ministryId
 			    """, nativeQuery = true)
-			Long countByMinistryId(@Param("ministryId") Long ministryId);
+			Long countByMinistryId(@Param("ministryId") Long ministryId);  
 
 
 

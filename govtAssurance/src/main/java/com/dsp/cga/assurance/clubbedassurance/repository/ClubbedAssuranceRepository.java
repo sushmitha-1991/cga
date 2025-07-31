@@ -59,7 +59,7 @@ public interface ClubbedAssuranceRepository extends JpaRepository<ClubbedAssuran
 			          OR 
 			          (e.fromMinistry = false)
 			      )
-			""")		
+			""")		  
 		ClubbedAssurance getAcceptedRequest(@Param("assuranceId") Long assuranceId);		
 
 }

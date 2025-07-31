@@ -291,6 +291,6 @@ public class ExtensionRequestController {
 	    GenericResponse<List<ExtensionRequestDTO>> response = new GenericResponse<>(HttpStatus.OK.value(), true,
 	            "ExtensionRequest(s) fetched successfully", requests);
 
-	    return ResponseEntity.ok(response);
+	    return ResponseEntity.ok(response); 
 	}
 }

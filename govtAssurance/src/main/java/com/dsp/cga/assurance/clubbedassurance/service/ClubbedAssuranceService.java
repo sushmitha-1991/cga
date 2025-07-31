@@ -25,7 +25,7 @@ public interface ClubbedAssuranceService {
 
 	AssuranceResponseDTO updateClubbedAssuranceById(Long id, ClubbedAssuranceDTO dto);
 	
-	ClubbedAssuranceDTO getAcceptedRequest (Long assuranceId);
+	ClubbedAssuranceDTO getAcceptedRequest (Long assuranceId);  
 
 
 }

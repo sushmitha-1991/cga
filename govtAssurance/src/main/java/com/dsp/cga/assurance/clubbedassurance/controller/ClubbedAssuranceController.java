@@ -187,8 +187,7 @@ public class ClubbedAssuranceController {
 	     return ResponseEntity.ok(
 	         new GenericResponse<>(200, true, "Clubbed Assurance updated successfully", updated));
 	 }
-
-	 
+  	 
 	@GetMapping("/accepted-records/{assuranceId}")
 	@Operation(summary = "Get Accepted Clubbed Assurances(s) by Assurance ID")
 	@ApiResponses(value = {

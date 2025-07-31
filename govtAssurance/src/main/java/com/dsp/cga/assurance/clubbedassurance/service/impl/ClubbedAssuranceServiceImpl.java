@@ -470,7 +470,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 			String no = fetchAssuranceNoById(id);
 			return AssuranceIdNoPairDTO.builder().id(id).no(no).build();
 		}).collect(Collectors.toList());
-		dto.setClubbedAssurances(clubbedPairs);
+		dto.setClubbedAssurances(clubbedPairs);  
 	                
         return dto;
 

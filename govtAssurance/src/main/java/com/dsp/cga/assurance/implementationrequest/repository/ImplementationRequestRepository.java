@@ -15,7 +15,7 @@ import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
 @Repository
 public interface ImplementationRequestRepository extends JpaRepository<ImplementationRequest, Long>, JpaSpecificationExecutor<ImplementationRequest> {
 
-	Optional<ImplementationRequest> findByAssuranceId(Long assuranceId);
+	Optional<ImplementationRequest> findByAssuranceId(Long assuranceId);  
 
 
 	@Query(value = """

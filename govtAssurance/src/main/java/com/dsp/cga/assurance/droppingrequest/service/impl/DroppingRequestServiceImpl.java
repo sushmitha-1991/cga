@@ -639,7 +639,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
     		}
 
     		if (droppingRequest.getAcceptedId() != null) {
-    			dto.setAcceptedDTO(fetchAcceptdData(droppingRequest.getAcceptedId()));
+    			dto.setAcceptedDTO(fetchAcceptdData(droppingRequest.getAcceptedId()));  
     		}
 		                
             return dto;

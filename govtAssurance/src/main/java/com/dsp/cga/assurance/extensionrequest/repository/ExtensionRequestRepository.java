@@ -20,7 +20,7 @@ public interface ExtensionRequestRepository extends JpaRepository<ExtensionReque
 
 	Optional<ExtensionRequest> findByAssuranceIdAndExtensionNo(Long assuranceId, String extensionNo);
 
-
+ 
 
 	@Query(value = """
 		    SELECT COUNT(*) FROM cga.extension_requests e

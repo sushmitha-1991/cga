@@ -12,7 +12,7 @@ import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
 @Repository
 public interface OtherRequestRepository extends JpaRepository<OtherRequests, Long>, JpaSpecificationExecutor<OtherRequests> {
 
-	@Query(value = """
+	@Query(value = """  
 		    SELECT COUNT(*) 
 		    FROM cga.other_requests ca
 		    JOIN cga.assurance a ON ca.assurance_id = a.id
@@ -30,7 +30,7 @@ public interface OtherRequestRepository extends JpaRepository<OtherRequests, Lon
 		    """, nativeQuery = true)
 		Long countByMinistryIdAndLokSabha(@Param("ministryId") Long ministryId);
 
-
+  
 
 	@Query("""
 		    FROM OtherRequests e

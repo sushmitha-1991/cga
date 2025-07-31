@@ -1200,7 +1200,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    return getImplementationDetailById(dto.getId());
 	}
 
-	
+	  
 	@Override
 	@Transactional (readOnly = true)
 	public ImplementationRequestDTO getAcceptedRequest (Long assuranceId) {
