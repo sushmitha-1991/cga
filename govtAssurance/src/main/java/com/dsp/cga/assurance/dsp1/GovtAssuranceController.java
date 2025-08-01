@@ -43,7 +43,10 @@ public class GovtAssuranceController {
             @RequestParam(required = false) String catg,
             @RequestParam(required = false) LocalDate dateFrom,
             @RequestParam(required = false) LocalDate dateTo,
-            @RequestParam(required = false) String rsSession
+            @RequestParam(required = false) String rsSession,
+            @RequestParam(required = false) Long sessionFrom,
+            @RequestParam(required = false) Long sessionTo
+
     ) {
     GovtAssuranceResponseDTO dto = govtAssuranceResponseService.getGovtAssuranceList(
             mpCode,
@@ -57,7 +60,9 @@ public class GovtAssuranceController {
             catg,
             dateFrom,
             dateTo,
-            rsSession
+            rsSession,
+            sessionFrom,
+            sessionTo
     );
 
     GenericResponse<GovtAssuranceResponseDTO> response = new GenericResponse<>(

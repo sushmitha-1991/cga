@@ -28,7 +28,9 @@ public class GovtAssuranceResponseService {
             String catg,
             LocalDate dateFrom,
             LocalDate dateTo,
-            String  rsSession
+            String  rsSession,
+            Long sessionFrom,
+            Long sessionTo
     ) {
     	
         StringBuilder sql = new StringBuilder("""
@@ -115,6 +117,15 @@ public class GovtAssuranceResponseService {
             sql.append(" AND rssm.session_number = :rsSession");
             paramMap.put("rsSession", rsSession);
         }
+        if (sessionFrom != null) {
+            sql.append(" AND lsm.session_number_int >= :sessionFrom");
+            paramMap.put("sessionFrom", sessionFrom);
+        }
+        if (sessionTo != null) {
+            sql.append(" AND lsm.session_number_int <= :sessionTo");
+            paramMap.put("sessionTo", sessionTo);
+        }
+
         List<GovtAssuranceResponseDTO.Record> records = jdbcTemplate.query(sql.toString(), paramMap, (rs, rowNum) -> {
             GovtAssuranceResponseDTO.Record record = new GovtAssuranceResponseDTO.Record();
             record.setAssuNo(rs.getString("assuNo"));
