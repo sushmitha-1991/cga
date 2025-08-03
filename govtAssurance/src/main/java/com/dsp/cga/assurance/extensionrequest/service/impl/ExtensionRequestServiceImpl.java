@@ -899,7 +899,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
 
-	            case "ClubbedAssurance":
+	            case "Clubbed Assurance":
 	                return clubbedAssuranceRepository.findById(id).map(entity -> {
 	                    if (updateDto.getStatusForMinistry() != null) {
 	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
@@ -1225,7 +1225,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 		
 		if (!Entities.MOPA.getValue().equalsIgnoreCase(statusFor) ||
 			!StringUtils.isEmpty(houseAbbr)) {
-			spec = spec.and(ImplementationRequestSpec.hasHouse(util.getHouseAbbr()));
+			spec = spec.and(ImplementationRequestSpec.hasHouse(houseAbbr));
 		}
 		
 		spec = spec.and(ImplementationRequestSpec.isFromMinistry(true));
@@ -1263,6 +1263,8 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 		Specification<ImplementationRequest> spec = createImplementationSpecification(fromDate, toDate, ministryId, 
 								memberId, status, reqBy, houseAbbr);
 
+		System.out.println("***************IMPL SPEC: " + spec);
+		
 		List<CommonRequestResponseDTO> response = new ArrayList<>();
 
 		implementationRequestRepository.findAll(spec).forEach(req -> {
@@ -1347,6 +1349,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 		if (assurance == null) return null;
 		
 		CommonRequestResponseDTO dto = populateCommonParams(assurance);
+        dto.setStatus(codeRepository.findCodeById(req.getStatusId()));
 		dto.setId(req.getId());
 		dto.setRequestType(RequestType.OTHER_REQ.getValue());
 		dto.setRemarks(req.getRemarks());

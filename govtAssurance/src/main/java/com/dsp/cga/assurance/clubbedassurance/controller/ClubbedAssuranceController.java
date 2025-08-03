@@ -201,7 +201,7 @@ public class ClubbedAssuranceController {
 
 		if (request == null) {
 			return ResponseEntity.status(HttpStatus.OK)
-					.body(new GenericResponse<>(HttpStatus.OK.value(), false, "Dropping Request not found", null));
+					.body(new GenericResponse<>(HttpStatus.OK.value(), false, "Clubbing Request not found", null));
 		}
 
 		GenericResponse<ClubbedAssuranceDTO> response = new GenericResponse<>(HttpStatus.OK.value(), true,

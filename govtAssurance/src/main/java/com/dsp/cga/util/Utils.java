@@ -88,6 +88,7 @@ public class Utils {
    
 	public String getHouseAbbr() {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		System.out.println("Principal: " + principal);
 		if (!(principal instanceof UserDetailsDTO udto)) {
 			throw new RuntimeException("Authentication Problems");
 		}
