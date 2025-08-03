@@ -27,7 +27,7 @@ public class ImplementationRequestSpec {
 		
 	public static Specification<ImplementationRequest> hasMinistryId(Long ministryId) {
 		return (root, query, criteriaBuilder) -> ministryId != null
-				? criteriaBuilder.equal(root.get("assurance").get("ministryId"), ministryId)
+				? criteriaBuilder.equal(root.get("assurance").get("ministryId"), ministryId) 
 				: criteriaBuilder.conjunction();
 	}
 	

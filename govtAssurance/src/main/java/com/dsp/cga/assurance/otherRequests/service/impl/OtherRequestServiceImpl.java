@@ -311,7 +311,7 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	            .id(or.getId())
 	            .assuranceNo(assurance != null ? assurance.getAssuranceNo() : null)
 	            .assuranceId(or.getAssuranceId())
-	            .status(codeRepository.findCodeById(or.getStatusId()))
+	            .status(codeRepository.findCodeById(or.getStatusId())) 
 	            .statusId(or.getStatusId())
 	            .otherSubject(or.getSubject())
 	            .subject(getSubject(assurance))

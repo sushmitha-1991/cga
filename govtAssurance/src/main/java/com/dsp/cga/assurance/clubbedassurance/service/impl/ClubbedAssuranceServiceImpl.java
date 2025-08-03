@@ -453,7 +453,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 
 	    // If no records are found, log the message and return an empty list
 	    if (clubRequest == null) {
-	        log.debug("No Clubbing Request found for Assurance ID: {}", assuranceId);
+	        log.debug("No Clubbing Request found for Assurance ID: {}", assuranceId); 
 	        return null;
 	    }
 

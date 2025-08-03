@@ -1344,7 +1344,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 		return assurance.map(Assurance::getAssuranceNo).orElse(null);
 	}
 	
-	private CommonRequestResponseDTO buildDTO(Assurance assurance, OtherRequests req) {
+	private CommonRequestResponseDTO buildDTO(Assurance assurance, OtherRequests req) { 
 
 		if (assurance == null) return null;
 		
