@@ -237,14 +237,29 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	        savedDTOs.add(savedDTO);
 	    }
 
+	    String msg = createResponseMsg(extensionRequestDTOList, savedDTOs);
+	    
 	    // Return the response wrapped in GenericResponse
 	    return new GenericResponse<>(
 	            HttpStatus.CREATED.value(),
 	            true,
-	            "ExtensionRequests created or updated successfully",
+	            msg,
 	            savedDTOs
 	    );
 	}
+	
+	private String createResponseMsg(List<ExtensionRequestDTO> extensionRequestDTOList,
+									 List<ExtensionRequestDTO> savedDTOs) {
+		
+		ExtensionRequestDTO er = extensionRequestDTOList.get(0);
+		String desc = er.getId() == null ? "Created" : "Updated";
+		boolean draft = er.getDraftStatus();
+		
+		
+		return "Extension Requests created or updated successfully";
+	}
+	
+	
 	private StatusDTO fetchStatusData(Long statusId) {
 		String statusServiceUrl = codeServiceUrl + statusId;
 		log.debug("Calling master service URL for Status: {}", statusServiceUrl);
