@@ -36,5 +36,8 @@ public interface ExtensionRequestService {
 			Long ministryId, Long memberId, String status, String requestedBy, String houseAbbr);
 
 	List<ExtensionRequestDTO> getAcceptedRequests(Long assuranceId);
+	
+	void deleteExtensionRequest(Long id);
+	
 
 }

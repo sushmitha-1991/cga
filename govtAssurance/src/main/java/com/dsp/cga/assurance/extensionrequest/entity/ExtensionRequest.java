@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.annotations.SQLDelete;
+
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.entity.Auditable;
 import com.dsp.cga.util.JsonMapConverter;
@@ -30,6 +32,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Table(name = "extension_requests", schema = "cga")
+@SQLDelete(sql = "UPDATE cga.extension_requests SET is_active = false, is_deleted = true WHERE id = ?")
 public class ExtensionRequest extends Auditable {
 
 	@Id

@@ -293,4 +293,18 @@ public class ExtensionRequestController {
 
 	    return ResponseEntity.ok(response); 
 	}
+
+	@PostMapping("/delete")
+	 @Operation(summary = "Delete an Extension Request")
+		@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Extension request deleted successfully"),
+				@ApiResponse(responseCode = "400", description = "Invalid input data"),
+				@ApiResponse(responseCode = "500", description = "Internal server error") })
+	 public ResponseEntity<GenericResponse<Long>> deleteExtensionRequest(@RequestBody ExtensionRequestDTO extensionRequestDTO) {
+		
+		extensionRequestService.deleteExtensionRequest(extensionRequestDTO.getId());
+        GenericResponse<Long> response = new GenericResponse<>(HttpStatus.CREATED.value(), true,
+	                "Extension request deleted successfully", extensionRequestDTO.getId());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+	 }
+
 }

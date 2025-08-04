@@ -1523,4 +1523,12 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	    return dtos;
 	}	
 	
+	@Override
+	public void deleteExtensionRequest(Long id) {
+		
+		extensionRepository.deleteById(id);
+		return;
+		
+	}
+
 }
