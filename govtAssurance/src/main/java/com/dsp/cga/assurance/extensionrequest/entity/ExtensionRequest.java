@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.entity.Auditable;
@@ -33,6 +34,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Table(name = "extension_requests", schema = "cga")
 @SQLDelete(sql = "UPDATE cga.extension_requests SET is_active = false, is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false") // All queries will ignore deleted records
 public class ExtensionRequest extends Auditable {
 
 	@Id
