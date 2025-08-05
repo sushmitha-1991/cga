@@ -159,6 +159,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	private Utils util;
 	
 	@Override
+	@Transactional
 	public ImplementationRequestDTO createImplementationRequest(ImplementationRequestDTO implementationRequestDTO) {
 
 		// New to be created. Validate if implementation exists for the assurance
@@ -299,6 +300,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		return null;
 	}
 
+	@Transactional
 	public String deleteDraftEntry(String applicationNo) {
 		String url = draftedServiceUrl + "/delete-save-as-draft?applicationNo=" + applicationNo;
 		String token = getTokenFromRequest();
@@ -334,6 +336,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	
 	@Override
+	@Transactional
 	public GenericResponse<ImplementationRequestDTO> createOrUpdateImplementationRequest(
 	        ImplementationRequestDTO implementationRequestDTO) {
 
@@ -410,6 +413,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 
 	@Override
+	@Transactional (readOnly = true)
 	public ImplementationRequestDTO getImplementationRequestByAssuranceId(Long id) {
 	    // Attempt to find the ImplementationRequest by Assurance ID
 	    ImplementationRequest implementationRequest = implementationRequestRepository.findByAssuranceId(id).orElse(null);
@@ -490,6 +494,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<AssuranceImplementationDTO> getAssuranceImplementations(Long sessionNo, LocalDate layingDate,
 	        Long implementationTypeId, String statusForMinistry, Integer ministryCode) {
 
@@ -791,14 +796,14 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    if (optionalRequest.isEmpty()) return null;
 
 	    ImplementationRequest implReq = optionalRequest.get();
-	    
-	  
 
 	    // Check statusForMinistry before allowing update
-	    if (implReq.getStatusForMinistry() == null || 
-	        !implReq.getStatusForMinistry().equalsIgnoreCase("Returned")) {
-	        throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
-	    }
+	    if (!implReq.getDraft()) {
+	    	if (implReq.getStatusForMinistry() == null || 
+	        	!implReq.getStatusForMinistry().equalsIgnoreCase("Returned")) {
+	    		throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
+	    	}
+		}
 	    
 	    // Update status fields
 	    implReq.setStatusForMinistry(MinistryStatus.SUBMITTED.getValue());
