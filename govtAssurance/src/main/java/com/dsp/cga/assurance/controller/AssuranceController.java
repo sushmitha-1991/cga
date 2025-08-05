@@ -33,7 +33,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @RestController
 @RequestMapping("/cga/assurance")
 public class AssuranceController {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(AssuranceController.class);
 
 
@@ -46,7 +46,7 @@ public class AssuranceController {
 			@ApiResponse(responseCode = "400", description = "Invalid input data"),
 			@ApiResponse(responseCode = "500", description = "Internal server error") })
 	public ResponseEntity<GenericResponse<AssuranceDTO>> createAssurance(@RequestBody AssuranceDTO assuranceDTO) {
-		
+
 		System.out.println("@@@@@@@@@@@@@"+ assuranceDTO);
 		AssuranceDTO createdAssurance = assuranceService.createAssurance(assuranceDTO);
 		GenericResponse<AssuranceDTO> response = new GenericResponse<>(HttpStatus.CREATED.value(), true,
@@ -64,7 +64,7 @@ public class AssuranceController {
 //				"assurance fetched successfully", assurance);
 //		return new ResponseEntity<>(response, HttpStatus.OK);
 //	}
-	
+
 	@GetMapping("/getAll")
 	@Operation(summary = "Get all Assurance")
 	@ApiResponses(value = {
@@ -84,7 +84,7 @@ public class AssuranceController {
 	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	
+
 //	@GetMapping("/getAll")
 //	@Operation(summary = "Get all Assurance")
 //	@ApiResponses(value = { 
@@ -108,8 +108,8 @@ public class AssuranceController {
 //	    return new ResponseEntity<>(response, HttpStatus.OK);
 //	}
 
-	
-	
+
+
 //	@GetMapping("/getAllLokSabha")
 //	@Operation(summary = "Get all Assurance")
 //	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
@@ -120,7 +120,7 @@ public class AssuranceController {
 //				"assurance fetched successfully", assurance);
 //		return new ResponseEntity<>(response, HttpStatus.OK);
 //	}
-	
+
 //	@GetMapping("/getAllLokSabha")
 //	@Operation(summary = "Get all Assurance")
 //	@ApiResponses(value = {
@@ -143,7 +143,7 @@ public class AssuranceController {
 //
 //	    return new ResponseEntity<>(response, HttpStatus.OK);
 //	}
-	
+
 	@GetMapping("/getAllLokSabha")
 	@Operation(summary = "Get all Assurance")
 	@ApiResponses(value = {
@@ -163,7 +163,7 @@ public class AssuranceController {
 	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	
+
 
 	@GetMapping("/{id}")
 	@Operation(summary = "Get Assurance by ID")
@@ -171,7 +171,7 @@ public class AssuranceController {
 			@ApiResponse(responseCode = "404", description = "Assurance not found"),
 			@ApiResponse(responseCode = "500", description = "Internal server error") })
 	public ResponseEntity<GenericResponse<AssuranceDTO>> getAssuranceById(@PathVariable Long id) {
-		try {
+//		try {
 			AssuranceDTO assurance = assuranceService.getAssuranceById(id);
 
 			if (assurance == null) {
@@ -184,12 +184,13 @@ public class AssuranceController {
 
 			return ResponseEntity.ok(response);
 
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GenericResponse<>(
-					HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Error fetching assurance", null));
-		}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GenericResponse<>(
+//					HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Error fetching assurance", null));
+//		}
 	}
-	
+
 
 
 //	@PutMapping("/update/{id}")
@@ -212,7 +213,7 @@ public class AssuranceController {
 //	            updatedAssurance);
 //	    return ResponseEntity.ok(response);
 //	}
-	
+
 	@PutMapping("/update/{id}")
 	@Operation(summary = "Update an existing Assurance by ID")
 	@ApiResponses(value = {
@@ -251,7 +252,7 @@ public class AssuranceController {
 	    );
 	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/filters")
 	@Operation(summary = "Get filtered Assurances")
 	@ApiResponses(value = {
@@ -264,7 +265,7 @@ public class AssuranceController {
 	        @RequestParam(required = false) Long ministryId,
 	        @RequestParam(required = false) Long rajyaSabhaSessionNo,
 	        @RequestParam(required = false) Long memberId) {
-		
+
 		 log.info("fromDate: {}", fromDate);
 		    log.info("toDate: {}", toDate);
 		    log.info("ministryId: {}", ministryId);
@@ -278,8 +279,8 @@ public class AssuranceController {
 	    );
 	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
-	
+
+
 	@GetMapping("/filters/ls")
 	@Operation(summary = "Get filtered Assurances")
 	@ApiResponses(value = {
@@ -303,8 +304,8 @@ public class AssuranceController {
 	    );
 	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
-	
+
+
 //	@GetMapping("/assurance-numbers")
 //	@Operation(summary = "Get assurance numbers")
 //	@ApiResponses(value = {
@@ -327,7 +328,7 @@ public class AssuranceController {
 //
 //	    return new ResponseEntity<>(response, HttpStatus.OK);
 //	}
-	
+
 	 @GetMapping("/assurance-numbers")
 	    @Operation(summary = "Get assurance numbers")
 	    @ApiResponses(value = {

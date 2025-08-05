@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 public class AssuranceDTO {
 
 	private Long id;
+	private Long draftId;
 	private Long lokSabhaNo;
 	private Long lokSabhaSessionNo;
 	private Long rajyaSabhaSessionNo;
