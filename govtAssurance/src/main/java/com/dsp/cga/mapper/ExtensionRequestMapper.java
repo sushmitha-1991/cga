@@ -46,8 +46,13 @@ public class ExtensionRequestMapper {
 	            entity.setRemarks(dto.getRemarks());
 	            entity.setExtensionFiles(dto.getExtensionFiles());
 	            entity.setDraftStatus(dto.getDraftStatus());
-	            entity.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
-				entity.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+
+	            // If Accepted, Status not to be updated. Else update. 
+	            if (!CgaStatus.ACCEPTED.getValue().equals(entity.getStatusForCga())) {
+		            entity.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
+					entity.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+	            }
+	            
 	            entity.setStatusId(dto.getStatusId());
 	        }
 	    }

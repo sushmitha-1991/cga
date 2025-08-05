@@ -907,9 +907,9 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
 	                    }
 	                    
-                    	if (CgaStatus.ACCEPTED.getValue().equals(updatedStatus)) {
-                    		entity.setActualDropDate(LocalDate.now());
-                    	}
+//                    	if (CgaStatus.ACCEPTED.getValue().equals(updatedStatus)) {
+//                    		entity.setActualDropDate(LocalDate.now());
+//                    	}
                     	droppingRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
