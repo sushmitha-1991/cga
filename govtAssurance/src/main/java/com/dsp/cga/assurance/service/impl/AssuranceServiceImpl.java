@@ -27,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
@@ -129,6 +130,9 @@ public class AssuranceServiceImpl implements AssuranceService {
 	@Value("${master.rajyaSabhaServiceUrl}")
 	private String rajyaSabhaServiceUrl;
 
+	@Value("${master.saveasdraft.url}")
+	private String saveAsDraftUrl;
+
 	@Autowired
 	private AssuranceRepository assuranceRepository;
 	
@@ -229,13 +233,50 @@ public class AssuranceServiceImpl implements AssuranceService {
 			supplementary.setAssurance(assurance); // Link Assurance to Supplementary
 		});
 
-
 		Assurance savedAssurance = assuranceRepository.save(assurance);
+
+		if (assuranceDTO.getDraftId()!=null)
+			softDeleteDraftData(assuranceDTO.getDraftId());
 
 		// Map entity back to DTO to return response
 		AssuranceDTO savedAssuranceDTO = assuranceMapper.toDTO(savedAssurance);
 		
 		return savedAssuranceDTO;
+	}
+
+	private void softDeleteDraftData(Long draftId) {
+		String url = saveAsDraftUrl + draftId;
+
+		log.info("Soft deleting draft data by draftId from URL: {}", url);
+//        System.out.println(("Soft deleting draft data by draftId from URL: " + url));
+		log.debug("Soft deleting draft data by draftId from URL: {}", url);
+
+		if (draftId==0 || draftId==null)
+			return;
+
+
+		try {
+			ResponseEntity<GenericResponse<?>> response = restTemplate.exchange(url, HttpMethod.DELETE, null,
+					new ParameterizedTypeReference<GenericResponse<?>>() {
+					});
+
+			if (response == null || response.getBody() == null || response.getBody().getData() == null) {
+				log.error("Response or body is null when soft deleting draft data with id: {}", draftId);
+				return;
+			}
+
+			log.info("draft data delete: {}", response.getBody().getData());
+			log.debug("draft data delete: {}", response.getBody().getData());
+
+		} catch (ResourceNotFoundException e) {
+			log.error("Resource not found for draftId: {}", draftId);
+			throw e;
+		} catch (HttpClientErrorException e) {
+			log.warn("Draft Data not found for draftId {}: {}", draftId, e.getStatusCode());
+		}
+		catch (Exception e) {
+			log.error("Error soft deleting draft data for draftId: {}", draftId, e);
+		}
 	}
 
 	private String generateRSAssuranceNo(Long rajyaSabhaSessionId) {
@@ -927,10 +968,6 @@ public class AssuranceServiceImpl implements AssuranceService {
 	    // Return updated assurance as DTO
 	    return assuranceMapper.mapToDTO(updatedAssurance);
 	}
-
-
-	
-
 
 
 //	@Override
