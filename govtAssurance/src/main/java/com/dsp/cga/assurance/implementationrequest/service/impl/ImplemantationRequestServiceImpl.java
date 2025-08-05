@@ -798,7 +798,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    ImplementationRequest implReq = optionalRequest.get();
 
 	    // Check statusForMinistry before allowing update
-	    if (!implReq.getDraft()) {
+	    if (!implReq.getDraft()) { 
 	    	if (implReq.getStatusForMinistry() == null || 
 	        	!implReq.getStatusForMinistry().equalsIgnoreCase("Returned")) {
 	    		throw new IllegalStateException("Update not allowed. statusForMinistry must be 'Returned'.");
