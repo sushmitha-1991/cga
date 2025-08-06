@@ -30,7 +30,8 @@ public class GovtAssuranceResponseService {
             LocalDate dateTo,
             String  rsSession,
             Long sessionFrom,
-            Long sessionTo
+            Long sessionTo,
+            String house
     ) {
     	
         StringBuilder sql = new StringBuilder("""
@@ -66,11 +67,21 @@ public class GovtAssuranceResponseService {
             LEFT JOIN master.rajya_sabha_session_master rssm 
                 ON rssm.id = a.rajya_sabha_session_no 
             WHERE a.is_active = true AND a.is_deleted = false
-              AND pd.mp_code = :mpCode
+                AND a.house_id = :house
         """);
 
         Map<String, Object> paramMap = new HashMap<>();
-       paramMap.put("mpCode", mpCode);
+       //paramMap.put("mpCode", mpCode);
+        if(house!=null && house.equalsIgnoreCase("LS")) {
+        	paramMap.put("house", 2);
+        	
+        } else {
+        	paramMap.put("house", 1);
+        }
+       if (mpCode != null) {
+           sql.append(" AND pd.mp_code = :mpCode");
+           paramMap.put("mpCode", mpCode);
+       }
         
         if (loksabha != null) {
             sql.append(" AND lm.lok_sabha_number = :loksabha");
