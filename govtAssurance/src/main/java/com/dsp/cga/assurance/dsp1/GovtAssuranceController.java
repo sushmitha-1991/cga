@@ -32,7 +32,7 @@ public class GovtAssuranceController {
         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     public ResponseEntity<GenericResponse<GovtAssuranceResponseDTO>> getAssuranceList(
-            @RequestParam (required = true)String mpCode,
+            @RequestParam (required = false)String mpCode,
             @RequestParam(required = false) String loksabha,
             @RequestParam(required = false) String session,
             @RequestParam(required = false) String subject,
@@ -45,7 +45,8 @@ public class GovtAssuranceController {
             @RequestParam(required = false) LocalDate dateTo,
             @RequestParam(required = false) String rsSession,
             @RequestParam(required = false) Long sessionFrom,
-            @RequestParam(required = false) Long sessionTo
+            @RequestParam(required = false) Long sessionTo,
+            @RequestParam(required = true) String house
 
     ) {
     GovtAssuranceResponseDTO dto = govtAssuranceResponseService.getGovtAssuranceList(
@@ -62,7 +63,8 @@ public class GovtAssuranceController {
             dateTo,
             rsSession,
             sessionFrom,
-            sessionTo
+            sessionTo,
+            house
     );
 
     GenericResponse<GovtAssuranceResponseDTO> response = new GenericResponse<>(
