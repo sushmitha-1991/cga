@@ -89,7 +89,7 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 
 		if (existingAssuranceOpt.isPresent()) {
 			ClubbedAssurance existingAssurance = existingAssuranceOpt.get();
-			System.out.println("Existing CA: " + existingAssurance);
+			System.out.println("Existing CA: " + existingAssurance);  
 			System.out.println("DTO CA: " + clubbedAssuranceDTO);
 
 			ClubbedAssuranceMapper.updateEntityFromDTO(clubbedAssuranceDTO, existingAssurance);
