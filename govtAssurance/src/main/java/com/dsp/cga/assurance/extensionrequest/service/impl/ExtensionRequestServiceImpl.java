@@ -69,8 +69,10 @@ import com.dsp.cga.eunms.MopaStatus;
 import com.dsp.cga.eunms.RequestType;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ClubbedAssuranceMapper;
+import com.dsp.cga.mapper.DroppingRequestMapper;
 import com.dsp.cga.mapper.ExtensionRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
+import com.dsp.cga.mapper.OtherRequestMapper;
 import com.dsp.cga.repository.HousesRepository;
 import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.specification.ClubbedAssuranceRequestSpec;
@@ -875,42 +877,36 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	        switch (requestType) {
 	            case "Extension Request":
 	                return extenionRequestRepository.findById(id).map(entity -> {
-	                    //if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
 	                  
-	                    if (updateDto.getStatusForMinistry() != null) {
-	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
-	                    }	                  
-	                    extenionRequestRepository.save(entity);
+//	                    if (updateDto.getStatusForMinistry() != null) {
+//	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
+//	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
+//	                    }	                  
+
+	                	ExtensionRequestMapper.updateEntityForReturnOrAccept(updateDto, entity);
+	                	extenionRequestRepository.save(entity);
 	                    
-                    	updateAssuranceOnAccept(entity);
+	                	if (MinistryStatus.ACCEPTED.getValue().equals(updatedStatus)) {
+	                		updateAssuranceOnAccept(entity);
+	                	}
 	                    
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
 
 	            case "Other Request":
 	                return otherRequestRepository.findById(id).map(entity -> {
-	                    //if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
-	                    if (updateDto.getStatusForMinistry() != null) {
-	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
-	                    }	                    
-	                    otherRequestRepository.save(entity);
+	                    
+	                	OtherRequestMapper.updateEntityForReturnOrAccept(updateDto, entity); 
+
+	                	otherRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
 
 	            case "Dropping Request":
 	                return droppingRequestRepository.findById(id).map(entity -> {
 	                    
-	                    //if (updateDto.getRemarks() != null) entity.setRemarks(updateDto.getRemarks());
-	                    if (updateDto.getStatusForMinistry() != null) {
-	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
-	                    }
-	                    
-//                    	if (CgaStatus.ACCEPTED.getValue().equals(updatedStatus)) {
-//                    		entity.setActualDropDate(LocalDate.now());
-//                    	}
+	                	DroppingRequestMapper.updateEntityForReturnOrAccept(updateDto, entity);
+	                	
                     	droppingRequestRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                }).orElse(null);
@@ -919,6 +915,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	                return clubbedAssuranceRepository.findById(id).map(entity -> {
 	                	
 	                	ClubbedAssuranceMapper.updateEntityForReturnOrAccept(updateDto, entity); 
+	                	System.out.println("***** UPDATED RETURNED ENTITY: " + entity);
 	                	clubbedAssuranceRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                    

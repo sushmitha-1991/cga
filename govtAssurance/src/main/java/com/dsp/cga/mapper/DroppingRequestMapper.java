@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 
 import com.dsp.cga.assurance.droppingrequest.dto.DroppingRequestDTO;
 import com.dsp.cga.assurance.droppingrequest.entity.DroppingRequest;
+import com.dsp.cga.assurance.dto.CommonRequestResponseDTO;
+import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.util.Utils;
 
@@ -103,4 +105,26 @@ public class DroppingRequestMapper {
 			}
 		}
 
+	  public static void updateEntityForReturnOrAccept(CommonRequestResponseDTO dto, DroppingRequest entity) {
+		  
+		  if (!MinistryStatus.RETURNED.getValue().equals(dto.getStatusForMinistry()) 
+			  && !CgaStatus.ACCEPTED.getValue().equals(dto.getStatusForMinistry())) 
+			  return;
+		  
+		  if (MinistryStatus.RETURNED.getValue().equals(dto.getStatusForMinistry())) {
+			  
+			  entity.setStatusForMinistry(MinistryStatus.RETURNED.getValue());
+			  entity.setStatusForCga(MinistryStatus.RETURNED.getValue());
+			  entity.setReturnRemarks(entity.getReturnRemarks());
+			  return;
+		  }
+
+		  if (MinistryStatus.ACCEPTED.getValue().equals(dto.getStatusForMinistry())) {
+			  
+			  entity.setStatusForMinistry(MinistryStatus.ACCEPTED.getValue());
+			  entity.setStatusForCga(MinistryStatus.ACCEPTED.getValue());
+			  return;
+		  }
+
+	  }		
 }

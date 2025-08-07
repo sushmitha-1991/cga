@@ -73,6 +73,9 @@ public class OtherRequests extends Auditable{
 
 		@Column(name = "draft_status")
 		private Boolean draftStatus;
+		
+		@Column(name = "return_remarks")
+		private String returnRemarks; 	
 	    
 	}
 	

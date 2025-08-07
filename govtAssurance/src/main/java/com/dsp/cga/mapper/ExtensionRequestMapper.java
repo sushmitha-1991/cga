@@ -3,9 +3,11 @@ package com.dsp.cga.mapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import com.dsp.cga.assurance.dto.CommonRequestResponseDTO;
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
 import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
+import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
 import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.util.Utils;
@@ -81,6 +83,30 @@ public class ExtensionRequestMapper {
 	                .statusId(dto.getStatusId())
 	                .build();
 	    }
+	    
+	  public static void updateEntityForReturnOrAccept(CommonRequestResponseDTO dto, ExtensionRequest entity) {
+		  
+		  if (!MinistryStatus.RETURNED.getValue().equals(dto.getStatusForMinistry()) 
+			  && !CgaStatus.ACCEPTED.getValue().equals(dto.getStatusForMinistry())) 
+			  return;
+		  
+		  if (MinistryStatus.RETURNED.getValue().equals(dto.getStatusForMinistry())) {
+			  
+			  entity.setStatusForMinistry(MinistryStatus.RETURNED.getValue());
+			  entity.setStatusForCga(MinistryStatus.RETURNED.getValue());
+			  entity.setReturnRemarks(entity.getReturnRemarks());
+			  return;
+		  }
+
+		  if (MinistryStatus.ACCEPTED.getValue().equals(dto.getStatusForMinistry())) {
+			  
+			  entity.setStatusForMinistry(MinistryStatus.ACCEPTED.getValue());
+			  entity.setStatusForCga(MinistryStatus.ACCEPTED.getValue());
+			  return;
+		  }
+
+	  }
+		  
 	}
 
 

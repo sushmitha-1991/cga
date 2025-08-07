@@ -110,4 +110,8 @@ public class DroppingRequest extends Auditable {
 	
 	@Column(name = "status_for_cga")
 	private String statusForCga; 
+	
+	@Column(name = "return_remarks")
+	private String returnRemarks; 	
+	
 }
