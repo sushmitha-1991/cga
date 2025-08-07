@@ -58,7 +58,7 @@ public class ClubbedAssuranceMapper {
 	    
 	  public static void updateEntityForReturnOrAccept(CommonRequestResponseDTO dto, ClubbedAssurance entity) {
 		  
-		  if (!CgaStatus.RETURNED.getValue().equals(dto.getStatusForCga())
+		  if (!CgaStatus.RETURNED.getValue().equals(dto.getStatusForCga()) 
 			  && !CgaStatus.ACCEPTED.getValue().equals(dto.getStatusForCga())) 
 			  return;
 		  

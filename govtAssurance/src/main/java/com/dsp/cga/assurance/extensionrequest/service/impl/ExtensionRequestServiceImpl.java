@@ -918,12 +918,12 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	            case "Clubbed Assurance":
 	                return clubbedAssuranceRepository.findById(id).map(entity -> {
 	                	
-	                	ClubbedAssuranceMapper.updateEntityForReturnOrAccept(updateDto, entity);
+	                	ClubbedAssuranceMapper.updateEntityForReturnOrAccept(updateDto, entity); 
 	                	clubbedAssuranceRepository.save(entity);
 	                    return getRequestById(id, requestType);
 	                    
 	                }).orElse(null);
-	                
+	                 
 	            case "Implementation Request":  // New case added
 	                return implementationRequestRepository.findById(id).map(entity -> {
 	                    if (updateDto.getStatusForMinistry() != null) {
