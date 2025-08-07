@@ -83,21 +83,23 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	public GenericResponse<ClubbedAssuranceDTO> createOrUpdateClubbedAssurance(
 			ClubbedAssuranceDTO clubbedAssuranceDTO) {
 		Optional<ClubbedAssurance> existingAssuranceOpt = clubbedAssuranceRepository
-				.findByAssuranceId(clubbedAssuranceDTO.getAssuranceId());
+				.findById(clubbedAssuranceDTO.getId());
 
 		ClubbedAssurance savedAssurance;
+		System.out.println("******** DTO CA: " + clubbedAssuranceDTO);
 
 		if (existingAssuranceOpt.isPresent()) {
 			ClubbedAssurance existingAssurance = existingAssuranceOpt.get();
-			System.out.println("Existing CA: " + existingAssurance);  
-			System.out.println("DTO CA: " + clubbedAssuranceDTO);
+			System.out.println("********** Existing CA: " + existingAssurance);  
 
 			ClubbedAssuranceMapper.updateEntityFromDTO(clubbedAssuranceDTO, existingAssurance);
 			
-			System.out.println("Updated CA: " + existingAssurance);
+			System.out.println("******** Updated CA: " + existingAssurance);
 
 			savedAssurance = clubbedAssuranceRepository.save(existingAssurance);
 		} else {
+			System.out.println("********** New CA: " );  
+
 			ClubbedAssurance newAssurance = ClubbedAssuranceMapper.toEntity(clubbedAssuranceDTO);
 			savedAssurance = clubbedAssuranceRepository.save(newAssurance);
 		}
