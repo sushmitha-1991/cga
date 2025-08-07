@@ -58,11 +58,11 @@ public class ClubbedAssuranceMapper {
 	    
 	  public static void updateEntityForReturnOrAccept(CommonRequestResponseDTO dto, ClubbedAssurance entity) {
 		  
-		  if (!CgaStatus.RETURNED.getValue().equals(dto.getStatusForCga()) 
+		  if (!MinistryStatus.RETURNED.getValue().equals(dto.getStatusForCga()) 
 			  && !CgaStatus.ACCEPTED.getValue().equals(dto.getStatusForCga())) 
 			  return;
 		  
-		  if (CgaStatus.RETURNED.getValue().equals(dto.getStatusForCga())) {
+		  if (MinistryStatus.RETURNED.getValue().equals(dto.getStatusForCga())) {
 			  
 			  entity.setStatusForMinistry(MinistryStatus.RETURNED.getValue());
 			  entity.setStatusForCga(MinistryStatus.RETURNED.getValue());
@@ -70,7 +70,7 @@ public class ClubbedAssuranceMapper {
 			  return;
 		  }
 
-		  if (CgaStatus.ACCEPTED.getValue().equals(dto.getStatusForCga())) {
+		  if (MinistryStatus.ACCEPTED.getValue().equals(dto.getStatusForCga())) {
 			  
 			  entity.setStatusForMinistry(MinistryStatus.ACCEPTED.getValue());
 			  entity.setStatusForCga(MinistryStatus.ACCEPTED.getValue());
