@@ -82,8 +82,13 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 	@Override
 	public GenericResponse<ClubbedAssuranceDTO> createOrUpdateClubbedAssurance(
 			ClubbedAssuranceDTO clubbedAssuranceDTO) {
-		Optional<ClubbedAssurance> existingAssuranceOpt = clubbedAssuranceRepository
-				.findById(clubbedAssuranceDTO.getId());
+		
+		Optional<ClubbedAssurance> existingAssuranceOpt = null;
+		if (clubbedAssuranceDTO.getId() != null) {
+			existingAssuranceOpt = clubbedAssuranceRepository.findById(clubbedAssuranceDTO.getId());
+		} else if (clubbedAssuranceDTO.getAssuranceId() != null) {
+			existingAssuranceOpt = clubbedAssuranceRepository.findByAssuranceId(clubbedAssuranceDTO.getAssuranceId());
+		}
 
 		ClubbedAssurance savedAssurance;
 		System.out.println("******** DTO CA: " + clubbedAssuranceDTO);

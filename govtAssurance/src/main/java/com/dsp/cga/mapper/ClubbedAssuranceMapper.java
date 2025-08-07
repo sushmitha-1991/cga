@@ -2,6 +2,8 @@ package com.dsp.cga.mapper;
 
 import com.dsp.cga.assurance.clubbedassurance.dto.ClubbedAssuranceDTO;
 import com.dsp.cga.assurance.clubbedassurance.entity.ClubbedAssurance;
+import com.dsp.cga.assurance.dto.CommonRequestResponseDTO;
+import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.util.Utils;
 
@@ -43,5 +45,38 @@ public class ClubbedAssuranceMapper {
 	        }
 	       
 	        // Add other fields here if needed.
-	    }
+	        entity.setDraftStatus(dto.getDraftStatus());
+	        if (MinistryStatus.RETURNED.getValue().equals(dto.getStatusForMinistry()) || 
+	        		CgaStatus.RETURNED.getValue().equals(dto.getStatusForMinistry())) {
+	        	entity.setStatusForMinistry(MinistryStatus.RETURNED.getValue());
+	        	entity.setStatusForCga(MinistryStatus.RETURNED.getValue());
+	        } else {
+	        	entity.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
+	        	entity.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+	        }	
+	  }
+	    
+	  public static void updateEntityForReturnOrAccept(CommonRequestResponseDTO dto, ClubbedAssurance entity) {
+		  
+		  if (!CgaStatus.RETURNED.getValue().equals(dto.getStatusForCga())
+			  && !CgaStatus.ACCEPTED.getValue().equals(dto.getStatusForCga())) 
+			  return;
+		  
+		  if (CgaStatus.RETURNED.getValue().equals(dto.getStatusForCga())) {
+			  
+			  entity.setStatusForMinistry(MinistryStatus.RETURNED.getValue());
+			  entity.setStatusForCga(MinistryStatus.RETURNED.getValue());
+			  entity.setReturnRemarks(entity.getReturnRemarks());
+			  return;
+		  }
+
+		  if (CgaStatus.ACCEPTED.getValue().equals(dto.getStatusForCga())) {
+			  
+			  entity.setStatusForMinistry(MinistryStatus.ACCEPTED.getValue());
+			  entity.setStatusForCga(MinistryStatus.ACCEPTED.getValue());
+			  return;
+		  }
+
+	  }
+	  
 }

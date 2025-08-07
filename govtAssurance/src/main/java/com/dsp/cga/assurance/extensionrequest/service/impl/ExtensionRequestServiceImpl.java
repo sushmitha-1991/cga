@@ -68,6 +68,7 @@ import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.eunms.MopaStatus;
 import com.dsp.cga.eunms.RequestType;
 import com.dsp.cga.exception.ResourceNotFoundException;
+import com.dsp.cga.mapper.ClubbedAssuranceMapper;
 import com.dsp.cga.mapper.ExtensionRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.repository.HousesRepository;
@@ -916,14 +917,11 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 
 	            case "Clubbed Assurance":
 	                return clubbedAssuranceRepository.findById(id).map(entity -> {
-	                    if (updateDto.getStatusForMinistry() != null) {
-	                    	entity.setStatusForMinistry(updateDto.getStatusForMinistry());
-	                    	entity.setStatusForCga(updateDto.getStatusForMinistry());
-                        }
-	                    
-	                    // Add more fields if required
-	                    clubbedAssuranceRepository.save(entity);
+	                	
+	                	ClubbedAssuranceMapper.updateEntityForReturnOrAccept(updateDto, entity);
+	                	clubbedAssuranceRepository.save(entity);
 	                    return getRequestById(id, requestType);
+	                    
 	                }).orElse(null);
 	                
 	            case "Implementation Request":  // New case added
