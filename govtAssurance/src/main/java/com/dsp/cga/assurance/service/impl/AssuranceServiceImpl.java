@@ -232,7 +232,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 		assurance.getSupplementary().forEach(supplementary -> {
 			supplementary.setAssurance(assurance); // Link Assurance to Supplementary
 		});
-
+		assurance.setDraftStatus(false);
 		Assurance savedAssurance = assuranceRepository.save(assurance);
 
 		if (assuranceDTO.getDraftId()!=null)
