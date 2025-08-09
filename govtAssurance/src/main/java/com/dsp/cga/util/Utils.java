@@ -61,6 +61,13 @@ public class Utils {
 
 	private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 	
+	public final static String draftMsg = "{0} for Assurance {1} has been saved as Draft successfully";
+	
+	public final static String createMsg = "{0} for Assurance {1} has been created successfully";
+	
+	public final static String updateMsg = "{0} for Assurance {1} has been updated successfully";
+	
+	
 	public Long getUserIdFromAuthentication() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {

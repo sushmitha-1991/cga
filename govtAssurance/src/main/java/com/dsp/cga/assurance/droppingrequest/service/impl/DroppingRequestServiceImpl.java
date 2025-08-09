@@ -1,5 +1,6 @@
 package com.dsp.cga.assurance.droppingrequest.service.impl;
 
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import org.springframework.data.domain.Sort;
 
@@ -11,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,7 @@ import com.dsp.cga.assurance.entity.Departments;
 import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.extensionrequest.dto.ExtensionRequestDTO;
 import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
+import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.service.impl.ImplemantationRequestServiceImpl;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
@@ -102,6 +105,8 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 
 	@Autowired
 	private Utils util;
+	
+
 	
 	@Override
 	public DroppingRequestDTO getDroppingRequestByAssuranceId(Long id) {
@@ -238,9 +243,30 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 
 		DroppingRequestDTO savedDTO = DroppingRequestMapper.toDTO(savedRequest);
 		return new GenericResponse<>(HttpStatus.CREATED.value(), true,
-				"DroppingRequest created or updated successfully", savedDTO);
+				generateResponseMsg(droppingRequestDTO, savedDTO.getAssuranceNo()), savedDTO);
 	}
 
+	
+	private String generateResponseMsg (DroppingRequestDTO input, String assuranceNo) {
+		
+		log.debug("REQ for MSG: " + input);
+
+		if (input == null) return "Success";
+		boolean isDraft = input.getDraftStatus();
+		String response = isDraft ? Utils.draftMsg : Utils.createMsg;
+		
+		if (!isDraft && input.getId() != null) response = Utils.updateMsg;
+		
+		if (StringUtils.isEmpty(assuranceNo)) {
+			assuranceNo = assuranceRepository.findAssuranceNoById(input.getAssuranceId());
+			input.setAssuranceNo(assuranceNo);
+		}
+		log.debug("Assurance No: " + input.getAssuranceNo());
+		
+		String finalMsg = MessageFormat.format(response, "Dropping request", input.getAssuranceNo());
+
+		return finalMsg;
+	}
 
 	@Override
 	public List<AssuranceDroppingResponseDTO> getFilteredDroppingRequests(Long sessionNo,

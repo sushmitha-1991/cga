@@ -1,5 +1,6 @@
 package com.dsp.cga.assurance.clubbedassurance.service.impl;
 
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import org.springframework.data.domain.Sort;
 
@@ -30,6 +31,7 @@ import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.entity.Departments;
 import com.dsp.cga.assurance.entity.Ministries;
+import com.dsp.cga.assurance.otherRequests.dto.OtherRequestDTO;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
@@ -111,34 +113,31 @@ public class ClubbedAssuranceServiceImpl implements ClubbedAssuranceService {
 
 		ClubbedAssuranceDTO savedDTO = ClubbedAssuranceMapper.toDTO(savedAssurance);
 		return new GenericResponse<>(HttpStatus.CREATED.value(), true,
-				"Clubbed Assurance created or updated successfully", savedDTO);
+				generateResponseMsg(clubbedAssuranceDTO, savedDTO.getAssuranceNo()), savedDTO);
 	}
 
-//	@Override
-//	public ClubbedAssuranceDTO getClubbedAssuranceByAssuranceId(Long id) {
-//	    // Fetch ClubbedAssurance by Assurance ID
-//	    ClubbedAssurance clubbedAssurance = clubbedAssuranceRepository.findByAssuranceId(id).orElse(null);
-//
-//	    // If no record is found, return null and log the message
-//	    if (clubbedAssurance == null) {
-//	       // log.debug("No ClubbedAssurance found for Assurance ID: {}", id);
-//	        return null; // Return null to handle at the controller level with a custom message
-//	    }
-//
-//	    // Fetch additional Assurance data
-////	    Assurance assurance = assuranceRepository.findById(id).orElse(null);
-////	    String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
-//
-//	    // Map the ClubbedAssurance entity to DTO
-//	    ClubbedAssuranceDTO dto = ClubbedAssuranceMapper.toDTO(clubbedAssurance);
-//	   // dto.setAssuranceNo(assuranceNo);
-//
-//	    // Populate additional data if available
-//	  //  dto.setAdditionalData(fetchAdditionalData(clubbedAssurance.getAdditionalFieldId()));
-//
-//	   // log.debug("Returning ClubbedAssuranceDTO: {}", dto);
-//	    return dto;
-//	}
+	private String generateResponseMsg(ClubbedAssuranceDTO req, String assuranceNo) {
+
+		log.debug("REQ for MSG: " + req);
+
+		if (req == null)
+			return "Success";
+		boolean isDraft = req.getDraftStatus();
+		String response = isDraft ? Utils.draftMsg : Utils.createMsg;
+
+		if (!isDraft && req.getId() != null) response = Utils.updateMsg;
+		
+		if (StringUtils.isEmpty(assuranceNo)) {
+			assuranceNo = assuranceRepository.findAssuranceNoById(req.getAssuranceId());
+			req.setAssuranceNo(assuranceNo);
+		}
+		log.debug("Assurance No: " + req.getAssuranceNo());
+
+		String finalMsg = MessageFormat.format(response, "Clubbing request", req.getAssuranceNo());
+
+		return finalMsg;
+	}
+	
 
 	@Override
 	public List<ClubbedAssuranceDTO> getClubbedAssurancesByAssuranceId(Long assuranceId) {

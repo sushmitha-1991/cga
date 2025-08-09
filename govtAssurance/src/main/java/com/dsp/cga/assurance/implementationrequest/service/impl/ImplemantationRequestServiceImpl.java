@@ -1,13 +1,11 @@
 package com.dsp.cga.assurance.implementationrequest.service.impl;
 
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import org.springframework.data.domain.Sort;
 
-
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
-
 import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -33,19 +31,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.dsp.cga.assurance.clubbedassurance.repository.ClubbedAssuranceRepository;
 import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepository;
-import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.CommitteeDecisionDTO;
 import com.dsp.cga.assurance.dto.ImplementationTypeDTO;
 import com.dsp.cga.assurance.dto.MemberDTO;
 import com.dsp.cga.assurance.dto.SerialNumberRequest;
 import com.dsp.cga.assurance.dto.SerialNumberResponse;
-import com.dsp.cga.assurance.dto.SessionDTO;
-import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.entity.Departments;
@@ -55,12 +49,9 @@ import com.dsp.cga.assurance.implementationrequest.dto.AssuranceImplementationDT
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.Application;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
-import com.dsp.cga.assurance.implementationrequest.repository.ApplicationInstanceRepository;
 import com.dsp.cga.assurance.implementationrequest.repository.ApplicationRepository;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
-import com.dsp.cga.assurance.otherRequests.dto.OtherRequestDTO;
-import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
 import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
@@ -70,7 +61,6 @@ import com.dsp.cga.assurance.repository.MasterLSSRepository;
 import com.dsp.cga.assurance.repository.MastersRSSRepository;
 import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
-import com.dsp.cga.assurance.service.impl.AssuranceServiceImpl;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.entity.MastersLokSabhaSession;
@@ -80,15 +70,10 @@ import com.dsp.cga.eunms.Entities;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.eunms.MopaStatus;
 import com.dsp.cga.exception.ResourceNotFoundException;
-import com.dsp.cga.mapper.DroppingRequestMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.util.Utils;
 
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import jakarta.servlet.http.HttpServletRequest;
 
 
@@ -136,10 +121,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	private OtherRequestRepository otherRequestRepo;
 	
 	@Autowired
-	private ApplicationInstanceRepository applicationInstanceRepository;
-	
-	
-	@Autowired
 	private PersonalDetailsRepository personalDetailsRepository;
 	
 	@Autowired
@@ -169,13 +150,11 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 			return null;
 		}
 		
-		
 		// Convert DTO to Entity
 	    ImplementationRequest implementationRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
-	    System.out.println("Implementation request created");
+	    System.out.println("Implementation request created " + implementationRequest);
 	    
 	    // Get house ID (Lok Sabha or Rajya Sabha)
-	    Long houseId = getHouseId();
 	    String houseAbbr = util.getHouseAbbr();
 	    
 	    SerialNumberRequest serialNumberRequest = new SerialNumberRequest();
@@ -195,7 +174,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 		    System.out.println("Assurance found");
 
 	        Assurance assurance = optionalAssurance.get();
-
+	        
 	        if (Utils.RAJYA_SABHA.equals(houseAbbr)) { // Rajya Sabha
 			    System.out.println("In RS");
 
@@ -238,34 +217,29 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        throw new ResourceNotFoundException("Assurance not found with ID: " + implementationRequest.getAssuranceId());
 	    }
 
-	    // Set content fields
-	    if (implementationRequest.getLayingDate() != null) {
-	        implementationRequest.setDocumentDate(implementationRequest.getLayingDate());
-	    } else if (implementationRequest.getDateOfImplementation() != null) {
-	        implementationRequest.setDocumentDate(implementationRequest.getDateOfImplementation());
-	    }
-	    implementationRequest.setCurrentStatus(implementationRequest.getStatusForMinistry());
+		// Set content fields
+		if (implementationRequest.getLayingDate() != null) {
+			implementationRequest.setDocumentDate(implementationRequest.getLayingDate());
+		} else if (implementationRequest.getDateOfImplementation() != null) {
+			implementationRequest.setDocumentDate(implementationRequest.getDateOfImplementation());
+		}
+		implementationRequest.setCurrentStatus(implementationRequest.getStatusForMinistry());
 //	    implementationRequest.setRefId(implementationRequest.getId());
 //	    System.out.println("***********refId" + implementationRequest.getId());
-	    implementationRequest.setApplicationId(optionalApp.get().getId());
-	    System.out.println("saving Implementation");
+		implementationRequest.setApplicationId(optionalApp.get().getId());
+		System.out.println("saving Implementation");
 
-	    // Save to DB
-	    ImplementationRequest saved = implementationRequestRepository.save(implementationRequest);
-	    System.out.println("Implementation saved");
+		// Save to DB
+		ImplementationRequest saved = implementationRequestRepository.save(implementationRequest);
+		System.out.println("Implementation saved");
 
-	    saved.setRefId(saved.getId());
+		saved.setRefId(saved.getId());
 
-	 // Save again to persist the refId update
-	 saved = implementationRequestRepository.save(saved);
-
-	    return ImplementationRequestMapper.toDTO(saved);
+		// Save again to persist the refId update
+		saved = implementationRequestRepository.save(saved);
+	
+		return ImplementationRequestMapper.toDTO(saved);
 	}
-
-
-
-
-
 
 	
 	public SerialNumberResponse generateSerialNumber(SerialNumberRequest request) {
@@ -343,7 +317,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	    Optional<ImplementationRequest> existingRequestOpt = implementationRequestRepository
 	            .findByAssuranceId(implementationRequestDTO.getAssuranceId());
 
-	    ImplementationRequest savedRequest;
+	    ImplementationRequest savedRequest = null;
 	    ImplementationRequestDTO savedDTO = null;  
  
 	    if (existingRequestOpt.isPresent()) {
@@ -394,21 +368,43 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 //	        
 //	    }
 //
-//	    // Convert saved entity to DTO
-//	    ImplementationRequestDTO savedDTO = ImplementationRequestMapper.toDTO(savedRequest);
-//
+	    // Convert saved entity to DTO
+	    if (savedDTO == null) {
+	    	savedDTO = ImplementationRequestMapper.toDTO(savedRequest);
+	    }
+	    
 //	    // Set fetched ImplementationTypeDTO in the response DTO
 //	    savedDTO.setImplementationTypeDTO(implementationRequestDTO.getImplementationTypeDTO());
 //	    savedDTO.setCommitteeDecisionDTO(implementationRequestDTO.getCommitteeDecisionDTO());
 
 	    // Return response
 		System.out.println("Response returned");
-
-	    return new GenericResponse<>(HttpStatus.CREATED.value(), true, "Success", savedDTO);
+		
+	    return new GenericResponse<>(HttpStatus.CREATED.value(), true, 
+	    		generateResponseMsg(implementationRequestDTO, savedDTO.getAssuranceNo()), savedDTO);
 	}
 
 
+	private String generateResponseMsg (ImplementationRequestDTO req, String assuranceNo) {
+		
+		log.debug("REQ for MSG: " + req);
 
+		if (req == null) return "Success";
+		boolean isDraft = req.getDraftStatus();
+		String response = isDraft ? Utils.draftMsg : Utils.createMsg;
+
+		if (!isDraft && req.getId() != null) response = Utils.updateMsg;
+		
+		if (StringUtils.isEmpty(assuranceNo)) {
+			assuranceNo = assuranceRepository.findAssuranceNoById(req.getAssuranceId());
+			req.setAssuranceNo(assuranceNo);
+		}
+		log.debug("Assurance No: " + req.getAssuranceNo());
+		
+		String finalMsg = MessageFormat.format(response, "Implementation request", req.getAssuranceNo());
+
+		return finalMsg;
+	}
 
 
 
@@ -790,7 +786,6 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	@Override
 	public AssuranceImplementationDTO updateImplementationRequest(Long id, ImplementationRequestDTO dto) {
-	    Long houseId = getHouseId();
 
 	    Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(id);
 	    if (optionalRequest.isEmpty()) return null;
@@ -1129,117 +1124,94 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	@Override
 	public AssuranceImplementationDTO updateImplementationRequestforMinistryStatusById(Long id,
 			ImplementationRequestDTO dto) {
-		  Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(id);
-		    if (optionalRequest.isEmpty()) return null;
+		Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(id);
+		if (optionalRequest.isEmpty())
+			return null;
 
-		    ImplementationRequest implReq = optionalRequest.get();
-		    
-		   
-		    if (dto.getRemarks() != null) {
-		    	implReq.setRemarks(dto.getRemarks()); // still updating remarks in Assurance (if required)
-		    }
-		    
-		    // When returned by MoPA to Ministry
-		    if (!StringUtils.isEmpty(dto.getStatusForMinistry()) && 
-		    						 MinistryStatus.RETURNED.getValue().equalsIgnoreCase(dto.getStatusForMinistry())) {
-		    	System.out.println(dto.getStatusForMinistry());
-		    	
-		    	implReq.setStatusForMinistry(dto.getStatusForMinistry()); 		    	
-		    	implReq.setReturnFrom("Mopa");		    	
-		    	implReq.setStatusForMopa(MopaStatus.RETURNED.getValue());
-		    }
-		    
-		    // When sending to LS / RS
-		    if (StringUtils.isEmpty(dto.getStatusForMinistry()) && !StringUtils.isEmpty(dto.getSendTo())) {
-		    	implReq.setSendTo(dto.getSendTo());
-		    	implReq.setStatusForMopa(MopaStatus.IN_PROGRESS.getValue());
-		    	implReq.setStatusForCga(CgaStatus.RECEIVED.getValue());
-		    	// Ministry status remains unchanged - SUBMITTED
-		    }
-		    
-		    implementationRequestRepository.save(implReq);
-		    //assuranceRepository.save(assurance); // only if remarks changed
+		ImplementationRequest implReq = optionalRequest.get();
 
-		    return getImplementationDetailById(id);
+		if (dto.getRemarks() != null) {
+			implReq.setRemarks(dto.getRemarks()); // still updating remarks in Assurance (if required)
 		}
-	
 
-//	@Override
-//	public List<AssuranceImplementationDTO> getRequestsReturnedToMinistry(String houseAbbr) {
-//
-//		List<ImplementationRequest> implRequests = implementationRequestRepository
-//													.findByStatusForMinistryAndReturnFrom("Returned", "CGA");
-//
-//	    List<AssuranceImplementationDTO> dtoList = new ArrayList<>();
-//
-//	    for (ImplementationRequest impl : implRequests) {
-//	        
-//	    	Assurance assurance = assuranceRepository.findById(impl.getAssuranceId()).orElse(null);
-//	        
-//	    	if (assurance != null) {
-//
-//	        	dtoList.add(buildImplementationDTO(assurance, impl));
-//	        
-//	        }
-//	    }
-//
-//	    return dtoList;
-//	}
+		// When returned by MoPA to Ministry
+		if (!StringUtils.isEmpty(dto.getStatusForMinistry())
+				&& MinistryStatus.RETURNED.getValue().equalsIgnoreCase(dto.getStatusForMinistry())) {
+			System.out.println(dto.getStatusForMinistry());
 
-	@Override
-	public AssuranceImplementationDTO sendToCga (ImplementationRequestDTO dto) {
-		
-		Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(dto.getId());
-		
-		if (optionalRequest.isEmpty()) return null;
+			implReq.setStatusForMinistry(dto.getStatusForMinistry());
+			implReq.setReturnFrom("Mopa");
+			implReq.setStatusForMopa(MopaStatus.RETURNED.getValue());
+		}
 
-	    ImplementationRequest implReq = optionalRequest.get();
-		    
-    	implReq.setSendTo(dto.getSendTo());
-    	implReq.setStatusForMopa(MopaStatus.IN_PROGRESS.getValue());
-    	implReq.setStatusForCga(CgaStatus.RECEIVED.getValue());
-    	// Ministry status remains unchanged - SUBMITTED
-		    
-	    implementationRequestRepository.save(implReq);
+		// When sending to LS / RS
+		if (StringUtils.isEmpty(dto.getStatusForMinistry()) && !StringUtils.isEmpty(dto.getSendTo())) {
+			implReq.setSendTo(dto.getSendTo());
+			implReq.setStatusForMopa(MopaStatus.IN_PROGRESS.getValue());
+			implReq.setStatusForCga(CgaStatus.RECEIVED.getValue());
+			// Ministry status remains unchanged - SUBMITTED
+		}
 
-	    return getImplementationDetailById(dto.getId());
+		implementationRequestRepository.save(implReq);
+		// assuranceRepository.save(assurance); // only if remarks changed
+
+		return getImplementationDetailById(id);
 	}
+	
+	@Override
+	public AssuranceImplementationDTO sendToCga(ImplementationRequestDTO dto) {
 
+		Optional<ImplementationRequest> optionalRequest = implementationRequestRepository.findById(dto.getId());
+
+		if (optionalRequest.isEmpty())
+			return null;
+
+		ImplementationRequest implReq = optionalRequest.get();
+
+		implReq.setSendTo(dto.getSendTo());
+		implReq.setStatusForMopa(MopaStatus.IN_PROGRESS.getValue());
+		implReq.setStatusForCga(CgaStatus.RECEIVED.getValue());
+		// Ministry status remains unchanged - SUBMITTED
+
+		implementationRequestRepository.save(implReq);
+
+		return getImplementationDetailById(dto.getId());
+	}
 	  
 	@Override
-	@Transactional (readOnly = true)
-	public ImplementationRequestDTO getAcceptedRequest (Long assuranceId) {
-		
-	    // Fetch the list of ExtensionRequest entities by Assurance ID
+	@Transactional(readOnly = true)
+	public ImplementationRequestDTO getAcceptedRequest(Long assuranceId) {
+
+		// Fetch the list of ExtensionRequest entities by Assurance ID
 		ImplementationRequest implRequest = implementationRequestRepository.getAcceptedRequest(assuranceId);
 
-	    // If no records are found, log the message and return an empty list
-	    if (implRequest == null) {
-	        log.debug("No Other Request found for Assurance ID: {}", assuranceId);
-	        return null;
-	    }
+		// If no records are found, log the message and return an empty list
+		if (implRequest == null) {
+			log.debug("No Other Request found for Assurance ID: {}", assuranceId);
+			return null;
+		}
 
-	    // Fetch Assurance to get the assuranceNo
-	    //Assurance assurance = assuranceRepository.findById(assuranceId).orElse(null);
-	    Assurance assurance = implRequest.getAssurance();
-	    	String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
+		// Fetch Assurance to get the assuranceNo
+		// Assurance assurance = assuranceRepository.findById(assuranceId).orElse(null);
+		Assurance assurance = implRequest.getAssurance();
+		String assuranceNo = (assurance != null) ? assurance.getAssuranceNo() : null;
 
-	    // Map the list of entities to a list of DTOs and set the assuranceNo in DTO
-	    ImplementationRequestDTO dto = ImplementationRequestMapper.toDTO(implRequest);
-        dto.setAssuranceNo(assuranceNo);        
+		// Map the list of entities to a list of DTOs and set the assuranceNo in DTO
+		ImplementationRequestDTO dto = ImplementationRequestMapper.toDTO(implRequest);
+		dto.setAssuranceNo(assuranceNo);
 
-	    if (implRequest.getImplementationTypeId() != null) {
-	    	dto.setImplementationTypeDTO(fetchImplementationTypeData(implRequest.getImplementationTypeId()));
-	    }
-	    // Populate additional data if available
-	    if (implRequest.getCommitteeDecisionId() != null) {
-	    	dto.setCommitteeDecisionDTO(fetchCommitteeDecisionData(implRequest.getCommitteeDecisionId()));
-	    }
-	    log.debug("Returning ImplementationRequestDTO: {}", dto);
-	    
-        return dto;
+		if (implRequest.getImplementationTypeId() != null) {
+			dto.setImplementationTypeDTO(fetchImplementationTypeData(implRequest.getImplementationTypeId()));
+		}
+		// Populate additional data if available
+		if (implRequest.getCommitteeDecisionId() != null) {
+			dto.setCommitteeDecisionDTO(fetchCommitteeDecisionData(implRequest.getCommitteeDecisionId()));
+		}
+		log.debug("Returning ImplementationRequestDTO: {}", dto);
 
-	}		
+		return dto;
+
+	}	
 	
 }
 

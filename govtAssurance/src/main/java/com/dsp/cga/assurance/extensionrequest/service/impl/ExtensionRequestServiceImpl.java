@@ -1,5 +1,6 @@
 package com.dsp.cga.assurance.extensionrequest.service.impl;
 
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import org.springframework.data.domain.Sort;
 
@@ -50,6 +51,7 @@ import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.impl.ImplementationRequestSpecification;
+import com.dsp.cga.assurance.otherRequests.dto.OtherRequestDTO;
 import com.dsp.cga.assurance.otherRequests.entity.OtherRequests;
 import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
@@ -255,13 +257,30 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 									 List<ExtensionRequestDTO> savedDTOs) {
 		
 		ExtensionRequestDTO er = extensionRequestDTOList.get(0);
-		String desc = er.getId() == null ? "Created" : "Updated";
-		boolean draft = er.getDraftStatus();
-		
-		
-		return "Extension Requests created or updated successfully";
+		return generateResponseMsg (er, savedDTOs.get(0).getAssuranceNo());
 	}
-	
+
+	private String generateResponseMsg(ExtensionRequestDTO req, String assuranceNo) {
+
+		log.debug("REQ for MSG: " + req);
+
+		if (req == null) return "Success";
+		
+		boolean isDraft = req.getDraftStatus();
+		String response = isDraft ? Utils.draftMsg : Utils.createMsg;
+
+		if (!isDraft && req.getId() != null) response = Utils.updateMsg;
+		
+		if (StringUtils.isEmpty(assuranceNo)) {
+			assuranceNo = assuranceRepository.findAssuranceNoById(req.getAssuranceId());
+			req.setAssuranceNo(assuranceNo);
+		}
+		log.debug("Assurance No: " + req.getAssuranceNo());
+
+		String finalMsg = MessageFormat.format(response, "Extension request", req.getAssuranceNo());
+
+		return finalMsg;
+	}	
 	
 	private StatusDTO fetchStatusData(Long statusId) {
 		String statusServiceUrl = codeServiceUrl + statusId;
