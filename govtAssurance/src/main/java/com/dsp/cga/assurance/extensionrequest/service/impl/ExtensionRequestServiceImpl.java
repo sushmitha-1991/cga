@@ -1351,7 +1351,8 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 		dto.setFromMinistry(req.getFromMinistry());
 		dto.setStatusForMinistry(req.getStatusForMinistry());
 		dto.setStatusForCga(req.getStatusForCga());
-		dto.setDate(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null);
+//		dto.setDate(req.getCreatedAt() != null ? req.getCreatedAt().toLocalDate() : null);
+		dto.setDate(req.getDate());
 
 		dto.setClubbedAssuranceIds(req.getClubbedAssuranceIds());
 		
