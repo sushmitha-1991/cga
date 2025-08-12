@@ -444,11 +444,19 @@ public class OtherRequestServiceImpl implements OtherRequestService {
 	        existing.setSubject(dto.getOtherSubject());
 	    }
 	    existing.setDraftStatus(dto.getDraftStatus());
-		existing.setStatusForMinistry(
-				dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
-		existing.setStatusForCga(
-				dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
-
+		
+        // If Accepted, Status not to be updated. Else update. 
+        if (!CgaStatus.ACCEPTED.getValue().equals(existing.getStatusForCga())) {
+        	existing.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
+        	existing.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+        }
+	    
+//	    existing.setStatusForMinistry(
+//				dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
+//		existing.setStatusForCga(
+//				dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+		
+		
 	    OtherRequests updated = otherRequestRepo.save(existing);
 
 	    return OtherRequestDTO.builder()

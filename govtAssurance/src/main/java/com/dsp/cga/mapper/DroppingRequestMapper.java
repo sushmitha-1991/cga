@@ -97,10 +97,12 @@ public class DroppingRequestMapper {
 				entity.setSession(dto.getSession());
 				entity.setRemarks(dto.getRemarks());
 				entity.setDraftStatus(entity.getDraftStatus());
-				entity.setStatusForMinistry(
-						dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
-				entity.setStatusForCga(
-						dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+				
+	            // If Accepted, Status not to be updated. Else update. 
+	            if (!CgaStatus.ACCEPTED.getValue().equals(entity.getStatusForCga())) {
+		            entity.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
+					entity.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+	            }
 
 			}
 		}

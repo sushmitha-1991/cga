@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import com.dsp.cga.assurance.implementationrequest.dto.ImplementationRequestDTO;
 import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
+import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.util.Utils;
 
@@ -96,8 +97,14 @@ public class ImplementationRequestMapper {
         entity.setDetailsOfImplementation(dto.getDetailsOfImplementation());
         entity.setDueDateOfImplementation(dto.getDueDateOfImplementation());
         entity.setRemarks(dto.getRemarks());
-        entity.setStatusForMinistry(getStatusForMinistry(dto.getDraftStatus()));
-        entity.setStatusForMopa(getStatusForMopa(dto));
+        
+        // If Accepted, Status not to be updated. Else update. 
+        if (!CgaStatus.ACCEPTED.getValue().equals(entity.getStatusForCga())) {
+            entity.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
+			entity.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+        }
+//        entity.setStatusForMinistry(getStatusForMinistry(dto.getDraftStatus()));
+//        entity.setStatusForMopa(getStatusForMopa(dto));
         
     }
     
