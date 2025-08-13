@@ -42,6 +42,9 @@ public class ClubbedAssuranceMapper {
 	        if (dto.getAssuranceId() != null) {
 	            entity.setAssuranceId(dto.getAssuranceId());
 	        }
+	        
+	        entity.setDate(dto.getDate());
+	        
 	        if (dto.getClubbedAssuranceIds() != null) {
 	            entity.setClubbedAssuranceIds(dto.getClubbedAssuranceIds());
 	        }
