@@ -1,5 +1,6 @@
 package com.dsp.cga.report.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +22,7 @@ public class ReportServiceImpl implements ReportService {
 	private ReportRepository reportRepo;
 
 	@Override
-	public List<ImplementationReportResponseDto> getImplementationReport(LocalDateTime fromDate,LocalDateTime toDate) {
+	public List<ImplementationReportResponseDto> getImplementationReport(LocalDate fromDate,LocalDate toDate) {
 //		fromDate.isEmpty() || toDate.isEmpty() || 
 		if (fromDate == null || toDate == null) {
 			throw new IllegalArgumentException("fromDate/toDate must not be blank");

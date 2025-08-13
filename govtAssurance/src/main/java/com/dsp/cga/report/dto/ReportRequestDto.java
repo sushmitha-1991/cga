@@ -1,5 +1,6 @@
 package com.dsp.cga.report.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import lombok.AccessLevel;
@@ -10,6 +11,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level=AccessLevel.PRIVATE)
 public class ReportRequestDto {
 
-	LocalDateTime fromDate;
-	LocalDateTime toDate;
+	LocalDate fromDate;
+	LocalDate toDate;
 }

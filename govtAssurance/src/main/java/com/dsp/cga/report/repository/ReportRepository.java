@@ -1,5 +1,6 @@
 package com.dsp.cga.report.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,12 +16,12 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 
 	@Query(value = """
 			select
-			    ca.assurance_no AS "assuranceNo",
-			    mc.code AS "questionType",
-			    ca.question_no AS "questionNo",
-			    ca.subject AS "subject",
-			    mm.ministry_name AS "ministry",
-			    cir.laying_date AS "layingDate",
+			    ca.assurance_no AS assuranceNo,
+			    mc.code AS questionType,
+			    ca.question_no AS questionNo,
+			    ca.subject AS subject,
+			    mm.ministry_name AS ministry,
+			    cir.laying_date AS layingDate,
 			    TO_CHAR(cir.created_at, 'YYYY-MM-DD HH24:MI:SS') AS "createdOn"
 			from cga.implementation_requests cir
 			join cga.assurance ca on ca.id = cir.assurance_id
@@ -29,8 +30,7 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			WHERE cir.created_at >= :fromDate 
 			AND cir.created_at <= :toDate
 			""", nativeQuery = true)
-	List<Object[]> fetchImplementationReports(LocalDateTime fromDate,
-			 LocalDateTime toDate);
+	List<Object[]> fetchImplementationReports(LocalDate fromDate, LocalDate toDate);
 	
 //	@Param("toDate")
 //	where cir.created_at between :fromDate and :toDate

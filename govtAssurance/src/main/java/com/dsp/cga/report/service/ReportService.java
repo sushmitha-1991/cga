@@ -8,5 +8,5 @@ import com.dsp.cga.report.dto.ImplementationReportResponseDto;
 
 public interface ReportService {
 
-	public List<ImplementationReportResponseDto> getImplementationReport(LocalDateTime fromDate,LocalDateTime toDate);
+	public List<ImplementationReportResponseDto> getImplementationReport(LocalDate fromDate, LocalDate  toDate);
 }
