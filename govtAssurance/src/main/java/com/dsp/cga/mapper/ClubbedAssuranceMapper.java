@@ -49,21 +49,23 @@ public class ClubbedAssuranceMapper {
 	            entity.setClubbedAssuranceIds(dto.getClubbedAssuranceIds());
 	        }
 	       
-	        // Add other fields here if needed.
+//	         Add other fields here if needed.
 	        entity.setDraftStatus(dto.getDraftStatus());
-	        if (MinistryStatus.RETURNED.getValue().equals(dto.getStatusForMinistry()) || 
-	        		CgaStatus.RETURNED.getValue().equals(dto.getStatusForMinistry())) {
-	        	entity.setStatusForMinistry(MinistryStatus.RETURNED.getValue());
-	        	entity.setStatusForCga(MinistryStatus.RETURNED.getValue());
-	        } else {
-	        	entity.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
-	        	entity.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
-	        }	
-	        
 	        if (!CgaStatus.ACCEPTED.getValue().equals(entity.getStatusForCga())) {
 	            entity.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
 				entity.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
-	        }	        
+	        }	 
+	        
+//	        if (MinistryStatus.RETURNED.getValue().equals(dto.getStatusForMinistry()) || 
+//	        		CgaStatus.RETURNED.getValue().equals(dto.getStatusForMinistry())) {
+//	        	entity.setStatusForMinistry(MinistryStatus.RETURNED.getValue());
+//	        	entity.setStatusForCga(MinistryStatus.RETURNED.getValue());
+//	        } else {
+//	        	entity.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
+//	        	entity.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+//	        }	
+//	        
+       
 	  }
 	    
 	  public static void updateEntityForReturnOrAccept(CommonRequestResponseDTO dto, ClubbedAssurance entity) {
