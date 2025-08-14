@@ -5,12 +5,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dsp.cga.report.dto.ExtensionReportResponseDto;
 import com.dsp.cga.report.dto.ImplementationReportResponseDto;
 import com.dsp.cga.report.dto.ReportRequestDto;
 import com.dsp.cga.report.repository.ReportRepository;
@@ -27,9 +27,6 @@ public class ReportController {
 
 	@Autowired
 	private ReportService reportService;
-	
-	@Autowired
-	private ReportRepository reportRepo;
 
 	
 	 @PostMapping("/get-implementation-report")
@@ -53,14 +50,25 @@ public class ReportController {
 	        return ResponseEntity.status(HttpStatus.FOUND).body(response);
 	    }
 	 
-	 @GetMapping("/test-id")
-	 public List<Long> testId() {
-	     return reportRepo.testId();
-	 }
+	 @PostMapping("/get-extension-report")
+	    @Operation(summary = "Get Extension report")
+	    @ApiResponses(value = {
+	        @ApiResponse(responseCode = "201", description = "Extension Report created successfully"),
+	        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+	        @ApiResponse(responseCode = "500", description = "Internal server error")
+	    })
+	    public ResponseEntity<GenericResponse<List<ExtensionReportResponseDto>>> getExtensionReport(
+	            @RequestBody ReportRequestDto dto) {
+
+		 List<ExtensionReportResponseDto> result = reportService.getExtensionReport(dto.getFromDate(),dto.getToDate());
+	        GenericResponse<List<ExtensionReportResponseDto>> response = new GenericResponse<>(
+	            HttpStatus.FOUND.value(),
+	            true,
+	            "Extension report fetched successfully",
+	            result
+	        );
+
+	        return ResponseEntity.status(HttpStatus.FOUND).body(response);
+	    }
 	 
-	 @GetMapping("/check-db")
-	 public String checkDb() {
-	     Object[] result = reportRepo.findCurrentDbAndSchema();
-	     return "Database: " + result[0] + ", Schema: " + result[1];
-	 }
 }

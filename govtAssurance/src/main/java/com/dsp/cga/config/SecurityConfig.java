@@ -75,7 +75,7 @@ public class SecurityConfig {
 		log.debug("Configuring SecurityFilterChain");
 
 		http.authorizeHttpRequests(
-				(authz) -> authz.requestMatchers("/cga/v3/api-docs/**", "/cga/swagger-ui/**", "/cga/swagger-ui.html/**","/cga/dsp1/govtAssuranceList","/cga/reports/**")
+				(authz) -> authz.requestMatchers("/cga/v3/api-docs/**", "/cga/swagger-ui/**", "/cga/swagger-ui.html/**","/cga/dsp1/govtAssuranceList")
 						.permitAll().requestMatchers("/**").hasRole("ADMIN").anyRequest().authenticated())
 				.csrf(AbstractHttpConfigurer::disable).authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
