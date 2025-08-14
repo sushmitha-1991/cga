@@ -40,7 +40,14 @@ public class ReportServiceImpl implements ReportService {
 		if (fromDate == null || toDate == null) {
 			throw new IllegalArgumentException("fromDate/toDate must not be blank");
 		}
+		System.out.println("-----------------Inside extension report service----------------");
 		List<ExtensionReportResponseDto> results = reportRepo.fetchExtensionReports(fromDate, addDatePlusOne(toDate));
+		if(results.size()>0) {
+		System.out.println(" result :"+results);}
+		else
+		{
+			System.out.println(" list empty :"+results);
+		}
 		return results.isEmpty() ? Collections.emptyList() : results;
 	}
 }
