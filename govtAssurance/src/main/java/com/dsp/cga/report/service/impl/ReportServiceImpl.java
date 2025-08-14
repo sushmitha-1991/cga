@@ -43,7 +43,7 @@ public class ReportServiceImpl implements ReportService {
                                 row[3] != null ? row[3].toString() : null, // subject
                                 row[4] != null ? row[4].toString() : null, // ministry
                                 row[5] != null ? row[5].toString() : null, // layingDate
-                                row[6] != null ? (DateFormatterUtil.format(row[6].toString())) : null  // createdOn  
+                                row[6] != null ? (DateFormatterUtil.formatDateTime(row[6].toString())) : null  // createdOn  
 //                                row[7] != null ? row[7].toString() : null,
 //                                row[8] != null ? row[8].toString() : null,
 //                                row[9] != null ? row[9].toString() : null,
@@ -53,18 +53,33 @@ public class ReportServiceImpl implements ReportService {
 	}
 	
 	@Override
-	public List<ExtensionReportResponseDto> getExtensionReport(LocalDate fromDate,LocalDate toDate) {
-		if (fromDate == null || toDate == null) {
-			throw new IllegalArgumentException("fromDate/toDate must not be blank");
-		}
+	public List<ExtensionReportResponseDto> getExtensionReport() {
 		System.out.println("-----------------Inside extension report service----------------");
-		List<ExtensionReportResponseDto> results = reportRepo.fetchExtensionReports(fromDate, DateFormatterUtil.addDatePlusOne(today));
+		List<Object[]> results = reportRepo.fetchExtensionReports();
 		if(results.size()>0) {
 		System.out.println(" result :"+results);}
 		else
 		{
 			System.out.println(" list empty :"+results);
 		}
-		return results.isEmpty() ? Collections.emptyList() : results;
+//		return results.isEmpty() ? Collections.emptyList() : results;
+		
+		return results.isEmpty() ? Collections.emptyList() : results.stream()
+                .map(row -> new ExtensionReportResponseDto(
+                				row[0] != null ? row[0].toString() : null, // assuranceNo
+                                row[1] != null ? row[1].toString() : null, // questionType
+                                row[2] != null ? row[2].toString() : null, // questionNo
+                                row[3] != null ? row[3].toString() : null, // subject
+                                row[4] != null ? row[4].toString() : null, // ministry
+                                row[5] != null ? row[5].toString() : null, // extensionNo
+                                row[6] != null ? (DateFormatterUtil.formatDate(row[6].toString())) : null,  // extReqDate  
+                                row[7] != null ? (DateFormatterUtil.formatDate(row[7].toString())) : null, // extGrantDate
+                                row[8] != null ? row[8].toString() : null, //ministryRefNo
+                                row[9] != null ? (DateFormatterUtil.formatDate(row[9].toString())) : null, //ministryRefDate
+                                row[10] != null ? row[10].toString() : null, //extensionRemarks
+                                row[11] != null ? (DateFormatterUtil.formatDateTime(row[11].toString())) : null //updatedOn
+                                		
+                		))
+                .toList();
 	}
 }

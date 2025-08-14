@@ -31,53 +31,40 @@ public class ReportController {
 	@Autowired
 	private ReportService reportService;
 
-	
-	 @PostMapping("/get-implementation-report")
-	    @Operation(summary = "Get Implementation report")
-	    @ApiResponses(value = {
-	        @ApiResponse(responseCode = "201", description = "Implementation Report created successfully"),
-	        @ApiResponse(responseCode = "400", description = "Invalid input data"),
-	        @ApiResponse(responseCode = "500", description = "Internal server error")
-	    })
-	    public ResponseEntity<GenericResponse<List<ImplementationReportResponseDto>>> getImplementationReport(
-	            @RequestBody ReportRequestDto dto) {
+	@PostMapping("/get-implementation-report")
+	@Operation(summary = "Get Implementation report")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "201", description = "Implementation Report created successfully"),
+			@ApiResponse(responseCode = "400", description = "Invalid input data"),
+			@ApiResponse(responseCode = "500", description = "Internal server error") })
+	public ResponseEntity<GenericResponse<List<ImplementationReportResponseDto>>> getImplementationReport(
+			@RequestBody ReportRequestDto dto) {
 
-		 List<ImplementationReportResponseDto> result = reportService.getImplementationReport(dto.getFromDate(),dto.getToDate());
-	        GenericResponse<List<ImplementationReportResponseDto>> response = new GenericResponse<>(
-	            HttpStatus.FOUND.value(),
-	            true,
-	            "Implementation report fetched successfully",
-	            result
-	        );
+		List<ImplementationReportResponseDto> result = reportService.getImplementationReport(dto.getFromDate(),
+				dto.getToDate());
+		GenericResponse<List<ImplementationReportResponseDto>> response = new GenericResponse<>(
+				HttpStatus.FOUND.value(), true, "Implementation report fetched successfully", result);
 
-	        return ResponseEntity.status(HttpStatus.FOUND).body(response);
-	    }
-	 
-	 @PostMapping("/get-extension-report")
-	    @Operation(summary = "Get Extension report")
-	    @ApiResponses(value = {
-	        @ApiResponse(responseCode = "201", description = "Extension Report created successfully"),
-	        @ApiResponse(responseCode = "400", description = "Invalid input data"),
-	        @ApiResponse(responseCode = "500", description = "Internal server error")
-	    })
-	    public ResponseEntity<GenericResponse<List<ExtensionReportResponseDto>>> getExtensionReport(
-	            @RequestBody ReportRequestDto dto) {
-		 System.out.println("------Inside extension report controller-----");
-		 List<ExtensionReportResponseDto> result = reportService.getExtensionReport(dto.getFromDate(),dto.getToDate());
-		 if(result.size()>0) {
-				System.out.println(" result :"+result);}
-				else
-				{
-					System.out.println(" list empty :"+result);
-				}  
-		 GenericResponse<List<ExtensionReportResponseDto>> response = new GenericResponse<>(
-	            HttpStatus.FOUND.value(),
-	            true,
-	            "Extension report fetched successfully",
-	            result
-	        );
+		return ResponseEntity.status(HttpStatus.FOUND).body(response);
+	}
 
-	        return ResponseEntity.status(HttpStatus.FOUND).body(response);
-	    }
-	 
+	@GetMapping("/get-extension-report")
+	@Operation(summary = "Get Extension report")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Extension Report created successfully"),
+			@ApiResponse(responseCode = "400", description = "Invalid input data"),
+			@ApiResponse(responseCode = "500", description = "Internal server error") })
+	public ResponseEntity<GenericResponse<List<ExtensionReportResponseDto>>> getExtensionReport() {
+		System.out.println("------Inside extension report controller-----");
+		List<ExtensionReportResponseDto> result = reportService.getExtensionReport();
+		if (result.size() > 0) {
+			System.out.println(" result :" + result);
+		} else {
+			System.out.println(" list empty :" + result);
+		}
+		GenericResponse<List<ExtensionReportResponseDto>> response = new GenericResponse<>(HttpStatus.FOUND.value(),
+				true, "Extension report fetched successfully", result);
+
+		return ResponseEntity.status(HttpStatus.FOUND).body(response);
+	}
+
 }

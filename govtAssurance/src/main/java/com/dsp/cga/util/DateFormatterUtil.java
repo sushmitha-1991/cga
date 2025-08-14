@@ -13,6 +13,8 @@ public class DateFormatterUtil {
 	private static final DateTimeFormatter FORMATTER =
             DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
 	
+	private static final String inputPattern = "yyyy-MM-dd";
+	
 	// Flexible SQL-style formatter: allows 0–6 fractional digits
     private static final DateTimeFormatter FLEXIBLE_SQL_FORMATTER =
         new DateTimeFormatterBuilder()
@@ -43,7 +45,16 @@ public class DateFormatterUtil {
      * @param inputDate original date string (e.g., "2025-07-31")
      * @param inputPattern pattern of the input date (e.g., "yyyy-MM-dd")
      */
-    public static String format(String inputDateTime) {
+    public static String formatDate(String inputDate) {
+    	 if (inputDate == null || inputDate.isBlank()) {
+             return null;
+         }
+    	 DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern(inputPattern, Locale.ENGLISH);
+    	 LocalDate date = LocalDate.parse(inputDate, inputFormatter);
+         return date.format(FORMATTER);
+    }
+    
+    public static String formatDateTime(String inputDateTime) {
     	if (inputDateTime == null || inputDateTime.trim().isEmpty()) {
             return null;
         }
