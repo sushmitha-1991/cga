@@ -59,9 +59,15 @@ public class ReportController {
 	    })
 	    public ResponseEntity<GenericResponse<List<ExtensionReportResponseDto>>> getExtensionReport(
 	            @RequestBody ReportRequestDto dto) {
-
+		 System.out.println("------Inside extension report controller-----");
 		 List<ExtensionReportResponseDto> result = reportService.getExtensionReport(dto.getFromDate(),dto.getToDate());
-	        GenericResponse<List<ExtensionReportResponseDto>> response = new GenericResponse<>(
+		 if(result.size()>0) {
+				System.out.println(" result :"+result);}
+				else
+				{
+					System.out.println(" list empty :"+result);
+				}  
+		 GenericResponse<List<ExtensionReportResponseDto>> response = new GenericResponse<>(
 	            HttpStatus.FOUND.value(),
 	            true,
 	            "Extension report fetched successfully",
