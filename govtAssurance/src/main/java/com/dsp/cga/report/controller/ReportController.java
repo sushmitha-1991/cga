@@ -5,11 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dsp.cga.assurance.dto.AssuranceDTO;
+import com.dsp.cga.assurance.dto.AssuranceListDTO;
 import com.dsp.cga.report.dto.ExtensionReportResponseDto;
 import com.dsp.cga.report.dto.ImplementationReportResponseDto;
 import com.dsp.cga.report.dto.ReportRequestDto;

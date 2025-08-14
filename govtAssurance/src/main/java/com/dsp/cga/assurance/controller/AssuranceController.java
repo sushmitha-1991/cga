@@ -24,6 +24,9 @@ import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
 import com.dsp.cga.assurance.dto.AssuranceRequestCountDTO;
 import com.dsp.cga.assurance.service.AssuranceService;
+import com.dsp.cga.report.dto.ExtensionReportResponseDto;
+import com.dsp.cga.report.dto.ReportRequestDto;
+import com.dsp.cga.report.service.ReportService;
 import com.dsp.cga.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,6 +42,10 @@ public class AssuranceController {
 
 	@Autowired
 	private AssuranceService assuranceService;
+	
+	@Autowired
+	private ReportService reportService;
+
 
 	@PostMapping("/create")
 	@Operation(summary = "Create a new Assurance")
@@ -366,4 +373,32 @@ public class AssuranceController {
 //	        AssuranceRequestCountDTO result = assuranceService.getAssuranceRequestCounts(sessionNo, ministryCode);
 //	        return ResponseEntity.ok(result);
 //	    }
+	
+//	------- report controller testing purpose-----------------
+	@PostMapping("/get-extension-report")
+    @Operation(summary = "Get Extension report")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Extension Report created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<GenericResponse<List<ExtensionReportResponseDto>>> getExtensionReport(
+            @RequestBody ReportRequestDto dto) {
+	 System.out.println("------Inside extension report controller-----");
+	 List<ExtensionReportResponseDto> result = reportService.getExtensionReport(dto.getFromDate(),dto.getToDate());
+	 if(result.size()>0) {
+			System.out.println(" result :"+result);}
+			else
+			{
+				System.out.println(" list empty :"+result);
+			}  
+	 GenericResponse<List<ExtensionReportResponseDto>> response = new GenericResponse<>(
+            HttpStatus.FOUND.value(),
+            true,
+            "Extension report fetched successfully",
+            result
+        );
+
+        return ResponseEntity.status(HttpStatus.FOUND).body(response);
+    }
 }
