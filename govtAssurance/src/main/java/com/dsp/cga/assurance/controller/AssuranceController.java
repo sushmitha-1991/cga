@@ -384,13 +384,14 @@ public class AssuranceController {
 		System.out.println("------Inside extension report controller-----");
 		List<ExtensionReportResponseDto> result = reportService.getExtensionReport();
 		if (result.size() > 0) {
-			System.out.println(" result :" + result);
+			System.out.println(" result :" + result); 
 		} else {
 			System.out.println(" list empty :" + result);
 		}
-		GenericResponse<List<ExtensionReportResponseDto>> response = new GenericResponse<>(HttpStatus.FOUND.value(),
+		GenericResponse<List<ExtensionReportResponseDto>> response = new GenericResponse<>(HttpStatus.OK.value(),
 				true, "Extension report fetched successfully", result);
 
-		return ResponseEntity.status(HttpStatus.FOUND).body(response);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
+
 }
