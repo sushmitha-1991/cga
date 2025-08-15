@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dsp.cga.report.dto.ConsolidatedMinistryWiseFimpAssurancesResponseDto;
+import com.dsp.cga.report.dto.ConsolidatedMinistryWisePendingAssurancesResponseDto;
 import com.dsp.cga.report.dto.DroppedAssurancesReportResponseDto;
 import com.dsp.cga.report.dto.ExtensionReportResponseDto;
 import com.dsp.cga.report.dto.ImplementationReportResponseDto;
@@ -111,7 +113,7 @@ public class ReportController {
 			@ApiResponse(responseCode = "400", description = "Invalid input data"),
 			@ApiResponse(responseCode = "500", description = "Internal server error") })
 	public ResponseEntity<GenericResponse<List<MinistryWisePendingAssurancesResponseDto>>> getMinistryWisePendingAssurancesReport() {
-		System.out.println("------Inside pending assurance report controller-----");
+		System.out.println("------Inside ministry wise pending assurance report controller-----");
 		List<MinistryWisePendingAssurancesResponseDto> result = reportService.getMinistryWisePendingAssurancesReport();
 		if (result.size() > 0) {
 			System.out.println(" result :" + result);
@@ -123,6 +125,43 @@ public class ReportController {
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
+	
+	@GetMapping("/get-consolidated-ministry-wise-pending-assurance-report")
+	@Operation(summary = "Get Consolidated Ministry Wise Pending Assurance report")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Consolidated Ministry Wise Pending Assurance Report created successfully"),
+			@ApiResponse(responseCode = "400", description = "Invalid input data"),
+			@ApiResponse(responseCode = "500", description = "Internal server error") })
+	public ResponseEntity<GenericResponse<List<ConsolidatedMinistryWisePendingAssurancesResponseDto>>> getConsolidatedMinistryWisePendingAssurancesReport() {
+		System.out.println("------Inside Consolidated ministry wise pending assurance report controller-----");
+		List<ConsolidatedMinistryWisePendingAssurancesResponseDto> result = reportService.getConsolidatedMinistryWisePendingAssurancesReport();
+		if (result.size() > 0) {
+			System.out.println(" result :" + result);
+		} else {
+			System.out.println(" list empty :" + result);
+		}
+		GenericResponse<List<ConsolidatedMinistryWisePendingAssurancesResponseDto>> response = new GenericResponse<>(HttpStatus.OK.value(),
+				true, "Consolidated Ministry wise pending assurance report fetched successfully", result);
 
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	@GetMapping("/get-consolidated-ministry-wise-fimp-assurance-report")
+	@Operation(summary = "Get Consolidated Ministry Wise Fimp Assurance report")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Consolidated Ministry Wise Fimp Assurance Report created successfully"),
+			@ApiResponse(responseCode = "400", description = "Invalid input data"),
+			@ApiResponse(responseCode = "500", description = "Internal server error") })
+	public ResponseEntity<GenericResponse<List<ConsolidatedMinistryWiseFimpAssurancesResponseDto>>> getConsolidatedMinistryWiseFimpAssurancesReport() {
+		System.out.println("------Inside Consolidated ministry wise fimp assurance report controller-----");
+		List<ConsolidatedMinistryWiseFimpAssurancesResponseDto> result = reportService.getConsolidatedMinistryWiseFimpAssurancesReport();
+		if (result.size() > 0) {
+			System.out.println(" result :" + result);
+		} else {
+			System.out.println(" list empty :" + result);
+		}
+		GenericResponse<List<ConsolidatedMinistryWiseFimpAssurancesResponseDto>> response = new GenericResponse<>(HttpStatus.OK.value(),
+				true, "Consolidated Ministry wise fimp assurance report fetched successfully", result);
+
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
 
 }

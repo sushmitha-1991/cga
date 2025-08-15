@@ -148,5 +148,42 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			""", nativeQuery = true)
 	List<Object[]> fetchMinistryWisePendingAssurancesLists();
 	
+	@Query(value = """
+						select
+			(mm.ministry_name ||' / '||md.department_name) as ministryOrDepartment,
+			count(ca.id) as pendingAssurances,
+			count(*) filter (where current_date - ca.updated_at < interval '2 years') as lessThanTwoYears,
+			count(*) filter (where current_date - ca.updated_at >= interval '2 years' and
+			current_date - ca.updated_at < interval '5 years') as betweenTwoAndFiveYears,
+			count(*) filter (where current_date - ca.updated_at >= interval '5 years' and
+			current_date - ca.updated_at < interval '10 years') as betweenFiveAndTenYears,
+			count(*) filter (where current_date - ca.updated_at >= interval '10 years') as moreThanTenYears
+			from cga.assurance ca
+			join master.ministries mm on mm.id=ca.ministry_id
+			join master.departments md on md.id=ca.department_id
+			where ca.status_id in(57,766) and ca.pending_due_to is not null and ca.updated_at < current_date
+			group by mm.ministry_name,md.department_name
+			order by mm.ministry_name,md.department_name			
+			""", nativeQuery = true)
+	List<Object[]> fetchConsolidatedMinistryWisePendingAssurancesLists();
 	
+	
+	@Query(value = """
+						select
+			(mm.ministry_name ||' / '||md.department_name) as ministryOrDepartment,
+			count(ca.id) as totalAssurances,
+			count(*) filter (where status_id in (56,767)) as totalAssurancesFimp,
+			count(*) filter (where status_id in (56,767) and current_date - ca.updated_at < interval '2 years') as lessThanTwoYears,
+			count(*) filter (where status_id in (56,767) and current_date - ca.updated_at >= interval '2 years' and
+			current_date - ca.updated_at < interval '5 years') as betweenTwoAndFiveYears,
+			count(*) filter (where status_id in (56,767) and current_date - ca.updated_at >= interval '5 years' and
+			current_date - ca.updated_at < interval '10 years') as betweenFiveAndTenYears,
+			count(*) filter (where status_id in (56,767) and current_date - ca.updated_at >= interval '10 years') as moreThanTenYears
+			from cga.assurance ca
+			join master.ministries mm on mm.id=ca.ministry_id
+			join master.departments md on md.id=ca.department_id
+			group by mm.ministry_name,md.department_name
+			order by mm.ministry_name,md.department_name	
+			""", nativeQuery = true)
+	List<Object[]> fetchConsolidatedMinistryWiseFimpAssurancesLists();
 }

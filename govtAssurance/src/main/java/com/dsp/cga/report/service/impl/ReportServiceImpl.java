@@ -8,6 +8,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dsp.cga.report.dto.ConsolidatedMinistryWiseFimpAssurancesResponseDto;
+import com.dsp.cga.report.dto.ConsolidatedMinistryWisePendingAssurancesResponseDto;
 import com.dsp.cga.report.dto.DroppedAssurancesReportResponseDto;
 import com.dsp.cga.report.dto.ExtensionReportResponseDto;
 import com.dsp.cga.report.dto.ImplementationReportResponseDto;
@@ -158,6 +160,51 @@ public class ReportServiceImpl implements ReportService {
                                 row[5] != null ? row[5].toString() : null, // questionType
                                 row[6] != null ? row[6].toString() : null,  // subject
                                 row[7] != null ? row[7].toString() : null  // pendingDueTo
+                                
+                		))
+                .toList();
+	}
+	
+	@Override
+	public List<ConsolidatedMinistryWisePendingAssurancesResponseDto> getConsolidatedMinistryWisePendingAssurancesReport() {
+		List<Object[]> results = reportRepo.fetchConsolidatedMinistryWisePendingAssurancesLists();
+		if(results.size()>0) {
+		System.out.println(" result :"+results);}
+		else
+		{
+			System.out.println(" list empty :"+results);
+		}
+		return results.isEmpty() ? Collections.emptyList() : results.stream()
+                .map(row -> new ConsolidatedMinistryWisePendingAssurancesResponseDto(
+                				row[0] != null ? row[0].toString() : null, // ministryOrDepartment
+                                row[1] != null ? row[1].toString() : null, // pendingAssurances
+                                row[2] != null ? row[2].toString() : null, // lessThanTwoYears
+                                row[3] != null ? row[3].toString() : null, // betweenTwoAndFiveYears
+                                row[4] != null ? row[4].toString() : null, // betweenFiveAndTenYears
+                                row[5] != null ? row[5].toString() : null // moreThanTenYears
+                                
+                		))
+                .toList();
+	}
+	
+	@Override
+	public List<ConsolidatedMinistryWiseFimpAssurancesResponseDto> getConsolidatedMinistryWiseFimpAssurancesReport() {
+		List<Object[]> results = reportRepo.fetchConsolidatedMinistryWiseFimpAssurancesLists();
+		if(results.size()>0) {
+		System.out.println(" result :"+results);}
+		else
+		{
+			System.out.println(" list empty :"+results);
+		}
+		return results.isEmpty() ? Collections.emptyList() : results.stream()
+                .map(row -> new ConsolidatedMinistryWiseFimpAssurancesResponseDto(
+                				row[0] != null ? row[0].toString() : null, // ministryOrDepartment
+                                row[1] != null ? row[1].toString() : null, // totalAssurances
+                                row[2] != null ? row[2].toString() : null, // totalAssurancesFimp		
+                                row[3] != null ? row[3].toString() : null, // lessThanTwoYears
+                                row[4] != null ? row[4].toString() : null, // betweenTwoAndFiveYears
+                                row[5] != null ? row[5].toString() : null, // betweenFiveAndTenYears
+                                row[6] != null ? row[6].toString() : null // moreThanTenYears
                                 
                 		))
                 .toList();
