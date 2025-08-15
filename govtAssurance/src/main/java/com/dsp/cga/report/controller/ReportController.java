@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dsp.cga.report.dto.ClubbingDetailsResponseDto;
+import com.dsp.cga.report.dto.ConsolidatedMinistryWiseAssurancesResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWiseFimpAssurancesResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWisePendingAssurancesResponseDto;
 import com.dsp.cga.report.dto.DroppedAssurancesReportResponseDto;
@@ -163,5 +165,42 @@ public class ReportController {
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
+	
+	@GetMapping("/get-consolidated-ministry-wise-assurance-report")
+	@Operation(summary = "Get Consolidated Ministry Wise Assurance report")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Consolidated Ministry Wise Assurance Report created successfully"),
+			@ApiResponse(responseCode = "400", description = "Invalid input data"),
+			@ApiResponse(responseCode = "500", description = "Internal server error") })
+	public ResponseEntity<GenericResponse<List<ConsolidatedMinistryWiseAssurancesResponseDto>>> getConsolidatedMinistryWiseAssurancesReport() {
+		System.out.println("------Inside Consolidated ministry wise assurance report controller-----");
+		List<ConsolidatedMinistryWiseAssurancesResponseDto> result = reportService.getConsolidatedMinistryWiseAssurancesReport();
+		if (result.size() > 0) {
+			System.out.println(" result :" + result);
+		} else {
+			System.out.println(" list empty :" + result);
+		}
+		GenericResponse<List<ConsolidatedMinistryWiseAssurancesResponseDto>> response = new GenericResponse<>(HttpStatus.OK.value(),
+				true, "Consolidated Ministry wise assurance report fetched successfully", result);
 
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+	
+	@GetMapping("/get-clubbing-details")
+	@Operation(summary = "Get Clubbing Details report")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Clubbing Details Report created successfully"),
+			@ApiResponse(responseCode = "400", description = "Invalid input data"),
+			@ApiResponse(responseCode = "500", description = "Internal server error") })
+	public ResponseEntity<GenericResponse<List<ClubbingDetailsResponseDto>>> getClubbingDetailsReport() {
+		System.out.println("------Inside Clubbing Details report controller-----");
+		List<ClubbingDetailsResponseDto> result = reportService.getClubbingDetailsReport();
+		if (result.size() > 0) {
+			System.out.println(" result :" + result);
+		} else {
+			System.out.println(" list empty :" + result);
+		}
+		GenericResponse<List<ClubbingDetailsResponseDto>> response = new GenericResponse<>(HttpStatus.OK.value(),
+				true, "Clubbing Details report fetched successfully", result);
+
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
 }
