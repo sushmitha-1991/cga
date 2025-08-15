@@ -12,37 +12,37 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class ExtensionReportResponseDto {
 
-	String AssuranceNo;
-	 String QuestionType;
-	 String QuestionNo;
-//	String QuestionDate;
-	 String Subject;
-	 String Ministry;
-	 String ExtensionNo;
-	String ExtReqDate;
-	String ExtGrantDate;
-	String MinistryRefNo;
-	String MinistryRefDate;
-	String ExtensionRemarks;
-	 String UpdatedOn;
+	String assuranceNo;
+	 String questionType;
+	 String questionNo;
+//	String questionDate;
+	 String subject;
+	 String ministry;
+	 String extensionNo;
+	String extReqDate;
+	String extGrantDate;
+	String ministryRefNo;
+	String ministryRefDate;
+	String extensionRemarks;
+	 String updatedOn;
 	 
 //	 String questionDate,
 	public ExtensionReportResponseDto(String assuranceNo, String questionType, String questionNo, 
 			String subject, String ministry, String extensionNo, String extReqDate, String extGrantDate,
 			String ministryRefNo, String ministryRefDate, String extensionRemarks, String updatedOn) {
 		super();
-		AssuranceNo = assuranceNo;
-		QuestionType = questionType;
-		QuestionNo = questionNo;
+		this.assuranceNo = assuranceNo;
+		this.questionType = questionType;
+		this.questionNo = questionNo;
 //		QuestionDate = questionDate;
-		Subject = subject;
-		Ministry = ministry;
-		ExtensionNo = extensionNo;
-		ExtReqDate = extReqDate;
-		ExtGrantDate = extGrantDate;
-		MinistryRefNo = ministryRefNo;
-		MinistryRefDate = ministryRefDate;
-		ExtensionRemarks = extensionRemarks;
-		UpdatedOn = updatedOn;
+		this.subject = subject;
+		this.ministry = ministry;
+		this.extensionNo = extensionNo;
+		this.extReqDate = extReqDate;
+		this.extGrantDate = extGrantDate;
+		this.ministryRefNo = ministryRefNo;
+		this.ministryRefDate = ministryRefDate;
+		this.extensionRemarks = extensionRemarks;
+		this.updatedOn = updatedOn;
 	}
 }
