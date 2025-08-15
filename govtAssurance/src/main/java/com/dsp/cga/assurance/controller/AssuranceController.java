@@ -393,4 +393,5 @@ public class AssuranceController {
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
+
 }
