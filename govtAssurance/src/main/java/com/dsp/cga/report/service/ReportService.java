@@ -3,6 +3,8 @@ package com.dsp.cga.report.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.dsp.cga.report.dto.ClubbingDetailsResponseDto;
+import com.dsp.cga.report.dto.ConsolidatedMinistryWiseAssurancesResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWiseFimpAssurancesResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWisePendingAssurancesResponseDto;
 import com.dsp.cga.report.dto.DroppedAssurancesReportResponseDto;
@@ -20,4 +22,6 @@ public interface ReportService {
 	public List<MinistryWisePendingAssurancesResponseDto> getMinistryWisePendingAssurancesReport();
 	public List<ConsolidatedMinistryWisePendingAssurancesResponseDto> getConsolidatedMinistryWisePendingAssurancesReport();
 	public List<ConsolidatedMinistryWiseFimpAssurancesResponseDto> getConsolidatedMinistryWiseFimpAssurancesReport();
+	public List<ConsolidatedMinistryWiseAssurancesResponseDto> getConsolidatedMinistryWiseAssurancesReport();
+	public List<ClubbingDetailsResponseDto> getClubbingDetailsReport();
 }

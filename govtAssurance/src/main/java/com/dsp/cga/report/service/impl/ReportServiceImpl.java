@@ -8,6 +8,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dsp.cga.report.dto.ClubbingDetailsResponseDto;
+import com.dsp.cga.report.dto.ConsolidatedMinistryWiseAssurancesResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWiseFimpAssurancesResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWisePendingAssurancesResponseDto;
 import com.dsp.cga.report.dto.DroppedAssurancesReportResponseDto;
@@ -206,6 +208,48 @@ public class ReportServiceImpl implements ReportService {
                                 row[5] != null ? row[5].toString() : null, // betweenFiveAndTenYears
                                 row[6] != null ? row[6].toString() : null // moreThanTenYears
                                 
+                		))
+                .toList();
+	}
+	
+	@Override
+	public List<ConsolidatedMinistryWiseAssurancesResponseDto> getConsolidatedMinistryWiseAssurancesReport() {
+		List<Object[]> results = reportRepo.fetchConsolidatedMinistryWiseAssurancesDetails();
+		if(results.size()>0) {
+		System.out.println(" result :"+results);}
+		else
+		{
+			System.out.println(" list empty :"+results);
+		}
+		return results.isEmpty() ? Collections.emptyList() : results.stream()
+                .map(row -> new ConsolidatedMinistryWiseAssurancesResponseDto(
+                				row[0] != null ? row[0].toString() : null, // ministry
+                                row[1] != null ? row[1].toString() : null, // totalAssurances
+                                row[2] != null ? row[2].toString() : null, // totalPendingAssurances		
+                                row[3] != null ? row[3].toString() : null, // fullyImplementedAssurances
+                                row[4] != null ? row[4].toString() : null // droppedAssurances
+                		))
+                .toList();
+	}
+	
+	@Override
+	public List<ClubbingDetailsResponseDto> getClubbingDetailsReport() {
+		List<Object[]> results = reportRepo.fetchClubbingDetails();
+		if(results.size()>0) {
+		System.out.println(" result :"+results);}
+		else
+		{
+			System.out.println(" list empty :"+results);
+		}
+		return results.isEmpty() ? Collections.emptyList() : results.stream()
+                .map(row -> new ClubbingDetailsResponseDto(
+                				row[0] != null ? row[0].toString() : null, // assuranceNo
+                                row[1] != null ? row[1].toString() : null, // questionType
+                                row[2] != null ? row[2].toString() : null, // questionNo		
+                                row[3] != null ? row[3].toString() : null, // subject
+                                row[4] != null ? row[4].toString() : null, // ministry
+                                row[5] != null ? row[5].toString() : null, // totalClubbedAssurances
+                                row[6] != null ? row[6].toString() : null // clubbedAssurancesList
                 		))
                 .toList();
 	}

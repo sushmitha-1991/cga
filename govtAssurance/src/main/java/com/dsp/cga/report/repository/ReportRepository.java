@@ -186,4 +186,37 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			order by mm.ministry_name,md.department_name	
 			""", nativeQuery = true)
 	List<Object[]> fetchConsolidatedMinistryWiseFimpAssurancesLists();
+	
+	@Query(value = """
+						select
+			mm.ministry_name as ministry,
+			count(ca.id) as totalAssurances,
+			count(*) filter (where status_id in (57,766)) as totalPendingAssurances,
+			count(*) filter (where status_id in (56,767)) as fullyImplementedAssurances,
+			count(*) filter (where status_id in (770)) as droppedAssurances
+			from cga.assurance ca
+			join master.ministries mm on mm.id=ca.ministry_id
+			where ca.updated_at < current_date
+			group by ministry
+			order by ministry
+			""", nativeQuery = true)
+	List<Object[]> fetchConsolidatedMinistryWiseAssurancesDetails();
+	
+	@Query(value = """
+						select 
+			ca.assurance_no AS assuranceNo,
+			mc.code AS questionType,
+			ca.question_no AS questionNo,
+			ca.subject AS subject,
+			mm.ministry_name AS ministry,
+			count(cca.id) as totalClubbedAssurances,
+			'Date_of_Assurance:- '||ca.assurance_date as clubbedAssurancesList
+			from cga.clubbed_assurances cca
+			join cga.assurance ca on ca.id=cca.assurance_id
+			join master.codes mc on mc.id=ca.assurance_type_id
+			join master.ministries mm on mm.id=ca.ministry_id
+			group by ca.id,questionType,ministry
+			order by ca.id desc
+			""", nativeQuery = true)
+	List<Object[]> fetchClubbingDetails();
 }
