@@ -1,17 +1,45 @@
 package com.dsp.cga.report.dto;
 
-public interface ImplementationReportResponseDto {
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 
-	 String getAssuranceNo();
-	 String getQuestionType();
-	 String getQuestionNo();
-	String getQuestionDate();
-	 String getSubject();
-	 String getMinistry();
-	 String getLayingDate();
-	String getSessionNo();
-	String getCommitteeDecision();
-	String getReason();
-	 String getCreatedOn();
-	
+@Data
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+public class ImplementationReportResponseDto {
+//	String questionDate,String sessionNo,
+//	String committeeDecision, String reason,
+	public ImplementationReportResponseDto(String assuranceNo, String questionType, String questionNo,
+			 String subject, String ministry, String layingDate,  String createdOn) {
+//	super();
+		this.assuranceNo = assuranceNo;
+		this.questionType = questionType;
+		this.questionNo = questionNo;
+//		this.questionDate = questionDate;
+		this.subject = subject;
+		this.ministry = ministry;
+		this.layingDate = layingDate;
+//		this.sessionNo = sessionNo;
+//		this.committeeDecision = committeeDecision;
+//		this.reason = reason;
+		this.createdOn = createdOn;
+	}
+
+	String assuranceNo;
+	String questionType;
+	String questionNo;
+//	String questionDate;
+	String subject;
+	String ministry;
+	String layingDate;
+//	String sessionNo;
+//	String committeeDecision;
+//	String reason;
+	String createdOn;
+
 }

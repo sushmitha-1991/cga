@@ -23,17 +23,21 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			    ca.subject AS subject,
 			    mm.ministry_name AS ministry,
 			    cir.laying_date AS layingDate,
-			    TO_CHAR(cir.created_at, 'YYYY-MM-DD HH24:MI:SS') AS createdOn
+			    cir.created_at AS updatedOn
 			from cga.implementation_requests cir
 			join cga.assurance ca on ca.id = cir.assurance_id
 			join master.ministries mm on mm.id = ca.ministry_id
 			join master.codes mc on mc.id = ca.assurance_type_id
-			WHERE cir.created_at >= :fromDate 
-			AND cir.created_at < :toDate
+			WHERE 
+			cir.created_at >= COALESCE(CAST(:fromDate AS DATE), cir.created_at)
+			--(:fromDate is null or cir.created_at >= (:fromDate)::date)
+			 AND
+			 cir.created_at < COALESCE(CAST(:toDate AS DATE), cir.created_at + interval '100 years')
+			--(:toDate is null or cir.created_at < (:toDate)::date)
 			order by cir.created_at desc
 			""", nativeQuery = true)
-	List<ImplementationReportResponseDto> fetchImplementationReports(@Param("fromDate") LocalDate fromDate,@Param("toDate") LocalDate toDate);
-	
+	List<Object[]> fetchImplementationReports(@Param("fromDate") LocalDate fromDate,@Param("toDate") LocalDate toDate);
+
 	@Query(value = """
 						select
 			ca.assurance_no as assuranceNo,
@@ -48,14 +52,15 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			cer.ministry_ref_no as ministryRefNo,
 			cer.ministry_ref_date as ministryRefDate,
 			cer.remarks as extensionRemarks,
-			cer.created_at as createdOn
+			cer.updated_at as updatedOn
 			from cga.extension_requests cer
 			join cga.assurance ca on ca.id=cer.assurance_id
 			join master.codes mc on mc.id=ca.assurance_type_id
 			join master.ministries mm on mm.id=ca.ministry_id
-			where cer.created_at >= :fromDate
-			and cer.created_at < :toDate
-			order by cer.created_at desc
+			where 
+			cer.ext_granted_till_date is not null
+			and cer.updated_at < current_date
+			order by cer.updated_at desc
 			""", nativeQuery = true)
-	List<ExtensionReportResponseDto> fetchExtensionReports(@Param("fromDate") LocalDate fromDate,@Param("toDate") LocalDate toDate);
+	List<Object[]> fetchExtensionReports();
 }
