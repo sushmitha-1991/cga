@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
 		GenericResponse<Map<String, String>> response = new GenericResponse<>(HttpStatus.BAD_REQUEST.value(), false,
 				"Validation failed", errors);
 
-		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); 
 	}
 
 	@ExceptionHandler(UserNotFoundException.class)
