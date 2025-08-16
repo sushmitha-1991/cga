@@ -1,6 +1,8 @@
 package com.dsp.cga.report.controller;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import com.dsp.cga.report.dto.PendingAssurancesListResponseDto;
 import com.dsp.cga.report.dto.ReportRequestDto;
 import com.dsp.cga.report.service.ReportService;
 import com.dsp.cga.response.GenericResponse;
+import com.dsp.cga.util.ExcelExportUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,6 +37,9 @@ public class ReportController {
 
 	@Autowired
 	private ReportService reportService;
+	
+	@Autowired
+	private ExcelExportUtil excelUtil;
 
 	@PostMapping("/get-implementation-report")
 	@Operation(summary = "Get Implementation report")
@@ -202,5 +208,11 @@ public class ReportController {
 				true, "Clubbing Details report fetched successfully", result);
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+	
+	@PostMapping(value = "/generate-excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	public ResponseEntity<byte[]> generateExcelReport(@RequestBody List<Map<String, Object>> data) throws IOException
+	{
+		return excelUtil.generateExcel(data);
 	}
 }
