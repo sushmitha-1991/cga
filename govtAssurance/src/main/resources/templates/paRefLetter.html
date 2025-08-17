@@ -1,0 +1,253 @@
+<!--
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Office Memorandum</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+		 
+        .center {
+            text-align: center;
+        }
+
+        @page {
+            size: A4 Portrait;
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+            }
+        }
+
+        .dsp2-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .dsp2-table th, .dsp2-table td {
+            border: 1px solid #ddd;
+            padding: 1px;
+            text-align: left;
+        }
+
+        .dsp2-table th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <h2 class="center">PARLIAMENT OF INDIA</h2>
+    <h3 class="center">RAJYA SABHA SECRETARIAT</h3>
+    <h4 class="center">(COMMITTEE ON GOVERNMENT ASSURANCES)</h4>
+    
+    <p align="right">Fax: 23010284<br/>
+    Parliament House Annexe Extn.<br/>
+    New Delhi 110001<br/>
+    Email: rsc3as@sansad.nic.in<br/>
+    
+    <p class="right">Dated: <span th:text="${om_date}"></span></p>
+    <p>No: <span th:text="${comm_no}"></span></p>
+    
+    <h3 class="center">OFFICE MEMORANDUM</h3>
+    
+    <h4>SUBJECT: IMPLEMENTATION OF ASSURANCE</h4>
+    
+    <ol>
+  	<li><p>The undersigned is directed to invite the attention of <span th:text="${ministry_name}"></span> to the assurance given in the Rajya Sabha while replying to <span th:text="${question_type}"></span> question No <span th:text="${question_no}"></span> on <span th:text="${question_date}"></span>.</p> </li>
+    
+    <li><p>The <span th:text="${ministry_name}"></span> is, therefore, requested to take necessary action for fulfilment of the above-mentioned assurance within a period of three months from the date of answer to the questions.</p></li>
+    
+    <li><p>In case the assurance is not likely to be fulfilled within the prescribed period of three months, the Ministry is required to make a request for extension of time to the Secretariat directly and not through the Ministry of Parliamentary Affairs, stating the reasons for such extension. The receipt of this ‘Office Memorandum’ may kindly be acknowledged.</p></li>
+  </ol>      
+  <br/><br/>  
+    <p align="right">(Anurag Saini) <br/>
+      Deputy Secretary <br/>
+      Tel: 01123035431</p>
+    
+    <h4>To</h4>
+    <p><span th:text="${ministry_name}"></span> <br/>
+    Parliament Section, <br/>
+    New Delhi</p>
+    
+    <h4>Copy to:</h4>
+	<p style="margin-left:60px;">
+    Ministry of Parliamentary Affairs<br/>
+    98, Parliament House, New Delhi</p>
+</body>
+</html>
+-->
+
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Office Memorandum</title>
+  <style>
+    body {
+      font-family: "Times New Roman", serif;
+      font-size: 13px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 0;
+    }
+
+	@page {
+		border : solid black;
+	           size: A4 Portrait;
+	           @bottom-right {
+	               content: "Page " counter(page) " of " counter(pages);
+	           }
+	       }
+		   
+    .page {
+      padding: 25px 35px;
+      box-sizing: border-box;
+    }
+
+    .header {
+      text-align: center;
+      line-height: 1.2;
+    }
+	.header .subline { font-weight: bold; text-transform: uppercase; }
+    .header .org { font-weight: bold; text-transform: uppercase; }
+    .header .sub { font-weight: bold; text-transform: uppercase; }
+
+    .contact {
+      text-align: right;
+      font-size: 12px;
+      line-height: 1.4;
+      margin-top: 5px;
+	  font-weight: bold;
+    }
+
+    .title {
+      text-align: center;
+      font-weight: bold;
+      text-decoration: underline;
+      margin: 15px 0;
+    }
+
+    .subject {
+      margin: 10px 0 15px 0;
+      text-transform: uppercase;
+    }
+
+    ol {
+      margin: 0 0 20px 20px;
+      padding: 0;
+    }
+    ol li {
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+
+    .signature {
+      text-align: right;
+      margin-top: 30px;
+      line-height: 1.4;
+    }
+
+    .address {
+      margin-top: 40px;
+    }
+
+    .copy {
+      margin-top: 20px;
+    }
+    .copy .content {
+      margin-left: 60px;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="org">PARLIAMENT OF INDIA</div>
+    <div class="sub">RAJYA SABHA SECRETARIAT</div>
+    <div class="subline">(COMMITTEE ON GOVERNMENT ASSURANCES)</div>
+  </div>
+  <br/>
+  <!-- Contact -->
+  <div class="contact">
+    Fax: 23010284<br/>
+    Parliament House Annexe Extn.<br/>
+    New Delhi - 110001<br/>
+    Email: rsc3as@sansad.nic.in
+  </div>
+  <br/>
+  <!-- Meta Info as table -->
+  <table style="width:100%; font-size:13px; margin:15px 0;">
+    <tr>
+      <td style="text-align:left;">No: <span th:text="${comm_no}"></span></td>
+      <td style="text-align:right;">Dated: <span th:text="${om_date}"></span></td>
+    </tr>
+  </table>
+  <br/>
+  <!-- Title -->
+  <div class="title">OFFICE MEMORANDUM</div>
+  <br/>
+  <!-- Subject -->
+  <div class="subject">SUBJECT: IMPLEMENTATION OF ASSURANCE</div>
+  <br/>
+  <!-- Content -->
+  <ol>
+    <li>
+      The undersigned is directed to invite the attention of
+      <span th:text="${ministry_name}"></span>
+      to the assurance given in the Rajya Sabha while replying to
+      <span th:text="${question_type}"></span> Question No
+      <span th:text="${question_no}"></span> on
+      <span th:text="${question_date}"></span>.
+    </li>
+    <li>
+      The <span th:text="${ministry_name}"></span> is, therefore, requested to take necessary
+      action for fulfilment of the above-mentioned assurance within a period of three
+      months from the date of answer to the question.
+    </li>
+    <li>
+      In case the assurance is not likely to be fulfilled within the prescribed period
+      of three months, the Ministry is required to make a request for extension of time
+      to the Secretariat directly and not through the Ministry of Parliamentary Affairs,
+      stating the reasons for such extension. The receipt of this ‘Office Memorandum’
+      may kindly be acknowledged.
+    </li>
+  </ol>
+
+  <!-- Signature -->
+  <div class="signature">
+    (<span class="name">Anurag Saini</span>)<br/>
+    Deputy Secretary<br/>
+    Tel: 01123035431
+  </div>
+
+  <!-- Address -->
+  <div class="address">
+    To<br/>
+    <span th:text="${ministry_name}"></span><br/>
+    Parliament Section,<br/>
+    New Delhi
+  </div>
+
+  <!-- Copy -->
+  <div class="copy">
+    Copy to:
+    <div class="content">
+      Ministry of Parliamentary Affairs<br/>
+      98, Parliament House, New Delhi
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
