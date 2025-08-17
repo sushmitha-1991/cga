@@ -74,7 +74,7 @@ public interface ExtensionRequestRepository extends JpaRepository<ExtensionReque
 			    WHERE e.isActive = true 
 			      AND e.assuranceId = :assuranceId 
 			      AND (
-			          (e.fromMinistry = true AND e.statusForCga = 'Accepted') 
+			          (e.fromMinistry = true AND e.statusForCga = 'Accepted')  
 			          OR 
 			          (e.fromMinistry = false)
 			      )
