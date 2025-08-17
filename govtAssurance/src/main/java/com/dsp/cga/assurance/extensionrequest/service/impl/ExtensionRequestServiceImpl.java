@@ -194,6 +194,20 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 
 	    List<ExtensionRequestDTO> savedDTOs = new ArrayList<>();
 
+	    if (extensionRequestDTOList == null || extensionRequestDTOList.isEmpty()) {
+		    return new GenericResponse<>(
+		            HttpStatus.CREATED.value(),
+		            true,
+		            "No Extension requests available for saving",
+		            Collections.EMPTY_LIST
+		    );
+	    }
+	    
+	    Long assuranceId = extensionRequestDTOList.get(0).getAssuranceId();
+	    
+	    // First retrieve all existing extension requests for the assurance
+	    List<Long> extnList = extenionRequestRepository.getExtensionIdList(assuranceId);
+	    
 	    for (ExtensionRequestDTO dto : extensionRequestDTOList) {
 	        if (dto.getId() == null && (dto.getAssuranceId() == null || dto.getExtensionNo() == null)) {
 	            throw new IllegalArgumentException("Invalid input: AssuranceId and ExtensionNo cannot be null.");
@@ -212,6 +226,9 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 
 	                // Save the updated entity
 	                savedRequest = extenionRequestRepository.save(existingRequest);
+	                
+	                // Remove from extnList as this has been processed
+	                extnList.remove(dto.getId());
 	            } else {
 	                throw new IllegalArgumentException("No ExtensionRequest found with the provided ID: " + dto.getId());
 	            }
@@ -242,6 +259,14 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	        savedDTOs.add(savedDTO);
 	    }
 
+	    if (extnList != null && !extnList.isEmpty()) {
+		    // Remove any residual items in extnLists. These have been deleted
+	    	extnList.forEach(x-> {
+	    		extenionRequestRepository.deleteExtenstion(x);
+	    		log.info("Deleted extension request: {}", x);
+	    	});
+	    }
+	    	    
 	    String msg = createResponseMsg(extensionRequestDTOList, savedDTOs);
 	    
 	    // Return the response wrapped in GenericResponse
