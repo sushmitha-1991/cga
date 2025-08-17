@@ -2,16 +2,16 @@ package com.dsp.cga.report.controller;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dsp.cga.report.dto.ClubbingDetailsResponseDto;
@@ -20,6 +20,8 @@ import com.dsp.cga.report.dto.ConsolidatedMinistryWiseFimpAssurancesResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWisePendingAssurancesResponseDto;
 import com.dsp.cga.report.dto.DroppedAssurancesReportResponseDto;
 import com.dsp.cga.report.dto.ExtensionReportResponseDto;
+import com.dsp.cga.report.dto.GenericExcelInputDTO;
+import com.dsp.cga.report.dto.GenericReportInputDTO;
 import com.dsp.cga.report.dto.ImplementationReportResponseDto;
 import com.dsp.cga.report.dto.MinistryWisePendingAssurancesResponseDto;
 import com.dsp.cga.report.dto.PendingAssurancesListResponseDto;
@@ -27,6 +29,7 @@ import com.dsp.cga.report.dto.ReportRequestDto;
 import com.dsp.cga.report.service.ReportService;
 import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.util.ExcelExportUtil;
+import com.dsp.cga.util.PdfExportUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -41,6 +44,9 @@ public class ReportController {
 	
 	@Autowired
 	private ExcelExportUtil excelUtil;
+	
+	@Autowired
+	private PdfExportUtil pdfUtil;
 
 	@PostMapping("/get-implementation-report")
 	@Operation(summary = "Get Implementation report")
@@ -212,8 +218,20 @@ public class ReportController {
 	}
 	
 	@PostMapping(value = "/generate-excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	public ResponseEntity<byte[]> generateExcelReport( @RequestParam String reportTitle,@RequestBody List<Map<String, Object>> data) throws IOException
+	public ResponseEntity<byte[]> generateExcelReport(@RequestBody GenericExcelInputDTO input) throws IOException
 	{
-		return excelUtil.generateExcel(data,reportTitle);
+		return excelUtil.generateExcel(input.getData(),input.getReportTitle());
 	}
+	
+	@PostMapping("/generate-generic-report")
+	public ResponseEntity<?> generateGenericPdf(@RequestBody GenericReportInputDTO input) throws Exception {
+
+		String abbr = input.getAbbr();
+		byte[] pdfBytes = pdfUtil.generatePdf(abbr, input.getReportParams());
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		headers.setContentDispositionFormData("inline", abbr + System.currentTimeMillis() + ".pdf");
+		return ResponseEntity.ok().headers(headers).contentLength(pdfBytes.length).body(pdfBytes);
+	}
+	
 }
