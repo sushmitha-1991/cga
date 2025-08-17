@@ -215,5 +215,19 @@ public class Utils {
 		return value;
 	}
 		
-	
+//	excel sanitize
+	public static String sanitizeForExcel(String value) {
+		if (value == null) {
+			return "";
+		}
+
+		String trimmed = value.trim();
+
+		// Prefix with apostrophe if starts with formula triggers
+		if (trimmed.startsWith("=") || trimmed.startsWith("+") || trimmed.startsWith("-") || trimmed.startsWith("@")) {
+			return "'" + trimmed;
+		}
+
+		return trimmed;
+	}
 }
