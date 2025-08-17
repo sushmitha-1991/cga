@@ -31,10 +31,10 @@ public class ExcelExportUtil {
 	@Autowired
 	private Utils utils;
 	
-	public ResponseEntity<byte[]> generateExcel(List<Map<String, Object>> data) throws IOException {
+	public ResponseEntity<byte[]> generateExcel(List<Map<String, Object>> data,String title) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		XSSFWorkbook workbook = new XSSFWorkbook();
-		XSSFSheet sheet = workbook.createSheet("report_title");
+		XSSFSheet sheet = workbook.createSheet(title);
 		
 		// === Styles ===
 	    CellStyle headerStyle = workbook.createCellStyle();
@@ -61,7 +61,7 @@ public class ExcelExportUtil {
 	    Row titleRow = sheet.createRow(0);
 	    Cell titleCell = titleRow.createCell(0);
 	    String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-	    titleCell.setCellValue("dynamic report title as on " + today);
+	    titleCell.setCellValue(title+" as on " + today);
 
 	    CellStyle titleStyle = workbook.createCellStyle();
 	    Font titleFont = workbook.createFont();
@@ -134,7 +134,7 @@ public class ExcelExportUtil {
 		byte[] excelBytes = out.toByteArray();
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentDisposition(ContentDisposition.builder("attachment").filename("report_title.xlsx").build());
+		headers.setContentDisposition(ContentDisposition.builder("attachment").filename(title+".xlsx").build());
 		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 
 		return ResponseEntity.ok().headers(headers).body(excelBytes);

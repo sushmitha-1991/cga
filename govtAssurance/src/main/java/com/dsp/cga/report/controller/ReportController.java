@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dsp.cga.report.dto.ClubbingDetailsResponseDto;
@@ -211,8 +212,8 @@ public class ReportController {
 	}
 	
 	@PostMapping(value = "/generate-excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	public ResponseEntity<byte[]> generateExcelReport(@RequestBody List<Map<String, Object>> data) throws IOException
+	public ResponseEntity<byte[]> generateExcelReport( @RequestParam String reportTitle,@RequestBody List<Map<String, Object>> data) throws IOException
 	{
-		return excelUtil.generateExcel(data);
+		return excelUtil.generateExcel(data,reportTitle);
 	}
 }
