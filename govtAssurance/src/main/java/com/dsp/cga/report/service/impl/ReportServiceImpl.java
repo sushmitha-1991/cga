@@ -245,11 +245,12 @@ public class ReportServiceImpl implements ReportService {
                 .map(row -> new ClubbingDetailsResponseDto(
                 				row[0] != null ? row[0].toString() : null, // assuranceNo
                                 row[1] != null ? row[1].toString() : null, // questionType
-                                row[2] != null ? row[2].toString() : null, // questionNo		
-                                row[3] != null ? row[3].toString() : null, // subject
-                                row[4] != null ? row[4].toString() : null, // ministry
-                                row[5] != null ? row[5].toString() : null, // totalClubbedAssurances
-                                row[6] != null ? row[6].toString() : null // clubbedAssurancesList
+                                row[2] != null ? row[2].toString() : null, // questionNo	
+                                row[3] != null ? row[3].toString() : null, // questionDate
+                                row[4] != null ? row[4].toString() : null, // subject
+                                row[5] != null ? row[5].toString() : null, // ministry
+                                row[6] != null ? row[6].toString() : null, // totalClubbedAssurances
+                                row[7] != null ? row[7].toString() : null // clubbedAssurancesList
                 		))
                 .toList();
 	}

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -218,20 +219,28 @@ public class ReportController {
 	}
 	
 	@PostMapping(value = "/generate-excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	public ResponseEntity<byte[]> generateExcelReport(@RequestBody GenericExcelInputDTO input) throws IOException
+	public ResponseEntity<?> generateExcelReport(@RequestBody GenericExcelInputDTO input) throws IOException
 	{
-		return excelUtil.generateExcel(input.getData(),input.getReportTitle());
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentDisposition(ContentDisposition.builder("attachment").filename(input.getReportTitle()+".xlsx").build());
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		System.out.println("----------inside generate excel service-------");
+		byte[] result=excelUtil.generateExcel(input.getData(),input.getReportTitle());
+		return ResponseEntity.status(HttpStatus.OK).headers(headers).body(result);
 	}
 	
 	@PostMapping("/generate-generic-report")
 	public ResponseEntity<?> generateGenericPdf(@RequestBody GenericReportInputDTO input) throws Exception {
 
 		String abbr = input.getAbbr();
+		System.out.println("------inside generate pdf service-----");
 		byte[] pdfBytes = pdfUtil.generatePdf(abbr, input.getReportParams());
+		System.out.println("------------returned pdfBytes-----");
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_PDF);
 		headers.setContentDispositionFormData("inline", abbr + System.currentTimeMillis() + ".pdf");
-		return ResponseEntity.ok().headers(headers).contentLength(pdfBytes.length).body(pdfBytes);
+		return ResponseEntity.status(HttpStatus.OK).headers(headers).contentLength(pdfBytes.length).body(pdfBytes);
+//		return ResponseEntity.ok().headers(headers).contentLength(pdfBytes.length).body(pdfBytes);
 	}
 	
 }
