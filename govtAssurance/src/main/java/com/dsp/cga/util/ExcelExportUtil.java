@@ -31,7 +31,7 @@ public class ExcelExportUtil {
 	@Autowired
 	private Utils utils;
 	
-	public ResponseEntity<byte[]> generateExcel(List<Map<String, Object>> data,String title) throws IOException {
+	public byte[] generateExcel(List<Map<String, Object>> data,String title) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		XSSFWorkbook workbook = new XSSFWorkbook();
 		XSSFSheet sheet = workbook.createSheet(title);
@@ -132,11 +132,10 @@ public class ExcelExportUtil {
 		workbook.close();
 
 		byte[] excelBytes = out.toByteArray();
+		System.out.println("----returning excel bytes----");
+		return excelBytes;
+		
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentDisposition(ContentDisposition.builder("attachment").filename(title+".xlsx").build());
-		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-
-		return ResponseEntity.ok().headers(headers).body(excelBytes);
+//		return ResponseEntity.ok().headers(headers).body(excelBytes);
 	}
 }

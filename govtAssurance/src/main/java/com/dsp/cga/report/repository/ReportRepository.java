@@ -207,6 +207,7 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			ca.assurance_no AS assuranceNo,
 			mc.code AS questionType,
 			ca.question_no AS questionNo,
+			ca.created_at as questionDate,
 			ca.subject AS subject,
 			mm.ministry_name AS ministry,
 			count(cca.id) as totalClubbedAssurances,
