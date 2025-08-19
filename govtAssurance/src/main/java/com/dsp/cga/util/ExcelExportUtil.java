@@ -35,7 +35,7 @@ public class ExcelExportUtil {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		XSSFWorkbook workbook = new XSSFWorkbook();
 		XSSFSheet sheet = workbook.createSheet(title);
-		
+		System.out.println("----in generate excel util-----");
 		// === Styles ===
 	    CellStyle headerStyle = workbook.createCellStyle();
 	    Font headerFont = workbook.createFont();
@@ -71,6 +71,7 @@ public class ExcelExportUtil {
 	    titleStyle.setAlignment(HorizontalAlignment.CENTER);
 	    titleCell.setCellStyle(titleStyle);
 
+	    System.out.println("-------1------------------");
 	    // Merge title row across columns
 	    int columnSize = !data.isEmpty() ? data.get(0).size()+1 : 1; //added +1 for serial number
 	    sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnSize-1));
@@ -91,6 +92,8 @@ public class ExcelExportUtil {
 				cell.setCellValue(utils.sanitizeForExcel(key)); // Sanitize header (optional)
 				cell.setCellStyle(headerStyle);
 			}
+			
+			System.out.println("----------2-----------------");
 
 			// Fill data rows
 			int rowIndex = 3;
@@ -113,6 +116,7 @@ public class ExcelExportUtil {
 				}
 			}
 			
+			System.out.println("-------------3------------");
 			// === Auto-size all columns with minimum width ===
 			int totalColumns = !data.isEmpty() ? data.get(0).size()+1 : 0; //added +1 for serial number
 			for (int i = 0; i < totalColumns; i++) {
@@ -128,9 +132,10 @@ public class ExcelExportUtil {
 
 		}
 		
+		System.out.println("-------------writing out------------");
 		workbook.write(out);
 		workbook.close();
-
+		System.out.println("----before returning excel bytes----");
 		byte[] excelBytes = out.toByteArray();
 		System.out.println("----returning excel bytes----");
 		return excelBytes;
