@@ -12,15 +12,16 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class ImplementationReportResponseDto {
-//	String questionDate,String sessionNo,
+//	String sessionNo,
 //	String committeeDecision, String reason,
 	public ImplementationReportResponseDto(String assuranceNo, String questionType, String questionNo,
-			 String subject, String ministry, String layingDate,  String createdOn) {
-//	super();
+			String questionDate,String subject, String ministry, String layingDate,  String createdOn) {
+		
+		super();
 		this.assuranceNo = assuranceNo;
 		this.questionType = questionType;
 		this.questionNo = questionNo;
-//		this.questionDate = questionDate;
+		this.questionDate = questionDate;
 		this.subject = subject;
 		this.ministry = ministry;
 		this.layingDate = layingDate;
@@ -33,7 +34,7 @@ public class ImplementationReportResponseDto {
 	String assuranceNo;
 	String questionType;
 	String questionNo;
-//	String questionDate;
+	String questionDate;
 	String subject;
 	String ministry;
 	String layingDate;

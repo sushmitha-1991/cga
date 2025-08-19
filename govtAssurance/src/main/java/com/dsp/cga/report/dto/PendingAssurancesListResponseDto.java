@@ -22,13 +22,13 @@ public class PendingAssurancesListResponseDto {
 	String fileNo;
 	String questionType;
 	String questionNo;
-//	String questionDate;
+	String questionDate;
 	String subject;
-//	String extent;
+	String extent;
 	String pendingDueTo;
 public PendingAssurancesListResponseDto(String sessionNo, String sourceName, String member, String clubbedMember,
 		String ministry, String department, String assuranceNo, String fileNo, String questionType, String questionNo,
-		String subject, String pendingDueTo) {
+		String questionDate,String subject, String extent, String pendingDueTo) {
 	super();
 	this.sessionNo = sessionNo;
 	this.sourceName = sourceName;
@@ -40,7 +40,9 @@ public PendingAssurancesListResponseDto(String sessionNo, String sourceName, Str
 	this.fileNo = fileNo;
 	this.questionType = questionType;
 	this.questionNo = questionNo;
+	this.questionDate=questionDate;
 	this.subject = subject;
+	this.extent=extent;
 	this.pendingDueTo = pendingDueTo;
 }
 

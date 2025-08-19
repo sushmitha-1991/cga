@@ -13,4 +13,5 @@ public class ReportRequestDto {
 
 	LocalDate fromDate;
 	LocalDate toDate;
+	LocalDate inputDate;
 }
