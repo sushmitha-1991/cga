@@ -282,6 +282,7 @@ public class ReportController {
 		headers.setContentDispositionFormData("inline", abbr + System.currentTimeMillis() + ".pdf");
 //		return ResponseEntity.status(HttpStatus.OK).headers(headers).contentLength(pdfBytes.length).body(pdfBytes);
 		return ResponseEntity.ok().headers(headers).contentLength(pdfBytes.length).body(pdfBytes);
+		
 	}
 	
 	@PostMapping("/get-quarterly-report")
