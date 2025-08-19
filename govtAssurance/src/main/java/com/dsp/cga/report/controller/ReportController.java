@@ -262,11 +262,15 @@ public class ReportController {
 	@PostMapping(value = "/generate-excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	public ResponseEntity<?> generateExcelReport(@RequestBody GenericExcelInputDTO input) throws IOException
 	{
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentDisposition(ContentDisposition.builder("attachment").filename(input.getReportTitle()+".xlsx").build());
-		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 		System.out.println("----------inside generate excel service-------");
 		byte[] result=excelUtil.generateExcel(input.getData(),input.getReportTitle());
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentDisposition(ContentDisposition.builder("attachment").filename(input.getReportTitle()+".xlsx").build());
+//		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		headers.setContentType(MediaType.parseMediaType(
+		        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+		    ));
+		
 		return ResponseEntity.status(HttpStatus.OK).headers(headers).body(result);
 	}
 	
