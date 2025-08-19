@@ -37,6 +37,8 @@ public class ExtensionRequestDTO {
     private List<Map<String, Object>> extensionFiles;
     private String statusForMinistry;
     private String statusForCga;
+	@Builder.Default
+    private Boolean fromMinistry = Boolean.TRUE;
 
 
 }

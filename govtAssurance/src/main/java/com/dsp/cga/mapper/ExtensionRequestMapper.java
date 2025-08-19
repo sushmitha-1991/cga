@@ -62,7 +62,17 @@ public class ExtensionRequestMapper {
 	        if (dto == null) {
 	            return null;
 	        }
-
+        
+	        if (dto.getFromMinistry()) {
+	        	dto.setFromMinistry(true);
+	            dto.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
+				dto.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+	        } else {
+	        	dto.setFromMinistry(false);
+	            dto.setStatusForMinistry(MinistryStatus.ACCEPTED.getValue());
+				dto.setStatusForCga(CgaStatus.ACCEPTED.getValue());
+	        }
+	        
 	        return ExtensionRequest.builder()
 	                .id(dto.getId())
 	                .assuranceId(dto.getAssuranceId())
@@ -77,9 +87,9 @@ public class ExtensionRequestMapper {
 	                .extensionFiles(dto.getExtensionFiles())
 	                .draftStatus(dto.getDraftStatus())
 	                .extensionFiles(dto.getExtensionFiles())
-	                .fromMinistry(true)
-		             .statusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue())
-					.statusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
+	                .fromMinistry(dto.getFromMinistry())
+		            .statusForMinistry(dto.getStatusForMinistry())
+					.statusForCga(dto.getStatusForCga())
 	                .statusId(dto.getStatusId())
 	                .build();
 	    }
