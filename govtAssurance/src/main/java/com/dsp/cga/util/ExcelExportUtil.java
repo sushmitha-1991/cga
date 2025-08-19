@@ -121,7 +121,7 @@ public class ExcelExportUtil {
 			int totalColumns = !data.isEmpty() ? data.get(0).size()+1 : 0; //added +1 for serial number
 			for (int i = 0; i < totalColumns; i++) {
 			    sheet.autoSizeColumn(i);
-
+			    System.out.println("---inside auto sizing column----");
 			    // minimum width (e.g., 4000 = ~15 characters)
 			    int currentWidth = sheet.getColumnWidth(i);
 			    int minWidth = 4000; 
@@ -129,7 +129,7 @@ public class ExcelExportUtil {
 			        sheet.setColumnWidth(i, minWidth);
 			    }
 			}
-
+			System.out.println("file write");
 		}
 		
 		System.out.println("-------------writing out------------");
