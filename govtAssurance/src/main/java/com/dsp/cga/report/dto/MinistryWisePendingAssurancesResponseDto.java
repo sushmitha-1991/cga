@@ -17,14 +17,14 @@ public class MinistryWisePendingAssurancesResponseDto {
 	String member;
 	String assuranceNo;
 	String questionNo;
-//	String questionDate;
+	String questionDate;
 	String questionType;
 	String subject;
-//	String extent;
+	String extent;
 	String pendingDueTo;
 	
 public MinistryWisePendingAssurancesResponseDto(String ministry, String sessionNo, String member, String assuranceNo,
-		String questionNo, String questionType, String subject, String pendingDueTo) {
+		String questionNo, String questionType,String questionDate, String subject, String extent,String pendingDueTo) {
 	super();
 	this.ministry = ministry;
 	this.sessionNo = sessionNo;
@@ -32,7 +32,9 @@ public MinistryWisePendingAssurancesResponseDto(String ministry, String sessionN
 	this.assuranceNo = assuranceNo;
 	this.questionNo = questionNo;
 	this.questionType = questionType;
+	this.questionDate=questionDate;
 	this.subject = subject;
+	this.extent=extent;
 	this.pendingDueTo = pendingDueTo;
 }
 	

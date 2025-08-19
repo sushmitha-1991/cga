@@ -15,7 +15,7 @@ public class DroppedAssurancesReportResponseDto {
 	String assuranceNo;
 	String questionType;
 	String questionNo;
-//	String questionDate;
+	String questionDate;
 	String subject;
 	String ministry;
 	String ministryRefNo;
@@ -26,12 +26,13 @@ public class DroppedAssurancesReportResponseDto {
 	String updatedOn;
 
 	public DroppedAssurancesReportResponseDto(String assuranceNo, String questionType, String questionNo,
-			String subject, String ministry, String ministryRefNo, String ministryRefDate, String reason,
+			String questionDate, String subject, String ministry, String ministryRefNo, String ministryRefDate, String reason,
 			String meetingdate, String updatedOn) {
 		super();
 		this.assuranceNo = assuranceNo;
 		this.questionType = questionType;
 		this.questionNo = questionNo;
+		this.questionDate=questionDate;
 		this.subject = subject;
 		this.ministry = ministry;
 		this.ministryRefNo = ministryRefNo;
