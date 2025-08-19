@@ -60,15 +60,13 @@ public class ExtensionRequestMapper {
 	    }
 	    public static ExtensionRequest toEntity(ExtensionRequestDTO dto) {
 	        if (dto == null) {
-	            return null;
+	            return null; 
 	        }
         
 	        if (dto.getFromMinistry()) {
-	        	dto.setFromMinistry(true);
 	            dto.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
 				dto.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
 	        } else {
-	        	dto.setFromMinistry(false);
 	            dto.setStatusForMinistry(MinistryStatus.ACCEPTED.getValue());
 				dto.setStatusForCga(CgaStatus.ACCEPTED.getValue());
 	        }
