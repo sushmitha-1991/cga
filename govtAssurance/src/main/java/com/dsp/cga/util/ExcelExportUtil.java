@@ -117,18 +117,18 @@ public class ExcelExportUtil {
 			}
 			
 			System.out.println("-------------3------------");
-			// === Auto-size all columns with minimum width ===
-			int totalColumns = !data.isEmpty() ? data.get(0).size()+1 : 0; //added +1 for serial number
-			for (int i = 0; i < totalColumns; i++) {
-			    sheet.autoSizeColumn(i);
-			    System.out.println("---inside auto sizing column----");
-			    // minimum width (e.g., 4000 = ~15 characters)
-			    int currentWidth = sheet.getColumnWidth(i);
-			    int minWidth = 4000; 
-			    if (currentWidth < minWidth) {
-			        sheet.setColumnWidth(i, minWidth);
-			    }
-			}
+//			// === Auto-size all columns with minimum width ===
+//			int totalColumns = !data.isEmpty() ? data.get(0).size()+1 : 0; //added +1 for serial number
+//			for (int i = 0; i < totalColumns; i++) {
+//			    sheet.autoSizeColumn(i);
+//			    System.out.println("---inside auto sizing column----");
+//			    // minimum width (e.g., 4000 = ~15 characters)
+//			    int currentWidth = sheet.getColumnWidth(i);
+//			    int minWidth = 4000; 
+//			    if (currentWidth < minWidth) {
+//			        sheet.setColumnWidth(i, minWidth);
+//			    }
+//			}
 			System.out.println("file write");
 		}
 		
