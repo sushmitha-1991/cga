@@ -31,11 +31,11 @@ public class ExcelExportUtil {
 	@Autowired
 	private Utils utils;
 	
-	public ResponseEntity<byte[]> generateExcel(List<Map<String, Object>> data) throws IOException {
+	public byte[] generateExcel(List<Map<String, Object>> data,String title) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		XSSFWorkbook workbook = new XSSFWorkbook();
-		XSSFSheet sheet = workbook.createSheet("report_title");
-		
+		XSSFSheet sheet = workbook.createSheet(title);
+		System.out.println("----in generate excel util-----");
 		// === Styles ===
 	    CellStyle headerStyle = workbook.createCellStyle();
 	    Font headerFont = workbook.createFont();
@@ -61,7 +61,7 @@ public class ExcelExportUtil {
 	    Row titleRow = sheet.createRow(0);
 	    Cell titleCell = titleRow.createCell(0);
 	    String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-	    titleCell.setCellValue("dynamic report title as on " + today);
+	    titleCell.setCellValue(title+" as on " + today);
 
 	    CellStyle titleStyle = workbook.createCellStyle();
 	    Font titleFont = workbook.createFont();
@@ -71,6 +71,7 @@ public class ExcelExportUtil {
 	    titleStyle.setAlignment(HorizontalAlignment.CENTER);
 	    titleCell.setCellStyle(titleStyle);
 
+	    System.out.println("-------1------------------");
 	    // Merge title row across columns
 	    int columnSize = !data.isEmpty() ? data.get(0).size()+1 : 1; //added +1 for serial number
 	    sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnSize-1));
@@ -91,6 +92,8 @@ public class ExcelExportUtil {
 				cell.setCellValue(utils.sanitizeForExcel(key)); // Sanitize header (optional)
 				cell.setCellStyle(headerStyle);
 			}
+			
+			System.out.println("----------2-----------------");
 
 			// Fill data rows
 			int rowIndex = 3;
@@ -113,30 +116,31 @@ public class ExcelExportUtil {
 				}
 			}
 			
-			// === Auto-size all columns with minimum width ===
-			int totalColumns = !data.isEmpty() ? data.get(0).size()+1 : 0; //added +1 for serial number
-			for (int i = 0; i < totalColumns; i++) {
-			    sheet.autoSizeColumn(i);
-
-			    // minimum width (e.g., 4000 = ~15 characters)
-			    int currentWidth = sheet.getColumnWidth(i);
-			    int minWidth = 4000; 
-			    if (currentWidth < minWidth) {
-			        sheet.setColumnWidth(i, minWidth);
-			    }
-			}
-
+			System.out.println("-------------3------------");
+//			// === Auto-size all columns with minimum width ===
+//			int totalColumns = !data.isEmpty() ? data.get(0).size()+1 : 0; //added +1 for serial number
+//			for (int i = 0; i < totalColumns; i++) {
+//			    sheet.autoSizeColumn(i);
+//			    System.out.println("---inside auto sizing column----");
+//			    // minimum width (e.g., 4000 = ~15 characters)
+//			    int currentWidth = sheet.getColumnWidth(i);
+//			    int minWidth = 4000; 
+//			    if (currentWidth < minWidth) {
+//			        sheet.setColumnWidth(i, minWidth);
+//			    }
+//			}
+			System.out.println("file write");
 		}
 		
+		System.out.println("-------------writing out------------");
 		workbook.write(out);
 		workbook.close();
-
+		System.out.println("----before returning excel bytes----");
 		byte[] excelBytes = out.toByteArray();
+		System.out.println("----returning excel bytes----");
+		return excelBytes;
+		
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentDisposition(ContentDisposition.builder("attachment").filename("report_title.xlsx").build());
-		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-
-		return ResponseEntity.ok().headers(headers).body(excelBytes);
+//		return ResponseEntity.ok().headers(headers).body(excelBytes);
 	}
 }

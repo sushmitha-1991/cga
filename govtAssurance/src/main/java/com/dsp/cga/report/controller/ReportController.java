@@ -2,10 +2,12 @@ package com.dsp.cga.report.controller;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,19 +15,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dsp.cga.report.dto.AssurancesRegisterResponseDto;
 import com.dsp.cga.report.dto.ClubbingDetailsResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWiseAssurancesResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWiseFimpAssurancesResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWisePendingAssurancesResponseDto;
+import com.dsp.cga.report.dto.DeletedAssurancesResponseDto;
 import com.dsp.cga.report.dto.DroppedAssurancesReportResponseDto;
 import com.dsp.cga.report.dto.ExtensionReportResponseDto;
+import com.dsp.cga.report.dto.GenericExcelInputDTO;
+import com.dsp.cga.report.dto.GenericReportInputDTO;
 import com.dsp.cga.report.dto.ImplementationReportResponseDto;
 import com.dsp.cga.report.dto.MinistryWisePendingAssurancesResponseDto;
 import com.dsp.cga.report.dto.PendingAssurancesListResponseDto;
+import com.dsp.cga.report.dto.QuarterlyReportResponseDto;
 import com.dsp.cga.report.dto.ReportRequestDto;
 import com.dsp.cga.report.service.ReportService;
 import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.util.ExcelExportUtil;
+import com.dsp.cga.util.PdfExportUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -40,6 +48,9 @@ public class ReportController {
 	
 	@Autowired
 	private ExcelExportUtil excelUtil;
+	
+	@Autowired
+	private PdfExportUtil pdfUtil;
 
 	@PostMapping("/get-implementation-report")
 	@Operation(summary = "Get Implementation report")
@@ -210,9 +221,88 @@ public class ReportController {
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 	
-	@PostMapping(value = "/generate-excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	public ResponseEntity<byte[]> generateExcelReport(@RequestBody List<Map<String, Object>> data) throws IOException
-	{
-		return excelUtil.generateExcel(data);
+	@GetMapping("/get-deleted-assurances")
+	@Operation(summary = "Get Deleted Assurances report")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Deleted Assurances Report created successfully"),
+			@ApiResponse(responseCode = "400", description = "Invalid input data"),
+			@ApiResponse(responseCode = "500", description = "Internal server error") })
+	public ResponseEntity<GenericResponse<List<DeletedAssurancesResponseDto>>> getDeletedAssurancesReport() {
+		System.out.println("------Inside Delete Assurance report controller-----");
+		List<DeletedAssurancesResponseDto> result = reportService.getDeletedAssurancesReport();
+		if (result.size() > 0) {
+			System.out.println(" result :" + result);
+		} else {
+			System.out.println(" list empty :" + result);
+		}
+		GenericResponse<List<DeletedAssurancesResponseDto>> response = new GenericResponse<>(HttpStatus.OK.value(),
+				true, "Deleted assurances report fetched successfully", result);
+
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
+	
+	@GetMapping("/get-registered-assurances")
+	@Operation(summary = "Get Registered Assurances report")
+	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Registered Assurances Report created successfully"),
+			@ApiResponse(responseCode = "400", description = "Invalid input data"),
+			@ApiResponse(responseCode = "500", description = "Internal server error") })
+	public ResponseEntity<GenericResponse<List<AssurancesRegisterResponseDto>>> getAssuranceRegisterReport() {
+		System.out.println("------Inside Delete Assurance report controller-----");
+		List<AssurancesRegisterResponseDto> result = reportService.getAssuranceRegisterReport();
+		if (result.size() > 0) {
+			System.out.println(" result :" + result);
+		} else {
+			System.out.println(" list empty :" + result);
+		}
+		GenericResponse<List<AssurancesRegisterResponseDto>> response = new GenericResponse<>(HttpStatus.OK.value(),
+				true, "Registered assurances report fetched successfully", result);
+
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+	
+	@PostMapping(value = "/generate-excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	public ResponseEntity<?> generateExcelReport(@RequestBody GenericExcelInputDTO input) throws IOException
+	{
+		System.out.println("----------inside generate excel service-------");
+		byte[] result=excelUtil.generateExcel(input.getData(),input.getReportTitle());
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentDisposition(ContentDisposition.builder("attachment").filename(input.getReportTitle()+".xlsx").build());
+//		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		headers.setContentType(MediaType.parseMediaType(
+		        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+		    ));
+		
+		return ResponseEntity.status(HttpStatus.OK).headers(headers).body(result);
+	}
+	
+	@PostMapping("/generate-generic-report")
+	public ResponseEntity<?> generateGenericPdf(@RequestBody GenericReportInputDTO input) throws Exception {
+
+		String abbr = input.getAbbr();
+		System.out.println("------inside generate pdf service-----");
+		byte[] pdfBytes = pdfUtil.generatePdf(abbr, input.getReportParams());
+		System.out.println("------------returned pdfBytes-----");
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		headers.setContentDispositionFormData("inline", abbr + System.currentTimeMillis() + ".pdf");
+//		return ResponseEntity.status(HttpStatus.OK).headers(headers).contentLength(pdfBytes.length).body(pdfBytes);
+		return ResponseEntity.ok().headers(headers).contentLength(pdfBytes.length).body(pdfBytes);
+		
+	}
+	
+	@PostMapping("/get-quarterly-report")
+	@Operation(summary = "Get Quarterly report")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "201", description = "Quarterly Report created successfully"),
+			@ApiResponse(responseCode = "400", description = "Invalid input data"),
+			@ApiResponse(responseCode = "500", description = "Internal server error") })
+	public ResponseEntity<GenericResponse<List<QuarterlyReportResponseDto>>> getQuarterlyReport(
+			@RequestBody ReportRequestDto dto) {
+
+		List<QuarterlyReportResponseDto> result = reportService.getQuarterlyReport(dto.getInputDate());
+		GenericResponse<List<QuarterlyReportResponseDto>> response = new GenericResponse<>(
+				HttpStatus.OK.value(), true, "Quarterly report fetched successfully", result);
+
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+	
 }

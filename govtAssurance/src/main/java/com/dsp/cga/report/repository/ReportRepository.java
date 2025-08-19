@@ -20,6 +20,7 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			    ca.assurance_no AS assuranceNo,
 			    mc.code AS questionType,
 			    ca.question_no AS questionNo,
+			    ca.created_at as questionDate,
 			    ca.subject AS subject,
 			    mm.ministry_name AS ministry,
 			    cir.laying_date AS layingDate,
@@ -43,7 +44,7 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			ca.assurance_no as assuranceNo,
 			mc.code as questionType,
 			ca.question_no as questionNo,
-			--question date not confirmed
+			ca.created_at as questionDate,
 			ca.subject as subject,
 			mm.ministry_name as ministry,
 			cer.extension_no as extensionNo,
@@ -69,7 +70,7 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			ca.assurance_no as assuranceNo,
 			mc.code as questionType,
 			ca.question_no as questionNo,
-			--question date not confirmed
+			ca.created_at as questionDate,
 			ca.subject as subject,
 			mm.ministry_name as ministry,
 			cdr.ministry_ref_no as ministryRefNo,
@@ -98,9 +99,9 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			ca.file_no fileNo,
 			mc1.code as questionType,
 			ca.question_no AS questionNo,
-			--question date not confirmed
+			ca.created_at as questionDate,
 			ca.subject AS subject,
-			--extent doubt
+			cer.ext_granted_till_date AS extent,
 			mc2.code as pendingDueTo
 			from cga.assurance ca
 			join master.codes mc on mc.id=ca.source_id
@@ -113,9 +114,10 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			ON ca.rajya_sabha_session_no = rs.id
 			join master.ministries mm on mm.id=ca.ministry_id
 			join master.departments md on md.id=ca.department_id
+			left join cga.extension_requests cer on cer.assurance_id=ca.id
 			where pending_due_to is not null and ca.updated_at < current_date
 			group by sessionNo,sourceName,member,ministry,department,assuranceNo,fileNo,
-			questionType,questionNo,subject,pendingDueTo
+			questionType,questionNo,questionDate,ca.subject,extent,pendingDueTo
 			""", nativeQuery = true)
 	List<Object[]> fetchPendingAssurancesLists();
 	
@@ -130,9 +132,9 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			ca.assurance_no as assuranceNo,
 			ca.question_no as questionNo,
 			mc.code as questionType,
-			--question date not confirmed
+			ca.created_at as questiondate,
 			ca.subject as subject,
-			--extent doubt
+			cer.ext_granted_till_date AS extent,
 			mc1.code as pendingDueTo
 			from master.ministries mm
 			join cga.assurance ca on mm.id=ca.ministry_id
@@ -142,8 +144,9 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			left join master.lok_sabha_session_masters ls on ca.lok_sabha_session_no = ls.id and ca.house_id = 2
 			join master.codes mc on mc.id=ca.assurance_type_id
 			join master.codes mc1 on mc1.id=ca.pending_due_to
+			left join cga.extension_requests cer on cer.assurance_id=ca.id
 			where ca.pending_due_to is not null and ca.updated_at < current_date
-			group by mm.ministry_name,sessionNo,member,assuranceNo,questionNo,questionType,subject,pendingDueTo
+			group by mm.ministry_name,sessionNo,member,assuranceNo,questionNo,questionType,questionDate,ca.subject,extent,pendingDueTo
 			order by mm.ministry_name
 			""", nativeQuery = true)
 	List<Object[]> fetchMinistryWisePendingAssurancesLists();
@@ -203,20 +206,135 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 	List<Object[]> fetchConsolidatedMinistryWiseAssurancesDetails();
 	
 	@Query(value = """
-						select 
-			ca.assurance_no AS assuranceNo,
-			mc.code AS questionType,
-			ca.question_no AS questionNo,
-			ca.subject AS subject,
-			mm.ministry_name AS ministry,
-			count(cca.id) as totalClubbedAssurances,
-			'Date_of_Assurance:- '||ca.assurance_date as clubbedAssurancesList
-			from cga.clubbed_assurances cca
-			join cga.assurance ca on ca.id=cca.assurance_id
-			join master.codes mc on mc.id=ca.assurance_type_id
-			join master.ministries mm on mm.id=ca.ministry_id
-			group by ca.id,questionType,ministry
+						select
+			    ca.assurance_no AS assuranceNo,
+			    mc.code AS questionType,
+			    ca.question_no AS questionNo,
+			    ca.created_at as questionDate,
+			    ca.subject AS subject,
+			    mm.ministry_name AS ministry,
+			    count(ccam.mapped_clubbed_assurance_id) as totalClubbedAssurances,
+			    case when count(ccam.mapped_clubbed_assurance_id)=0 then null
+			    else string_agg(
+			      'Assurance given in reply to USQ/SQ No. '
+			      || coalesce(ca1.question_no, '__')
+			      || ' dated ' || coalesce(to_char(ca1.created_at, 'DD-Mon-YYYY'), '__')
+			      || ' regarding ' || coalesce(ca1.subject, '__'),
+			      '\n'
+			      ORDER BY ca1.created_at
+			  ) end as clubbedAssurancesList
+			from cga.assurance ca
+			left join cga.clubbed_assurances cca on cca.assurance_id = ca.id
+			left join cga.clubbed_assurance_mapping ccam on ccam.clubbed_assurance_id = cca.id
+			left join cga.assurance ca1 on ca1.id = ccam.mapped_clubbed_assurance_id
+			join master.codes mc on mc.id = ca.assurance_type_id
+			join master.ministries mm on mm.id = ca.ministry_id
+			group by ca.id, assuranceNo, questionType, questionNo, questionDate, ca.subject, ministry
 			order by ca.id desc
 			""", nativeQuery = true)
 	List<Object[]> fetchClubbingDetails();
+	
+	
+	@Query(value = """
+						select
+			ca.assurance_no as assuranceNo,
+			mc.code as questionType,
+			ca.question_no as questionNo,
+			ca.created_at as questionDate,
+			ca.subject as subject,
+			ca.updated_at as deleteDate
+			from cga.assurance ca
+			join master.codes mc on mc.id=ca.assurance_type_id
+			where ca.is_deleted='true'
+			""", nativeQuery = true)
+	List<Object[]> fetchDeletedAssurancesReport();
+	
+	@Query(value = """
+						select
+			ca.assurance_no as assuranceNo,
+			ca.question_no as questionNo,
+			ca.created_at as questionDate,
+			ca.subject as subject,
+			mm.ministry_name as ministry,
+			ca.date_of_implementation as implementationDate,
+			cir.laying_date as layingDate,
+			cdr.actual_drop_date as dropDate,
+			ca.updated_at as deleteDate,
+			cdr.ministry_ref_no as ministryRefNo
+			from cga.assurance ca
+			join cga.implementation_requests cir on cir.assurance_id=ca.id
+			join cga.dropping_requests cdr on cdr.assurance_id=ca.id
+			join master.ministries mm on mm.id=ca.ministry_id
+			order by ca.id desc
+			""", nativeQuery = true)
+	List<Object[]> fetchAssuranceRegisterReport();
+	
+	@Query(value = """
+						WITH date_params AS (
+			    SELECT
+			        date_trunc('quarter', CAST(:inputDate AS date))::date AS qtr_start,
+			        (date_trunc('quarter', CAST(:inputDate AS date)) + interval '3 month - 1 day')::date AS qtr_end,
+			        CAST(:inputDate AS date) AS ref_date
+			)
+			SELECT
+			    mm.ministry_name as ministry,
+
+			    -- Pending at start of quarter
+			    COUNT(*) FILTER (
+			        WHERE ca.status_id in (57,766)
+			          AND ca.updated_at < dp.qtr_start
+			    ) AS pendingStartQrtr,
+
+			    -- Added during quarter
+			    COUNT(*) FILTER (
+			        WHERE ca.updated_at BETWEEN dp.qtr_start AND dp.qtr_end
+			    ) AS addedQrtr,
+
+			    -- Dropped during quarter
+			    COUNT(*) FILTER (
+			        WHERE ca.status_id in (770)
+			          AND ca.updated_at BETWEEN dp.qtr_start AND dp.qtr_end
+			    ) AS droppedQrtr,
+
+			    -- Laid during quarter
+			    COUNT(*) FILTER (
+			        WHERE ca.updated_at BETWEEN dp.qtr_start AND dp.qtr_end
+			    ) AS laidQrtr,
+
+			    -- Ageing buckets (calculated as of :givenDate)
+			    COUNT(*) FILTER (
+			        WHERE ca.status_id in (57,766)
+			          AND AGE(dp.ref_date, ca.updated_at) <= interval '6 months'
+			    ) AS lessThanSixMonths,
+
+			    COUNT(*) FILTER (
+			        WHERE ca.status_id in (57,766)
+			          AND AGE(dp.ref_date, ca.updated_at) > interval '6 months'
+			          AND AGE(dp.ref_date, ca.updated_at) <= interval '12 months'
+			    ) AS betweenSixAndTwelveMonths,
+
+			    COUNT(*) FILTER (
+			        WHERE ca.status_id in (57,766)
+			          AND AGE(dp.ref_date, ca.updated_at) > interval '12 months'
+			          AND AGE(dp.ref_date, ca.updated_at) <= interval '24 months'
+			    ) AS betweenTwelveAndTwentyFourMonths,
+
+			    COUNT(*) FILTER (
+			        WHERE ca.status_id in (57,766)
+			          AND AGE(dp.ref_date, ca.updated_at) > interval '24 months'
+			    ) AS moreThanTwentyFourMonths,
+
+			    -- Total pending at given date
+			    COUNT(*) FILTER (
+			        WHERE ca.status_id in (57,766)
+			          AND ca.updated_at <= dp.ref_date
+			    ) AS totalPending
+
+			FROM cga.assurance ca
+			join master.ministries mm on mm.id=ca.ministry_id
+			CROSS JOIN date_params dp
+			GROUP BY mm.ministry_name
+			ORDER BY mm.ministry_name
+			""", nativeQuery = true)
+	List<Object[]> fetchQuarterlyReport(@Param("inputDate") LocalDate inputDate);
 }

@@ -8,15 +8,18 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dsp.cga.report.dto.AssurancesRegisterResponseDto;
 import com.dsp.cga.report.dto.ClubbingDetailsResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWiseAssurancesResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWiseFimpAssurancesResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWisePendingAssurancesResponseDto;
+import com.dsp.cga.report.dto.DeletedAssurancesResponseDto;
 import com.dsp.cga.report.dto.DroppedAssurancesReportResponseDto;
 import com.dsp.cga.report.dto.ExtensionReportResponseDto;
 import com.dsp.cga.report.dto.ImplementationReportResponseDto;
 import com.dsp.cga.report.dto.MinistryWisePendingAssurancesResponseDto;
 import com.dsp.cga.report.dto.PendingAssurancesListResponseDto;
+import com.dsp.cga.report.dto.QuarterlyReportResponseDto;
 import com.dsp.cga.report.repository.ReportRepository;
 import com.dsp.cga.report.service.ReportService;
 import com.dsp.cga.util.DateFormatterUtil;
@@ -46,10 +49,11 @@ public class ReportServiceImpl implements ReportService {
                 				row[0] != null ? row[0].toString() : null, // assuranceNo
                                 row[1] != null ? row[1].toString() : null, // questionType
                                 row[2] != null ? row[2].toString() : null, // questionNo
-                                row[3] != null ? row[3].toString() : null, // subject
-                                row[4] != null ? row[4].toString() : null, // ministry
-                                row[5] != null ? row[5].toString() : null, // layingDate
-                                row[6] != null ? (DateFormatterUtil.formatDateTime(row[6].toString())) : null  // createdOn  
+                                row[3] != null ? (DateFormatterUtil.formatDateTime(row[3].toString())) : null, //questionDate		
+                                row[4] != null ? row[4].toString() : null, // subject
+                                row[5] != null ? row[5].toString() : null, // ministry
+                                row[6] != null ? row[6].toString() : null, // layingDate
+                                row[7] != null ? (DateFormatterUtil.formatDateTime(row[7].toString())) : null  // createdOn  
 //                                row[7] != null ? row[7].toString() : null,
 //                                row[8] != null ? row[8].toString() : null,
 //                                row[9] != null ? row[9].toString() : null,
@@ -75,15 +79,16 @@ public class ReportServiceImpl implements ReportService {
                 				row[0] != null ? row[0].toString() : null, // assuranceNo
                                 row[1] != null ? row[1].toString() : null, // questionType
                                 row[2] != null ? row[2].toString() : null, // questionNo
-                                row[3] != null ? row[3].toString() : null, // subject
-                                row[4] != null ? row[4].toString() : null, // ministry
-                                row[5] != null ? row[5].toString() : null, // extensionNo
-                                row[6] != null ? (DateFormatterUtil.formatDate(row[6].toString())) : null,  // extReqDate  
-                                row[7] != null ? (DateFormatterUtil.formatDate(row[7].toString())) : null, // extGrantDate
-                                row[8] != null ? row[8].toString() : null, //ministryRefNo
-                                row[9] != null ? (DateFormatterUtil.formatDate(row[9].toString())) : null, //ministryRefDate
-                                row[10] != null ? row[10].toString() : null, //extensionRemarks
-                                row[11] != null ? (DateFormatterUtil.formatDateTime(row[11].toString())) : null //updatedOn
+                                row[3] != null ? (DateFormatterUtil.formatDateTime(row[3].toString())) : null, //questionDate		
+                                row[4] != null ? row[4].toString() : null, // subject
+                                row[5] != null ? row[5].toString() : null, // ministry
+                                row[6] != null ? row[6].toString() : null, // extensionNo
+                                row[7] != null ? (DateFormatterUtil.formatDate(row[7].toString())) : null,  // extReqDate  
+                                row[8] != null ? (DateFormatterUtil.formatDate(row[8].toString())) : null, // extGrantDate
+                                row[9] != null ? row[9].toString() : null, //ministryRefNo
+                                row[10] != null ? (DateFormatterUtil.formatDate(row[10].toString())) : null, //ministryRefDate
+                                row[11] != null ? row[11].toString() : null, //extensionRemarks
+                                row[12] != null ? (DateFormatterUtil.formatDateTime(row[12].toString())) : null //updatedOn
                                 		
                 		))
                 .toList();
@@ -104,13 +109,14 @@ public class ReportServiceImpl implements ReportService {
                 				row[0] != null ? row[0].toString() : null, // assuranceNo
                                 row[1] != null ? row[1].toString() : null, // questionType
                                 row[2] != null ? row[2].toString() : null, // questionNo
-                                row[3] != null ? row[3].toString() : null, // subject
-                                row[4] != null ? row[4].toString() : null, // ministry
-                                row[5] != null ? row[5].toString() : null, // ministryRefNo
-                                row[6] != null ? (DateFormatterUtil.formatDate(row[6].toString())) : null,  // ministryRefDate  
-                                row[7] != null ? row[7].toString() : null, // reason
-                                row[8] != null ? (DateFormatterUtil.formatDate(row[8].toString())) : null, //meetingDate
-                                row[9] != null ? (DateFormatterUtil.formatDateTime(row[9].toString())) : null //updatedOn
+                                row[3] != null ? (DateFormatterUtil.formatDateTime(row[3].toString())) : null, //questionDate	
+                                row[4] != null ? row[4].toString() : null, // subject
+                                row[5] != null ? row[5].toString() : null, // ministry
+                                row[6] != null ? row[6].toString() : null, // ministryRefNo
+                                row[7] != null ? (DateFormatterUtil.formatDate(row[7].toString())) : null,  // ministryRefDate  
+                                row[8] != null ? row[8].toString() : null, // reason
+                                row[9] != null ? (DateFormatterUtil.formatDate(row[9].toString())) : null, //meetingDate
+                                row[10] != null ? (DateFormatterUtil.formatDateTime(row[10].toString())) : null //updatedOn
                                 		
                 		))
                 .toList();
@@ -137,8 +143,10 @@ public class ReportServiceImpl implements ReportService {
                                 row[7] != null ? row[7].toString() : null, // fileNo
                                 row[8] != null ? row[8].toString() : null, //questionType
                                 row[9] != null ? row[9].toString() : null, //questionNo
-                                row[10] != null ? row[10].toString() : null, //subject
-                                row[11] != null ? row[11].toString() : null //pendingDueTo
+                                row[10] != null ? (DateFormatterUtil.formatDateTime(row[10].toString())) : null,	//questionDate	
+                                row[11] != null ? row[11].toString() : null, //subject
+                                row[12] != null ? (DateFormatterUtil.formatDate(row[12].toString())) : null,	//extentDate
+                                row[13] != null ? row[13].toString() : null //pendingDueTo
                 		))
                 .toList();
 	}
@@ -160,8 +168,10 @@ public class ReportServiceImpl implements ReportService {
                                 row[3] != null ? row[3].toString() : null, // assuranceNo
                                 row[4] != null ? row[4].toString() : null, // questionNo
                                 row[5] != null ? row[5].toString() : null, // questionType
-                                row[6] != null ? row[6].toString() : null,  // subject
-                                row[7] != null ? row[7].toString() : null  // pendingDueTo
+                                row[6] != null ? (DateFormatterUtil.formatDateTime(row[6].toString())) : null,	//questionDate
+                                row[7] != null ? row[7].toString() : null,  // subject
+                                row[8] != null ? (DateFormatterUtil.formatDate(row[8].toString())) : null,	//extentDate
+                                row[9] != null ? row[9].toString() : null  // pendingDueTo
                                 
                 		))
                 .toList();
@@ -245,11 +255,83 @@ public class ReportServiceImpl implements ReportService {
                 .map(row -> new ClubbingDetailsResponseDto(
                 				row[0] != null ? row[0].toString() : null, // assuranceNo
                                 row[1] != null ? row[1].toString() : null, // questionType
-                                row[2] != null ? row[2].toString() : null, // questionNo		
+                                row[2] != null ? row[2].toString() : null, // questionNo	
+                                row[3] != null ? (DateFormatterUtil.formatDateTime(row[3].toString())) : null, // questionDate
+                                row[4] != null ? row[4].toString() : null, // subject
+                                row[5] != null ? row[5].toString() : null, // ministry
+                                row[6] != null ? row[6].toString() : null, // totalClubbedAssurances
+                                row[7] != null ? row[7].toString() : null // clubbedAssurancesList
+                		))
+                .toList();
+	}
+	
+	@Override
+	public List<DeletedAssurancesResponseDto> getDeletedAssurancesReport() {
+		List<Object[]> results = reportRepo.fetchDeletedAssurancesReport();
+		if(results.size()>0) {
+		System.out.println(" result :"+results);}
+		else
+		{
+			System.out.println(" list empty :"+results);
+		}
+		return results.isEmpty() ? Collections.emptyList() : results.stream()
+                .map(row -> new DeletedAssurancesResponseDto(
+                				row[0] != null ? row[0].toString() : null, // assuranceNo
+                                row[1] != null ? row[1].toString() : null, // questionType
+                                row[2] != null ? row[2].toString() : null, // questionNo	
+                                row[3] != null ? (DateFormatterUtil.formatDateTime(row[3].toString())) : null, // questionDate
+                                row[4] != null ? row[4].toString() : null, // subject
+                                row[5] != null ? (DateFormatterUtil.formatDateTime(row[5].toString())) : null // deletionDate
+                		))
+                .toList();
+	}
+	
+	@Override
+	public List<AssurancesRegisterResponseDto> getAssuranceRegisterReport() {
+		List<Object[]> results = reportRepo.fetchAssuranceRegisterReport();
+		if(results.size()>0) {
+		System.out.println(" result :"+results);}
+		else
+		{
+			System.out.println(" list empty :"+results);
+		}
+		return results.isEmpty() ? Collections.emptyList() : results.stream()
+                .map(row -> new AssurancesRegisterResponseDto(
+                				row[0] != null ? row[0].toString() : null, // assuranceNo
+                                row[1] != null ? row[1].toString() : null, // questionNo	
+                                row[2] != null ? (DateFormatterUtil.formatDateTime(row[2].toString())) : null, // questionDate
                                 row[3] != null ? row[3].toString() : null, // subject
-                                row[4] != null ? row[4].toString() : null, // ministry
-                                row[5] != null ? row[5].toString() : null, // totalClubbedAssurances
-                                row[6] != null ? row[6].toString() : null // clubbedAssurancesList
+                                row[4] != null ? row[4].toString() : null, // ministry	
+                                row[5] != null ? (DateFormatterUtil.formatDate(row[5].toString())) : null, // implementationDate
+                                row[6] != null ? (DateFormatterUtil.formatDate(row[6].toString())) : null, // layingdate
+                                row[7] != null ? (DateFormatterUtil.formatDate(row[7].toString())) : null, // dropDate
+                                row[8] != null ? (DateFormatterUtil.formatDateTime(row[8].toString())) : null, // deletionDate
+                                row[9] != null ? row[9].toString() : null // ministryRefNo
+                		))
+                .toList();
+	}
+	
+	@Override
+	public List<QuarterlyReportResponseDto> getQuarterlyReport(LocalDate inputDate) {
+		List<Object[]> results = reportRepo.fetchQuarterlyReport(inputDate);
+		if(results.size()>0) {
+		System.out.println(" result :"+results);}
+		else
+		{
+			System.out.println(" list empty :"+results);
+		}
+		return results.isEmpty() ? Collections.emptyList() : results.stream()
+                .map(row -> new QuarterlyReportResponseDto(
+                				row[0] != null ? row[0].toString() : null, // ministry
+                                row[1] != null ? row[1].toString() : null, // pendingStartQrtr	
+                                row[2] != null ? row[2].toString() : null, // addedQrtr
+                                row[3] != null ? row[3].toString() : null, // droppedQrtr
+                                row[4] != null ? row[4].toString() : null, // laidQrtr	
+                                row[5] != null ? row[5].toString() : null, // lessThanSixMonths
+                                row[6] != null ? row[6].toString() : null, // betweenSixAndTwelveMonths
+                                row[7] != null ? row[7].toString() : null, // betweenTwelveAndTwentyFourMonths
+                                row[8] != null ? row[8].toString() : null, // moreThanTwentyFourMonths
+                                row[9] != null ? row[9].toString() : null // totalPending
                 		))
                 .toList();
 	}

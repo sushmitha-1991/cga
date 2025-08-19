@@ -148,6 +148,19 @@
 			<version>1.15.3</version> <!-- Check for the latest version -->
 		</dependency>
 		
+		<!-- https://mvnrepository.com/artifact/com.itextpdf/html2pdf -->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>html2pdf</artifactId>
+			<version>4.0.5</version>
+		</dependency>
+		
+		<!-- thymeleaf dependency -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
