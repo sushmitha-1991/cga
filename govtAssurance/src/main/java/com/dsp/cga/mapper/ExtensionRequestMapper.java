@@ -29,6 +29,7 @@ public class ExtensionRequestMapper {
 	                .ministryRefNo(entity.getMinistryRefNo())
 	                .ministryRefDate(entity.getMinistryRefDate())
 	                .remarks(entity.getRemarks())
+	                .fromMinistry(entity.getFromMinistry())
 	                .extensionFiles(entity.getExtensionFiles())
 	                .draftStatus(entity.getDraftStatus())
 	                .statusId(entity.getStatusId())
