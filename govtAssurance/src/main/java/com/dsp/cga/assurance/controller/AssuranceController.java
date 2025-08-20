@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
-import com.dsp.cga.assurance.dto.AssuranceRequestCountDTO;
+import com.dsp.cga.assurance.dto.DocumentMetadataDTO;
+import com.dsp.cga.assurance.dto.WorkflowRequestDto;
 import com.dsp.cga.assurance.service.AssuranceService;
-import com.dsp.cga.report.dto.ExtensionReportResponseDto;
-import com.dsp.cga.report.dto.ReportRequestDto;
+import com.dsp.cga.entity.RequestHistory;
 import com.dsp.cga.report.service.ReportService;
 import com.dsp.cga.response.GenericResponse;
 
@@ -374,24 +374,43 @@ public class AssuranceController {
 //	        return ResponseEntity.ok(result);
 //	    }
 	
-//	------- report controller testing purpose-----------------
-	@GetMapping("/get-extension-report")
-	@Operation(summary = "Get Extension report")
-	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Extension Report created successfully"),
-			@ApiResponse(responseCode = "400", description = "Invalid input data"),
-			@ApiResponse(responseCode = "500", description = "Internal server error") })
-	public ResponseEntity<GenericResponse<List<ExtensionReportResponseDto>>> getExtensionReport() {
-		System.out.println("------Inside extension report controller-----");
-		List<ExtensionReportResponseDto> result = reportService.getExtensionReport();
-		if (result.size() > 0) {
-			System.out.println(" result :" + result); 
-		} else {
-			System.out.println(" list empty :" + result);
-		}
-		GenericResponse<List<ExtensionReportResponseDto>> response = new GenericResponse<>(HttpStatus.OK.value(),
-				true, "Extension report fetched successfully", result);
+	/*
+	 * Get the Input History
+	 */
+	@PostMapping("/get-input-history")
+	public ResponseEntity<GenericResponse<List<RequestHistory>>> getInputHistory(
+			@RequestBody WorkflowRequestDto dto) {
+		
+		List<RequestHistory> histories = assuranceService.getInputHistoryByRequestId(dto.getRequestId());
 
-		return ResponseEntity.status(HttpStatus.OK).body(response);
+		if (histories.isEmpty()) {
+			GenericResponse<List<RequestHistory>> response = new GenericResponse<>(false, "No records found",
+					histories, HttpStatus.OK.value());
+			return ResponseEntity.status(HttpStatus.OK).body(response);
+		}
+
+		GenericResponse<List<RequestHistory>> response = new GenericResponse<>(true, "Records found", histories,
+				HttpStatus.OK.value());
+
+		return ResponseEntity.ok(response);
 	}
 
+	
+	@PostMapping("/get-input-documents")
+	public ResponseEntity<GenericResponse<List<DocumentMetadataDTO>>> getInputDocuments (
+															@RequestBody WorkflowRequestDto dto) {
+
+		List<DocumentMetadataDTO> histories = assuranceService.getDocuments(dto.getRequestId());
+
+		if (histories.isEmpty()) {
+			GenericResponse<List<DocumentMetadataDTO>> response = new GenericResponse<>(false, "No records found",
+					histories, HttpStatus.OK.value());
+			return ResponseEntity.status(HttpStatus.OK).body(response);
+		}
+
+		GenericResponse<List<DocumentMetadataDTO>> response = new GenericResponse<>(true, "Records found", histories,
+				HttpStatus.OK.value());
+
+		return ResponseEntity.ok(response);
+	}
 }
