@@ -251,12 +251,12 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 
 	            } else {
 	            	
-	            	log.info("New Entity created");
 	                // Create a new entity
 	                ExtensionRequest newRequest = ExtensionRequestMapper.toEntity(dto);
 
 	                // Save the new entity
 	                savedRequest = extenionRequestRepository.save(newRequest);
+	            	log.info("New Entity created");
 	            }
 	        }
 

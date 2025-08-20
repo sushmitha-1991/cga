@@ -68,7 +68,7 @@ public class ExtensionRequestMapper {
 				dto.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
 	        } else {
 	            dto.setStatusForMinistry(MinistryStatus.ACCEPTED.getValue());
-				dto.setStatusForCga(CgaStatus.ACCEPTED.getValue()); 
+				dto.setStatusForCga(CgaStatus.ACCEPTED.getValue());  
 	        }
 	        
 	        return ExtensionRequest.builder()
