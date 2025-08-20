@@ -2,12 +2,12 @@ package com.dsp.cga.assurance.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
-import com.dsp.cga.assurance.dto.AssuranceRequestCountDTO;
+import com.dsp.cga.assurance.dto.DocumentMetadataDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceWithImplementationRequestDTO;
+import com.dsp.cga.entity.RequestHistory;
 
 public interface AssuranceService {
 
@@ -41,7 +41,8 @@ public interface AssuranceService {
 
 	//AssuranceRequestCountDTO getAssuranceRequestCounts(Long sessionNo, Integer ministryCode);
 
-	
+	public List<RequestHistory> getInputHistoryByRequestId(Long requestId);
+	public List<DocumentMetadataDTO> getDocuments(Long requestId);
 
 	
 }
