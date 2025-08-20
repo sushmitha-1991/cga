@@ -227,6 +227,8 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	                // Save the updated entity
 	                savedRequest = extenionRequestRepository.save(existingRequest);
 	                
+	            	log.info("Existing Entity updated");
+
 	                // Remove from extnList as this has been processed
 	                extnList.remove(dto.getId());
 	            } else {
@@ -245,7 +247,11 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 
 	                // Save the updated entity
 	                savedRequest = extenionRequestRepository.save(existingRequest);
+	            	log.info("Existing Entity updated");
+
 	            } else {
+	            	
+	            	log.info("New Entity created");
 	                // Create a new entity
 	                ExtensionRequest newRequest = ExtensionRequestMapper.toEntity(dto);
 
