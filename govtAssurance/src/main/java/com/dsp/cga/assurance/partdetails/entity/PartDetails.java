@@ -30,7 +30,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-@Table(name = "part_details", schema = "cga")
+@Table(name = "part_details", schema = "cga")  
 public class PartDetails {
 
     @Id
