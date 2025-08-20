@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -35,9 +32,9 @@ import com.dsp.cga.assurance.droppingrequest.repository.DroppingRequestRepositor
 import com.dsp.cga.assurance.dto.AssuranceCategory;
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
-import com.dsp.cga.assurance.dto.AssuranceRequestCountDTO;
 import com.dsp.cga.assurance.dto.AssuranceTypeDTO;
 import com.dsp.cga.assurance.dto.DepartmentsDTO;
+import com.dsp.cga.assurance.dto.DocumentMetadataDTO;
 import com.dsp.cga.assurance.dto.LokSabhaNoDTO;
 import com.dsp.cga.assurance.dto.LoksabhaSessionNoDTO;
 import com.dsp.cga.assurance.dto.MemberDTO;
@@ -45,8 +42,6 @@ import com.dsp.cga.assurance.dto.MinistryDTO;
 import com.dsp.cga.assurance.dto.PartDetailsDTO;
 import com.dsp.cga.assurance.dto.PendingDueToDTO;
 import com.dsp.cga.assurance.dto.RajyaSabhaSessionNoDTO;
-import com.dsp.cga.assurance.dto.SerialNumberRequest;
-import com.dsp.cga.assurance.dto.SerialNumberResponse;
 import com.dsp.cga.assurance.dto.SourceDTO;
 import com.dsp.cga.assurance.dto.StatusDTO;
 import com.dsp.cga.assurance.dto.SupplementDTO;
@@ -58,7 +53,6 @@ import com.dsp.cga.assurance.entity.Ministries;
 import com.dsp.cga.assurance.extensionrequest.entity.ExtensionRequest;
 import com.dsp.cga.assurance.extensionrequest.repository.ExtensionRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceWithImplementationRequestDTO;
-import com.dsp.cga.assurance.implementationrequest.entity.ImplementationRequest;
 import com.dsp.cga.assurance.implementationrequest.repository.ApplicationInstanceRepository;
 import com.dsp.cga.assurance.implementationrequest.repository.ImplementationRequestRepository;
 import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequestService;
@@ -77,12 +71,15 @@ import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.assurance.supplementry.repository.SupplementaryRepository;
+import com.dsp.cga.entity.RequestHistory;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.AssuranceListMapper;
 import com.dsp.cga.mapper.AssuranceMapper;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
 import com.dsp.cga.mapper.PartDetailsMapper;
+import com.dsp.cga.mapper.RequestHistoryMapper;
 import com.dsp.cga.mapper.SupplementaryMapper;
+import com.dsp.cga.repository.RequestHistoryRepository;
 import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.util.Utils;
 
@@ -210,6 +207,12 @@ public class AssuranceServiceImpl implements AssuranceService {
 	
 	@Autowired
 	private ImplementationRequestRepository implementationRequestRepository;
+	
+	@Autowired
+	private RequestHistoryRepository rqtHistoryRepo;
+	
+	@Autowired
+	private RequestHistoryMapper rqtHistoryMapper;
 
 	@Transactional
 	@Override
@@ -1282,7 +1285,35 @@ public class AssuranceServiceImpl implements AssuranceService {
 		
 	}
 
+	@Override
+	public List<RequestHistory> getInputHistoryByRequestId(Long requestId) {
+		
+		List<RequestHistory> historyList = rqtHistoryRepo.findByRequestId(requestId);
+		
+		List<RequestHistory> response =historyList.size()>0 ?
+		 historyList.stream()
+                .map(rqtHistoryMapper::toRequestHistory) 
+                .collect(Collectors.toList()) : Collections.EMPTY_LIST;
+		return response;
+    }
 	
+	@Override
+	public List<DocumentMetadataDTO> getDocuments(Long requestId) {
+		
+		RequestHistory history = rqtHistoryRepo.findTop1ByRequestIdOrderByCreatedAtDesc(requestId);
+		
+		if (history == null) return Collections.EMPTY_LIST;
+		
+		List<Map<String, Object>>docList = history.getReferenceFiles();
+		
+		if (docList == null) return Collections.EMPTY_LIST;
+		
+		return docList.stream()
+                .map(rqtHistoryMapper::toDocumentDTO) 
+                .collect(Collectors.toList());
+    
+	}	
+
 //		 @Override
 //		    public AssuranceRequestCountDTO getAssuranceRequestCounts(Long sessionNo, Integer ministryCode) {
 //			 Long houseId = getHouseId();

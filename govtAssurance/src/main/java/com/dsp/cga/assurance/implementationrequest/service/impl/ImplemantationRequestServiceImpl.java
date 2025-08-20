@@ -2,10 +2,6 @@ package com.dsp.cga.assurance.implementationrequest.service.impl;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
-import org.springframework.data.domain.Sort;
-
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -15,11 +11,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -55,6 +53,7 @@ import com.dsp.cga.assurance.implementationrequest.service.ImplementationRequest
 import com.dsp.cga.assurance.otherRequests.repository.OtherRequestRepository;
 import com.dsp.cga.assurance.partdetails.entity.PartDetails;
 import com.dsp.cga.assurance.repository.AssuranceRepository;
+import com.dsp.cga.assurance.repository.BaseUserRepository;
 import com.dsp.cga.assurance.repository.CodeRepository;
 import com.dsp.cga.assurance.repository.DepartmentRepository;
 import com.dsp.cga.assurance.repository.MasterLSSRepository;
@@ -63,14 +62,19 @@ import com.dsp.cga.assurance.repository.MinistryRepository;
 import com.dsp.cga.assurance.repository.PersonalDetailsRepository;
 import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
+import com.dsp.cga.entity.BaseUser;
 import com.dsp.cga.entity.MastersLokSabhaSession;
 import com.dsp.cga.entity.MastersRajyaSabha;
+import com.dsp.cga.entity.RequestHistory;
 import com.dsp.cga.eunms.CgaStatus;
 import com.dsp.cga.eunms.Entities;
 import com.dsp.cga.eunms.MinistryStatus;
 import com.dsp.cga.eunms.MopaStatus;
+import com.dsp.cga.eunms.RequestHistoryStatus;
+import com.dsp.cga.eunms.RequestType;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.ImplementationRequestMapper;
+import com.dsp.cga.repository.RequestHistoryRepository;
 import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.util.Utils;
 
@@ -125,6 +129,12 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	
 	@Autowired
 	private MastersRSSRepository rssRepo;
+	
+	@Autowired
+	private RequestHistoryRepository rqtHistoryRepo;
+	
+	@Autowired
+	private BaseUserRepository userRepo;
 	
 	@Value("${master.service.url}")
 	private String masterServiceUrl;
@@ -237,6 +247,9 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 		// Save again to persist the refId update
 		saved = implementationRequestRepository.save(saved);
+		
+		createRequestHistory(saved,"Created");
+		System.out.println("new record saved in request history table");
 	
 		return ImplementationRequestMapper.toDTO(saved);
 	}
@@ -335,6 +348,9 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        System.out.println("Updated: " + existingRequest);
 	        savedRequest = implementationRequestRepository.save(existingRequest);  
 	        
+	        createRequestHistory(savedRequest,savedRequest.getStatusForMopa());
+	        System.out.println("existing record saved in request history table");
+	        
 	    } else {
 	        // Create new entity
 	    	
@@ -347,6 +363,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 			}			
 			
 			savedDTO = createImplementationRequest(implementationRequestDTO);
+			
 //			
 //	        ImplementationRequest newRequest = ImplementationRequestMapper.toEntity(implementationRequestDTO);
 //	        savedRequest = implementationRequestRepository.save(newRequest);
@@ -1213,18 +1230,57 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	}	
 	
-}
+	private void createRequestHistory(ImplementationRequest input, String actionTaken) {
 
+//    	String pendingWithName = null;
+//    	String actiontakenByName = null;
+//    	
+//    	if ("Returned".equalsIgnoreCase(actionTaken)) {
+//    		pendingWithName = getActionTakenBy(input);
+//    		actiontakenByName = input.getPendingAt();
+//    	}
 
+		RequestHistory history = RequestHistory.builder()
+				.requestId(input.getId())
+				.requestType(RequestType.IMPLEMENTATION_REQ.getValue())
+				.actionType(actionTaken)
+				.referenceFiles(input.getImplementationReportFiles())
+				.pendingWith(RequestHistoryStatus.MOPA.getValue())
+				.actionTakenBy(RequestHistoryStatus.MINISTRY.getValue())
+				.actionTakenByName(Entities.MINISTRY.getValue())
+				.pendingWithName(Entities.MOPA.getValue())
+				.commentForDisplay(input.getRemarks())
+//    			.ipAddress(getClientIp(httpRequest))
+				.build();
 
+		rqtHistoryRepo.save(history);
+	}
 
+	private String getActionTakenBy(ImplementationRequest input) {
+
+		String userName="";
+		if(input.getUpdatedBy()==null && input.getCreatedBy()!=null)
+		{
+			Optional<BaseUser> user = userRepo.findById(input.getCreatedBy());
+			if (user == null)
+				return null;
+			System.out.println("Fetched user: " + input.getId() + " " + user.get());
+
+		 userName = user.get().getFirstName() + " " + (user.get().getMiddleName() != null ? (user.get().getMiddleName() + " ") : "")
+				+ (user.get().getLastName() != null ? user.get().getLastName() : "");
+	}
+		
+		if(!(input.getUpdatedBy()==null))
+		{
+			Optional<BaseUser> user = userRepo.findById(input.getUpdatedBy());
+			if (user == null)
+				return null;
+			System.out.println("Fetched user: " + input.getId() + " " + user.get());
+
+		 userName = user.get().getFirstName() + " " + (user.get().getMiddleName() != null ? (user.get().getMiddleName() + " ") : "")
+				+ (user.get().getLastName() != null ? user.get().getLastName() : "");
+		}
+		return userName;
+	}
 	
-
-
-
-
-
-
-
-
-
+}
