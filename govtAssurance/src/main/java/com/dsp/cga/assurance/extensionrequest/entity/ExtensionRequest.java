@@ -25,12 +25,15 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Builder
 @Table(name = "extension_requests", schema = "cga")
 @SQLDelete(sql = "UPDATE cga.extension_requests SET is_active = false, is_deleted = true WHERE id = ?")

@@ -19,6 +19,8 @@ public class ExtensionRequestMapper {
 	            return null;
 	        }
 
+	        System.out.println("ENTITY: " + entity);
+	        
 	        return ExtensionRequestDTO.builder()
 	                .id(entity.getId())
 	                .assuranceId(entity.getAssuranceId())

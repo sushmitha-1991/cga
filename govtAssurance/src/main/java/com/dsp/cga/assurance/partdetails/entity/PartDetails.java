@@ -1,5 +1,9 @@
 package com.dsp.cga.assurance.partdetails.entity;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
 import com.dsp.cga.assurance.entity.Assurance;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -16,12 +20,15 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 @Table(name = "part_details", schema = "cga")
 public class PartDetails {
