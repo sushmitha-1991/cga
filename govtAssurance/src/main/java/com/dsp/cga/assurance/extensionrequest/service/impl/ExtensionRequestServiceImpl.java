@@ -209,11 +209,16 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	    List<Long> extnList = extenionRequestRepository.getExtensionIdList(assuranceId);
 	    
 	    for (ExtensionRequestDTO dto : extensionRequestDTOList) {
-	        if (dto.getId() == null && (dto.getAssuranceId() == null || dto.getExtensionNo() == null)) {
-	            throw new IllegalArgumentException("Invalid input: AssuranceId and ExtensionNo cannot be null.");
+//	        if (dto.getId() == null && (dto.getAssuranceId() == null || dto.getExtensionNo() == null)) {
+	    	
+	    	System.out.println("ID: " + dto.getId());
+	    	System.out.println("Assurance ID: " + dto.getAssuranceId());
+
+	    	if (dto.getId() == null && dto.getAssuranceId() == null) {
+	            throw new IllegalArgumentException("Invalid input: AssuranceId and Extension ID both cannot be null.");
 	        }
 
-	        ExtensionRequest savedRequest;
+	        ExtensionRequest savedRequest = null;
 
 	        if (dto.getId() != null) {
 	            // If the ID is provided, try to find the existing record by ID
@@ -235,9 +240,9 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	                throw new IllegalArgumentException("No ExtensionRequest found with the provided ID: " + dto.getId());
 	            }
 
-	        } else {
+	        } else if (dto.getAssuranceId() != null && dto.getExtensionNo() != null) { 
 	            // If no ID is provided, check if an entry exists for assuranceId + extensionNo
-	            Optional<ExtensionRequest> existingRequestOpt = extenionRequestRepository
+	        	Optional<ExtensionRequest> existingRequestOpt = extenionRequestRepository
 	                    .findByAssuranceIdAndExtensionNo(dto.getAssuranceId(), dto.getExtensionNo());
 
 	            if (existingRequestOpt.isPresent()) {
@@ -248,8 +253,8 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	                // Save the updated entity
 	                savedRequest = extenionRequestRepository.save(existingRequest);
 	            	log.info("Existing Entity updated");
-
-	            } else {
+	            } 
+	        } else {
 	            	
 	                // Create a new entity
 	                ExtensionRequest newRequest = ExtensionRequestMapper.toEntity(dto);
@@ -257,7 +262,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 	                // Save the new entity
 	                savedRequest = extenionRequestRepository.save(newRequest);
 	            	log.info("New Entity created");
-	            }
+
 	        }
 
 	        // Convert the saved entity to DTO and add to the response list
