@@ -377,7 +377,7 @@ public class AssuranceController {
 	/*
 	 * Get the Input History
 	 */
-	@PostMapping("/get-input-history")
+	@PostMapping("/get-request-history")
 	public ResponseEntity<GenericResponse<List<RequestHistory>>> getInputHistory(
 			@RequestBody WorkflowRequestDto dto) {
 		
@@ -396,7 +396,7 @@ public class AssuranceController {
 	}
 
 	
-	@PostMapping("/get-input-documents")
+	@PostMapping("/get-request-history-documents")
 	public ResponseEntity<GenericResponse<List<DocumentMetadataDTO>>> getInputDocuments (
 															@RequestBody WorkflowRequestDto dto) {
 
