@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
 import com.dsp.cga.assurance.dto.DocumentMetadataDTO;
-import com.dsp.cga.assurance.dto.WorkflowRequestDto;
 import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.entity.RequestHistory;
 import com.dsp.cga.report.service.ReportService;
@@ -375,20 +374,22 @@ public class AssuranceController {
 //	    }
 	
 	/*
-	 * Get the Input History
+	 * Get the Request History
 	 */
-	@PostMapping("/get-input-history")
+	@GetMapping("/get-request-history")
 	public ResponseEntity<GenericResponse<List<RequestHistory>>> getInputHistory(
-			@RequestBody WorkflowRequestDto dto) {
+			@RequestParam Long requestId) {
+		System.out.println("inside history service in assurance");
+		List<RequestHistory> histories = assuranceService.getInputHistoryByRequestId(requestId);
 		
-		List<RequestHistory> histories = assuranceService.getInputHistoryByRequestId(dto.getRequestId());
-
 		if (histories.isEmpty()) {
+			System.out.println("no records found");
 			GenericResponse<List<RequestHistory>> response = new GenericResponse<>(false, "No records found",
 					histories, HttpStatus.OK.value());
 			return ResponseEntity.status(HttpStatus.OK).body(response);
 		}
-
+		
+		System.out.println("records found");
 		GenericResponse<List<RequestHistory>> response = new GenericResponse<>(true, "Records found", histories,
 				HttpStatus.OK.value());
 
@@ -396,18 +397,19 @@ public class AssuranceController {
 	}
 
 	
-	@PostMapping("/get-input-documents")
+	@GetMapping("/get-request-history-documents")
 	public ResponseEntity<GenericResponse<List<DocumentMetadataDTO>>> getInputDocuments (
-															@RequestBody WorkflowRequestDto dto) {
-
-		List<DocumentMetadataDTO> histories = assuranceService.getDocuments(dto.getRequestId());
+															@RequestParam Long requestId) {
+		System.out.println("inside history service in assurance");
+		List<DocumentMetadataDTO> histories = assuranceService.getDocuments(requestId);
 
 		if (histories.isEmpty()) {
+			System.out.println("no records found");
 			GenericResponse<List<DocumentMetadataDTO>> response = new GenericResponse<>(false, "No records found",
 					histories, HttpStatus.OK.value());
 			return ResponseEntity.status(HttpStatus.OK).body(response);
 		}
-
+		System.out.println("records found");
 		GenericResponse<List<DocumentMetadataDTO>> response = new GenericResponse<>(true, "Records found", histories,
 				HttpStatus.OK.value());
 
