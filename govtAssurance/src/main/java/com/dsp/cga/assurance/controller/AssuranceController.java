@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
 import com.dsp.cga.assurance.dto.DocumentMetadataDTO;
-import com.dsp.cga.assurance.dto.WorkflowRequestDto;
 import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.entity.RequestHistory;
 import com.dsp.cga.report.service.ReportService;
@@ -375,13 +374,13 @@ public class AssuranceController {
 //	    }
 	
 	/*
-	 * Get the Input History
+	 * Get the Request History
 	 */
-	@PostMapping("/get-request-history")
+	@GetMapping("/get-request-history")
 	public ResponseEntity<GenericResponse<List<RequestHistory>>> getInputHistory(
-			@RequestBody WorkflowRequestDto dto) {
+			@RequestParam Long requestId) {
 		
-		List<RequestHistory> histories = assuranceService.getInputHistoryByRequestId(dto.getRequestId());
+		List<RequestHistory> histories = assuranceService.getInputHistoryByRequestId(requestId);
 
 		if (histories.isEmpty()) {
 			GenericResponse<List<RequestHistory>> response = new GenericResponse<>(false, "No records found",
@@ -396,11 +395,11 @@ public class AssuranceController {
 	}
 
 	
-	@PostMapping("/get-request-history-documents")
+	@GetMapping("/get-request-history-documents")
 	public ResponseEntity<GenericResponse<List<DocumentMetadataDTO>>> getInputDocuments (
-															@RequestBody WorkflowRequestDto dto) {
+															@RequestParam Long requestId) {
 
-		List<DocumentMetadataDTO> histories = assuranceService.getDocuments(dto.getRequestId());
+		List<DocumentMetadataDTO> histories = assuranceService.getDocuments(requestId);
 
 		if (histories.isEmpty()) {
 			GenericResponse<List<DocumentMetadataDTO>> response = new GenericResponse<>(false, "No records found",
