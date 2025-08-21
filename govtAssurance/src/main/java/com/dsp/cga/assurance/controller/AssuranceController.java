@@ -379,15 +379,17 @@ public class AssuranceController {
 	@GetMapping("/get-request-history")
 	public ResponseEntity<GenericResponse<List<RequestHistory>>> getInputHistory(
 			@RequestParam Long requestId) {
-		
+		System.out.println("inside history service in assurance");
 		List<RequestHistory> histories = assuranceService.getInputHistoryByRequestId(requestId);
-
+		
 		if (histories.isEmpty()) {
+			System.out.println("no records found");
 			GenericResponse<List<RequestHistory>> response = new GenericResponse<>(false, "No records found",
 					histories, HttpStatus.OK.value());
 			return ResponseEntity.status(HttpStatus.OK).body(response);
 		}
-
+		
+		System.out.println("records found");
 		GenericResponse<List<RequestHistory>> response = new GenericResponse<>(true, "Records found", histories,
 				HttpStatus.OK.value());
 
@@ -398,15 +400,16 @@ public class AssuranceController {
 	@GetMapping("/get-request-history-documents")
 	public ResponseEntity<GenericResponse<List<DocumentMetadataDTO>>> getInputDocuments (
 															@RequestParam Long requestId) {
-
+		System.out.println("inside history service in assurance");
 		List<DocumentMetadataDTO> histories = assuranceService.getDocuments(requestId);
 
 		if (histories.isEmpty()) {
+			System.out.println("no records found");
 			GenericResponse<List<DocumentMetadataDTO>> response = new GenericResponse<>(false, "No records found",
 					histories, HttpStatus.OK.value());
 			return ResponseEntity.status(HttpStatus.OK).body(response);
 		}
-
+		System.out.println("records found");
 		GenericResponse<List<DocumentMetadataDTO>> response = new GenericResponse<>(true, "Records found", histories,
 				HttpStatus.OK.value());
 

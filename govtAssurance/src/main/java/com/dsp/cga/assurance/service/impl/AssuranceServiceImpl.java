@@ -1287,19 +1287,20 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	@Override
 	public List<RequestHistory> getInputHistoryByRequestId(Long requestId) {
-		
+		System.out.println("fetching data from repo");
 		List<RequestHistory> historyList = rqtHistoryRepo.findByRequestId(requestId);
 		
 		List<RequestHistory> response =historyList.size()>0 ?
 		 historyList.stream()
                 .map(rqtHistoryMapper::toRequestHistory) 
                 .collect(Collectors.toList()) : Collections.EMPTY_LIST;
+		System.out.println("returning response list");
 		return response;
     }
 	
 	@Override
 	public List<DocumentMetadataDTO> getDocuments(Long requestId) {
-		
+		System.out.println("fetching data from repo");
 		RequestHistory history = rqtHistoryRepo.findTop1ByRequestIdOrderByCreatedAtDesc(requestId);
 		
 		if (history == null) return Collections.EMPTY_LIST;
@@ -1307,7 +1308,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 		List<Map<String, Object>>docList = history.getReferenceFiles();
 		
 		if (docList == null) return Collections.EMPTY_LIST;
-		
+		System.out.println("returning response list");
 		return docList.stream()
                 .map(rqtHistoryMapper::toDocumentDTO) 
                 .collect(Collectors.toList());
