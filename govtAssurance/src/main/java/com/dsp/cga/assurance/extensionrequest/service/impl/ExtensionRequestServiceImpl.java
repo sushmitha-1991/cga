@@ -212,7 +212,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 //	        if (dto.getId() == null && (dto.getAssuranceId() == null || dto.getExtensionNo() == null)) {
 	    	
 	    	System.out.println("ID: " + dto.getId());
-	    	System.out.println("Assurance ID: " + dto.getAssuranceId());
+	    	System.out.println("Assurance ID: " + dto.getAssuranceId()); 
 
 	    	if (dto.getId() == null && dto.getAssuranceId() == null) {
 	            throw new IllegalArgumentException("Invalid input: AssuranceId and Extension ID both cannot be null.");
