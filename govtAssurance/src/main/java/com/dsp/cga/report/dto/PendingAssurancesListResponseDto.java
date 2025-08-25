@@ -13,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 public class PendingAssurancesListResponseDto {
 
 	String sessionNo;
+	String lokSabhaNo;
 	String sourceName;
 	String member;
 	String clubbedMember;
@@ -26,11 +27,12 @@ public class PendingAssurancesListResponseDto {
 	String subject;
 	String extent;
 	String pendingDueTo;
-public PendingAssurancesListResponseDto(String sessionNo, String sourceName, String member, String clubbedMember,
+public PendingAssurancesListResponseDto(String sessionNo,String lokSabhaNo, String sourceName, String member, String clubbedMember,
 		String ministry, String department, String assuranceNo, String fileNo, String questionType, String questionNo,
 		String questionDate,String subject, String extent, String pendingDueTo) {
 	super();
 	this.sessionNo = sessionNo;
+	this.lokSabhaNo= lokSabhaNo;
 	this.sourceName = sourceName;
 	this.member = member;
 	this.clubbedMember = clubbedMember;
