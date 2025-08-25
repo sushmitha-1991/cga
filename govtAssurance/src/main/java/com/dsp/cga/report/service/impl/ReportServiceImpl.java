@@ -6,8 +6,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.report.dto.AssurancesRegisterResponseDto;
 import com.dsp.cga.report.dto.ClubbingDetailsResponseDto;
 import com.dsp.cga.report.dto.ConsolidatedMinistryWiseAssurancesResponseDto;
@@ -37,12 +39,13 @@ public class ReportServiceImpl implements ReportService {
 
 	@Override
 	public List<ImplementationReportResponseDto> getImplementationReport(LocalDate fromDate,LocalDate toDate) {
+		Long houseId=getHouseId();
 		List<Object[]> results=new ArrayList<Object[]>(); 
 		if(toDate == null) {
-			 results = reportRepo.fetchImplementationReports(fromDate, toDate);
+			 results = reportRepo.fetchImplementationReports(houseId,fromDate, toDate);
 		}
 		else {
-		 results = reportRepo.fetchImplementationReports(fromDate, DateFormatterUtil.addDatePlusOne(toDate));
+		 results = reportRepo.fetchImplementationReports(houseId,fromDate, DateFormatterUtil.addDatePlusOne(toDate));
 		}
 		 return results.isEmpty() ? Collections.emptyList() : results.stream()
                 .map(row -> new ImplementationReportResponseDto(
@@ -52,20 +55,22 @@ public class ReportServiceImpl implements ReportService {
                                 row[3] != null ? (DateFormatterUtil.formatDateTime(row[3].toString())) : null, //questionDate		
                                 row[4] != null ? row[4].toString() : null, // subject
                                 row[5] != null ? row[5].toString() : null, // ministry
-                                row[6] != null ? row[6].toString() : null, // layingDate
-                                row[7] != null ? (DateFormatterUtil.formatDateTime(row[7].toString())) : null  // createdOn  
-//                                row[7] != null ? row[7].toString() : null,
-//                                row[8] != null ? row[8].toString() : null,
-//                                row[9] != null ? row[9].toString() : null,
-//                                row[10] != null ? row[10].toString() : null
+                                row[6] != null ? (DateFormatterUtil.formatDate(row[6].toString())) : null, // layingDate
+                                row[7] != null ? row[7].toString() : null, //sessionNo
+                                row[8] != null ? row[8].toString() : null, //lokSabhaNo if houseId=2
+                                row[9] != null ? row[9].toString() : null, //committeeDecision
+                                row[10] != null ? row[10].toString() : null, //reason
+                                row[11] != null ? (DateFormatterUtil.formatDateTime(row[11].toString())) : null  // createdOn  
+                                
                 		))
                 .toList();
 	}
 	
 	@Override
 	public List<ExtensionReportResponseDto> getExtensionReport() {
+		Long houseId=getHouseId();
 		System.out.println("-----------------Inside extension report service----------------");
-		List<Object[]> results = reportRepo.fetchExtensionReports();
+		List<Object[]> results = reportRepo.fetchExtensionReports(houseId);
 		if(results.size()>0) {
 		System.out.println(" result :"+results);}
 		else
@@ -96,8 +101,9 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Override
 	public List<DroppedAssurancesReportResponseDto> getDroppedAssuranceReport() {
+		Long houseId=getHouseId();
 		System.out.println("-----------------Inside Dropped Assurance report service----------------");
-		List<Object[]> results = reportRepo.fetchDroppedAssurancesReports();
+		List<Object[]> results = reportRepo.fetchDroppedAssurancesReports(houseId);
 		if(results.size()>0) {
 		System.out.println(" result :"+results);}
 		else
@@ -124,7 +130,8 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Override
 	public List<PendingAssurancesListResponseDto> getPendingAssurancesReport() {
-		List<Object[]> results = reportRepo.fetchPendingAssurancesLists();
+		Long houseId=getHouseId();
+		List<Object[]> results = reportRepo.fetchPendingAssurancesLists(houseId);
 		if(results.size()>0) {
 		System.out.println(" result :"+results);}
 		else
@@ -134,26 +141,28 @@ public class ReportServiceImpl implements ReportService {
 		return results.isEmpty() ? Collections.emptyList() : results.stream()
                 .map(row -> new PendingAssurancesListResponseDto(
                 				row[0] != null ? row[0].toString() : null, // sessionNo
-                                row[1] != null ? row[1].toString() : null, // sourceName
-                                row[2] != null ? row[2].toString() : null, // member
-                                row[3] != null ? row[3].toString() : null, // clubbedMember
-                                row[4] != null ? row[4].toString() : null, // ministry
-                                row[5] != null ? row[5].toString() : null, // department
-                                row[6] != null ? row[6].toString() : null,  // assuranceNo  
-                                row[7] != null ? row[7].toString() : null, // fileNo
-                                row[8] != null ? row[8].toString() : null, //questionType
-                                row[9] != null ? row[9].toString() : null, //questionNo
-                                row[10] != null ? (DateFormatterUtil.formatDateTime(row[10].toString())) : null,	//questionDate	
-                                row[11] != null ? row[11].toString() : null, //subject
-                                row[12] != null ? (DateFormatterUtil.formatDate(row[12].toString())) : null,	//extentDate
-                                row[13] != null ? row[13].toString() : null //pendingDueTo
+                				row[1] != null ? row[1].toString() : null, //lokSabhNo if house id=2
+                                row[2] != null ? row[2].toString() : null, // sourceName
+                                row[3] != null ? row[3].toString() : null, // member
+                                row[4] != null ? row[4].toString() : null, // clubbedMember
+                                row[5] != null ? row[5].toString() : null, // ministry
+                                row[6] != null ? row[6].toString() : null, // department
+                                row[7] != null ? row[7].toString() : null,  // assuranceNo  
+                                row[8] != null ? row[8].toString() : null, // fileNo
+                                row[9] != null ? row[9].toString() : null, //questionType
+                                row[10] != null ? row[10].toString() : null, //questionNo
+                                row[11] != null ? (DateFormatterUtil.formatDateTime(row[11].toString())) : null,	//questionDate	
+                                row[12] != null ? row[12].toString() : null, //subject
+                                row[13] != null ? (DateFormatterUtil.formatDate(row[13].toString())) : null,	//extentDate
+                                row[14] != null ? row[14].toString() : null //pendingDueTo
                 		))
                 .toList();
 	}
 	
 	@Override
 	public List<MinistryWisePendingAssurancesResponseDto> getMinistryWisePendingAssurancesReport() {
-		List<Object[]> results = reportRepo.fetchMinistryWisePendingAssurancesLists();
+		Long houseId=getHouseId();
+		List<Object[]> results = reportRepo.fetchMinistryWisePendingAssurancesLists(houseId);
 		if(results.size()>0) {
 		System.out.println(" result :"+results);}
 		else
@@ -164,14 +173,15 @@ public class ReportServiceImpl implements ReportService {
                 .map(row -> new MinistryWisePendingAssurancesResponseDto(
                 				row[0] != null ? row[0].toString() : null, // ministry
                                 row[1] != null ? row[1].toString() : null, // sessionNo
-                                row[2] != null ? row[2].toString() : null, // member
-                                row[3] != null ? row[3].toString() : null, // assuranceNo
-                                row[4] != null ? row[4].toString() : null, // questionNo
-                                row[5] != null ? row[5].toString() : null, // questionType
-                                row[6] != null ? (DateFormatterUtil.formatDateTime(row[6].toString())) : null,	//questionDate
-                                row[7] != null ? row[7].toString() : null,  // subject
-                                row[8] != null ? (DateFormatterUtil.formatDate(row[8].toString())) : null,	//extentDate
-                                row[9] != null ? row[9].toString() : null  // pendingDueTo
+                                row[2] != null ? row[2].toString() : null, //lokSabhNo if house id=2
+                                row[3] != null ? row[3].toString() : null, // member
+                                row[4] != null ? row[4].toString() : null, // assuranceNo
+                                row[5] != null ? row[5].toString() : null, // questionNo
+                                row[6] != null ? row[6].toString() : null, // questionType
+                                row[7] != null ? (DateFormatterUtil.formatDateTime(row[7].toString())) : null,	//questionDate
+                                row[8] != null ? row[8].toString() : null,  // subject
+                                row[9] != null ? (DateFormatterUtil.formatDate(row[9].toString())) : null,	//extentDate
+                                row[10] != null ? row[10].toString() : null  // pendingDueTo
                                 
                 		))
                 .toList();
@@ -179,7 +189,8 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Override
 	public List<ConsolidatedMinistryWisePendingAssurancesResponseDto> getConsolidatedMinistryWisePendingAssurancesReport() {
-		List<Object[]> results = reportRepo.fetchConsolidatedMinistryWisePendingAssurancesLists();
+		Long houseId=getHouseId();
+		List<Object[]> results = reportRepo.fetchConsolidatedMinistryWisePendingAssurancesLists(houseId);
 		if(results.size()>0) {
 		System.out.println(" result :"+results);}
 		else
@@ -201,7 +212,8 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Override
 	public List<ConsolidatedMinistryWiseFimpAssurancesResponseDto> getConsolidatedMinistryWiseFimpAssurancesReport() {
-		List<Object[]> results = reportRepo.fetchConsolidatedMinistryWiseFimpAssurancesLists();
+		Long houseId=getHouseId();
+		List<Object[]> results = reportRepo.fetchConsolidatedMinistryWiseFimpAssurancesLists(houseId);
 		if(results.size()>0) {
 		System.out.println(" result :"+results);}
 		else
@@ -224,7 +236,8 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Override
 	public List<ConsolidatedMinistryWiseAssurancesResponseDto> getConsolidatedMinistryWiseAssurancesReport() {
-		List<Object[]> results = reportRepo.fetchConsolidatedMinistryWiseAssurancesDetails();
+		Long houseId=getHouseId();
+		List<Object[]> results = reportRepo.fetchConsolidatedMinistryWiseAssurancesDetails(houseId);
 		if(results.size()>0) {
 		System.out.println(" result :"+results);}
 		else
@@ -244,7 +257,8 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Override
 	public List<ClubbingDetailsResponseDto> getClubbingDetailsReport() {
-		List<Object[]> results = reportRepo.fetchClubbingDetails();
+		Long houseId=getHouseId();
+		List<Object[]> results = reportRepo.fetchClubbingDetails(houseId);
 		if(results.size()>0) {
 		System.out.println(" result :"+results);}
 		else
@@ -267,7 +281,8 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Override
 	public List<DeletedAssurancesResponseDto> getDeletedAssurancesReport() {
-		List<Object[]> results = reportRepo.fetchDeletedAssurancesReport();
+		Long houseId=getHouseId();
+		List<Object[]> results = reportRepo.fetchDeletedAssurancesReport(houseId);
 		if(results.size()>0) {
 		System.out.println(" result :"+results);}
 		else
@@ -288,7 +303,8 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Override
 	public List<AssurancesRegisterResponseDto> getAssuranceRegisterReport() {
-		List<Object[]> results = reportRepo.fetchAssuranceRegisterReport();
+		Long houseId=getHouseId();
+		List<Object[]> results = reportRepo.fetchAssuranceRegisterReport(houseId);
 		if(results.size()>0) {
 		System.out.println(" result :"+results);}
 		else
@@ -313,7 +329,8 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Override
 	public List<QuarterlyReportResponseDto> getQuarterlyReport(LocalDate inputDate) {
-		List<Object[]> results = reportRepo.fetchQuarterlyReport(inputDate);
+		Long houseId=getHouseId();
+		List<Object[]> results = reportRepo.fetchQuarterlyReport(houseId,inputDate);
 		if(results.size()>0) {
 		System.out.println(" result :"+results);}
 		else
@@ -335,4 +352,13 @@ public class ReportServiceImpl implements ReportService {
                 		))
                 .toList();
 	}
+	
+	private Long getHouseId() {
+        Long houseId = null;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetailsDTO) {
+            houseId = ((UserDetailsDTO) principal).getHouseId();
+        }
+        return houseId;
+    }
 }
