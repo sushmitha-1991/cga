@@ -124,8 +124,83 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 //				@Param("ministryId") Long ministryId, @Param("memberId") Long memberId); 
 
 
-	
-	
+	@Query(value = """
+			select
+			case
+				when ca.house_id = 1 then rs.session_number
+				when ca.house_id = 2 then ls.session_number
+			end as sessionNo,
+			lsm.lok_sabha_number as lokSabhaNo,
+			count(ca.id) as count
+			from cga.assurance ca
+			left join master.rajya_sabha_session_master rs on ca.rajya_sabha_session_no = rs.id and ca.house_id = 1
+			left join master.lok_sabha_session_masters ls on ca.lok_sabha_session_no = ls.id and ca.house_id = 2
+			left join master.lok_sabha_masters lsm on ca.lok_sabha_no =lsm.id and ca.house_id = 2
+			where ca.house_id=:houseId
+			and(
+			(:houseId =2 and ca.lok_sabha_session_no is not null
+			and (cast(:lokSabhaNo as varchar) is null or lsm.lok_sabha_number=cast(:lokSabhaNo as varchar))
+			and (cast(:sessionNo as varchar) is null or ls.session_number=cast(:sessionNo as varchar)))
+			or
+			(:houseId =1 and ca.rajya_sabha_session_no is not null
+			and (cast(:sessionNo as varchar) is null or rs.session_number=cast(:sessionNo as varchar)))
+			)
+			group by
+			case
+				when ca.house_id = 1 then rs.session_number
+				when ca.house_id = 2 then ls.session_number
+			end,lokSabhaNo
+			""", nativeQuery = true)
+	List<Object[]> getSessionWiseAssurancesCount(@Param("houseId") Long houseId,@Param("lokSabhaNo") String lokSabhaNo, @Param("sessionNo") String sessionNo);
 
+	@Query(value = """
+						select
+			ca.question_no as questionNo,
+			ca.assurance_no as assuranceNo,
+			mc1.code as category,
+			case
+				when ca.house_id = 1 then rs.session_number
+				when ca.house_id = 2 then ls.session_number
+			end as sessionNo,
+			lsm.lok_sabha_number as lokSabhaNo,
+			ca.assurance_date as assuranceDate,
+			mpd.full_name as member,
+			mm.ministry_name as ministry,
+			md.department_name as department,
+			ca.created_at as questionDate,
+			ca.subject as subject,
+			mc.code as questionType,
+			mc2.code as status,
+			ca.details_of_implementation as implementationDetails,
+			ca.remarks as remarks
+			from cga.assurance ca
+			left join master.codes mc on mc.id=ca.assurance_type_id
+			left join master.codes mc1 on mc1.id=ca.category_id
+			left join master.codes mc2 on mc2.id=ca.status_id
+			left join members.personal_details mpd on mpd.id=ca.member_id
+			left join master.ministries mm on mm.id=ca.ministry_id
+			left join master.departments md on md.id=ca.department_id
+			left join master.rajya_sabha_session_master rs on ca.rajya_sabha_session_no = rs.id and ca.house_id = 1
+			left join master.lok_sabha_session_masters ls on ca.lok_sabha_session_no = ls.id and ca.house_id = 2
+			left join master.lok_sabha_masters lsm on ca.lok_sabha_no =lsm.id and ca.house_id = 2
+			where ca.house_id=:houseId
+			and(
+			(:houseId =2 and ca.lok_sabha_session_no is not null
+			and (cast(:lokSabhaNo as varchar) is null or lsm.lok_sabha_number=cast(:lokSabhaNo as varchar))
+			and (cast(:sessionNo as varchar) is null or ls.session_number=cast(:sessionNo as varchar)))
+			or
+			(:houseId =1 and ca.rajya_sabha_session_no is not null
+			and (cast(:sessionNo as varchar) is null or rs.session_number=cast(:sessionNo as varchar)))
+			)
+			""", nativeQuery = true)
+	List<Object[]> getSessionWiseAssurancesDetails(@Param("houseId") Long houseId,@Param("lokSabhaNo") String lokSabhaNo, @Param("sessionNo") String sessionNo);
+	
+	@Query(value = """
+						select
+			count(ca.id) as totalAssurances
+			from cga.assurance ca
+			where ca.house_id=:houseId
+			""", nativeQuery = true)
+	String getTotalAssurancesCountByHouseId(@Param("houseId") Long houseId);
 }
 

@@ -33,6 +33,9 @@ import com.dsp.cga.assurance.dto.AssuranceCategory;
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
 import com.dsp.cga.assurance.dto.AssuranceTypeDTO;
+import com.dsp.cga.assurance.dto.DashboardAssurancesCountResponseDTO;
+import com.dsp.cga.assurance.dto.DashboardAssurancesDetailsResponseDTO;
+import com.dsp.cga.assurance.dto.DashboardAssurancesSessionWiseCountsResponseDTO;
 import com.dsp.cga.assurance.dto.DepartmentsDTO;
 import com.dsp.cga.assurance.dto.DocumentMetadataDTO;
 import com.dsp.cga.assurance.dto.LokSabhaNoDTO;
@@ -81,6 +84,7 @@ import com.dsp.cga.mapper.RequestHistoryMapper;
 import com.dsp.cga.mapper.SupplementaryMapper;
 import com.dsp.cga.repository.RequestHistoryRepository;
 import com.dsp.cga.response.GenericResponse;
+import com.dsp.cga.util.DateFormatterUtil;
 import com.dsp.cga.util.Utils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -1314,6 +1318,60 @@ public class AssuranceServiceImpl implements AssuranceService {
                 .collect(Collectors.toList());
     
 	}	
+	
+//	******************* MGMT Dashboard assurance count ***************************************
+	 @Override
+	    public DashboardAssurancesCountResponseDTO getMgmtDashboardAssurancesCount(String lokSabhaNo, String sessionNo)
+	    {
+	    	Long houseId=getHouseId();
+	    	
+	    		List<Object[]> results = assuranceRepository.getSessionWiseAssurancesCount(houseId,lokSabhaNo,sessionNo);
+	    		String totalAssurancesCountByHouse=assuranceRepository.getTotalAssurancesCountByHouseId(houseId);
+	    		
+	    		return DashboardAssurancesCountResponseDTO.builder()
+	    	            .totalAssurances(!(totalAssurancesCountByHouse.isBlank() || totalAssurancesCountByHouse.equalsIgnoreCase("null")) ? totalAssurancesCountByHouse : null)
+	    	            .sessionWiseCountList(mapResponseToDto(results))
+	    	            .build();
+	    }
+	 
+	    public List<DashboardAssurancesSessionWiseCountsResponseDTO> mapResponseToDto(List<Object[]> results)
+	    {
+
+			return results.isEmpty() ? Collections.emptyList() : results.stream().map(row ->
+				DashboardAssurancesSessionWiseCountsResponseDTO.builder()
+						.sessionNo(row[0] != null ? row[0].toString() : null)
+						.lokSabhaNo(row[1] != null ? row[1].toString() : null)
+						.assuranceCounts(row[2] != null ? row[2].toString() : null)
+						.build()
+			).toList();
+	    }
+	    
+	    public List<DashboardAssurancesDetailsResponseDTO> getMgmtDashboardAssurancesDetails(String lokSabhaNo, String sessionNo)
+	    {
+	    	Long houseId=getHouseId();
+	    	
+    		List<Object[]> results = assuranceRepository.getSessionWiseAssurancesDetails(houseId,lokSabhaNo,sessionNo);
+
+			return results.isEmpty() ? Collections.emptyList() : results.stream().map(row ->
+			DashboardAssurancesDetailsResponseDTO.builder()
+						.questionNo(row[0] != null ? row[0].toString() : null)
+						.assuranceNo(row[1] != null ? row[1].toString() : null)
+						.category(row[2] != null ? row[2].toString() : null)
+						.sessionNo(row[3] != null ? row[3].toString() : null)
+						.lokSabhaNo(row[4] != null ? row[4].toString() : null)
+						.assuranceDate(row[5] != null ? DateFormatterUtil.formatDate(row[5].toString()) : null)
+						.member(row[6] != null ? row[6].toString() : null)
+						.ministry(row[7] != null ? row[7].toString() : null)
+						.department(row[8] != null ? row[8].toString() : null)
+						.questionDate(row[9] != null ? DateFormatterUtil.formatDateTime(row[9].toString()) : null)
+						.subject(row[10] != null ? row[10].toString() : null)
+						.questionType(row[11] != null ? row[11].toString() : null)
+						.status(row[12] != null ? row[12].toString() : null)
+						.implementationDetails(row[13] != null ? row[13].toString() : null)
+						.remarks(row[14] != null ? row[14].toString() : null)
+						.build()
+			).toList();
+	    }
 
 //		 @Override
 //		    public AssuranceRequestCountDTO getAssuranceRequestCounts(Long sessionNo, Integer ministryCode) {

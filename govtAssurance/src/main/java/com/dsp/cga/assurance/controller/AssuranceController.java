@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
+import com.dsp.cga.assurance.dto.DashboardAssurancesCountResponseDTO;
+import com.dsp.cga.assurance.dto.DashboardAssurancesDetailsResponseDTO;
 import com.dsp.cga.assurance.dto.DocumentMetadataDTO;
 import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.entity.RequestHistory;
@@ -415,4 +417,42 @@ public class AssuranceController {
 
 		return ResponseEntity.ok(response);
 	}
+	
+	@GetMapping("/management-dashboard-assurances-count")
+	public ResponseEntity<GenericResponse<DashboardAssurancesCountResponseDTO>> getMgmtDashboardAssurancesCount (
+			@RequestParam(required = false) String lokSabhaNo,
+    		@RequestParam(required = false) String sessionNo) {
+		System.out.println("inside dashboard assurance count service in assurance");
+		DashboardAssurancesCountResponseDTO result = assuranceService.getMgmtDashboardAssurancesCount(lokSabhaNo,sessionNo);
+
+		if (result==null) {
+			GenericResponse<DashboardAssurancesCountResponseDTO> response = new GenericResponse<>(false, "No records found",
+					result, HttpStatus.OK.value());
+			return ResponseEntity.status(HttpStatus.OK).body(response);
+		}
+		GenericResponse<DashboardAssurancesCountResponseDTO> response = new GenericResponse<>(true, "Mgmt Dashboard Assurances counts fetched successfully", result,
+				HttpStatus.OK.value());
+
+		return ResponseEntity.ok(response);
+	}
+	
+	@GetMapping("/management-dashboard-assurances-details")
+	public ResponseEntity<GenericResponse<List<DashboardAssurancesDetailsResponseDTO>>> getMgmtDashboardAssurancesDetails (
+			@RequestParam(required = false) String lokSabhaNo,
+    		@RequestParam(required = false) String sessionNo) {
+		System.out.println("inside dashboard assurance details service in assurance");
+		List<DashboardAssurancesDetailsResponseDTO> result = assuranceService.getMgmtDashboardAssurancesDetails(lokSabhaNo,sessionNo);
+
+		if (result.isEmpty()) {
+			GenericResponse<List<DashboardAssurancesDetailsResponseDTO>> response = new GenericResponse<>(false, "No records found",
+					result, HttpStatus.OK.value());
+			return ResponseEntity.status(HttpStatus.OK).body(response);
+		}
+		GenericResponse<List<DashboardAssurancesDetailsResponseDTO>> response = new GenericResponse<>(true, "Mgmt Dashboard Assurances Records fetched successfully", result,
+				HttpStatus.OK.value());
+
+		return ResponseEntity.ok(response);
+	}
+	
+	
 }
