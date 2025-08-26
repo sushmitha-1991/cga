@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
+import com.dsp.cga.assurance.dto.DashboardAssurancesCountResponseDTO;
+import com.dsp.cga.assurance.dto.DashboardAssurancesDetailsResponseDTO;
 import com.dsp.cga.assurance.dto.DocumentMetadataDTO;
 import com.dsp.cga.assurance.implementationrequest.dto.AssuranceWithImplementationRequestDTO;
 import com.dsp.cga.entity.RequestHistory;
@@ -43,6 +45,7 @@ public interface AssuranceService {
 
 	public List<RequestHistory> getInputHistoryByRequestId(Long requestId);
 	public List<DocumentMetadataDTO> getDocuments(Long requestId);
-
+	public DashboardAssurancesCountResponseDTO getMgmtDashboardAssurancesCount(String lokSabhaNo, String sessionNo);
+	public List<DashboardAssurancesDetailsResponseDTO> getMgmtDashboardAssurancesDetails(String lokSabhaNo, String sessionNo);
 	
 }
