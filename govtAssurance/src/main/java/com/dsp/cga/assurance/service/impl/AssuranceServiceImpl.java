@@ -1321,11 +1321,11 @@ public class AssuranceServiceImpl implements AssuranceService {
 	
 //	******************* MGMT Dashboard assurance count ***************************************
 	 @Override
-	    public DashboardAssurancesCountResponseDTO getMgmtDashboardAssurancesCount(String lokSabhaNo, String sessionNo)
+	    public DashboardAssurancesCountResponseDTO getMgmtDashboardAssurancesCount(Long lokSabhaNoId, Long sessionNoId)
 	    {
 	    	Long houseId=getHouseId();
 	    	
-	    		List<Object[]> results = assuranceRepository.getSessionWiseAssurancesCount(houseId,lokSabhaNo,sessionNo);
+	    		List<Object[]> results = assuranceRepository.getSessionWiseAssurancesCount(houseId,lokSabhaNoId,sessionNoId);
 	    		String totalAssurancesCountByHouse=assuranceRepository.getTotalAssurancesCountByHouseId(houseId);
 	    		
 	    		return DashboardAssurancesCountResponseDTO.builder()
@@ -1346,11 +1346,16 @@ public class AssuranceServiceImpl implements AssuranceService {
 			).toList();
 	    }
 	    
-	    public List<DashboardAssurancesDetailsResponseDTO> getMgmtDashboardAssurancesDetails(String lokSabhaNo, String sessionNo)
+	    public List<DashboardAssurancesDetailsResponseDTO> getMgmtDashboardAssurancesDetails(Long lokSabhaNoId, 
+				 Long sessionNoId, LocalDate fromDate, LocalDate toDate,
+				 Long categoryId, Long memberId, Long ministryId,
+				 Long departmentId, Long questionTypeId, Long statusId)
 	    {
 	    	Long houseId=getHouseId();
-	    	
-    		List<Object[]> results = assuranceRepository.getSessionWiseAssurancesDetails(houseId,lokSabhaNo,sessionNo);
+    		List<Object[]> results = assuranceRepository.getSessionWiseAssurancesDetails(houseId,  lokSabhaNoId, 
+    				  sessionNoId, fromDate, (toDate==null)?null:DateFormatterUtil.addDatePlusOne(toDate),
+    				  categoryId,  memberId,  ministryId,
+    				  departmentId,  questionTypeId,  statusId);
 
 			return results.isEmpty() ? Collections.emptyList() : results.stream().map(row ->
 			DashboardAssurancesDetailsResponseDTO.builder()
