@@ -35,7 +35,7 @@ import com.dsp.cga.assurance.dto.AssuranceListDTO;
 import com.dsp.cga.assurance.dto.AssuranceTypeDTO;
 import com.dsp.cga.assurance.dto.DashboardAssurancesCountResponseDTO;
 import com.dsp.cga.assurance.dto.DashboardAssurancesDetailsResponseDTO;
-import com.dsp.cga.assurance.dto.DashboardAssurancesSessionWiseCountsResponseDTO;
+import com.dsp.cga.assurance.dto.DashboardAssurancesWiseCountsResponseDTO;
 import com.dsp.cga.assurance.dto.DepartmentsDTO;
 import com.dsp.cga.assurance.dto.DocumentMetadataDTO;
 import com.dsp.cga.assurance.dto.LokSabhaNoDTO;
@@ -75,6 +75,7 @@ import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.assurance.supplementry.repository.SupplementaryRepository;
 import com.dsp.cga.entity.RequestHistory;
+import com.dsp.cga.eunms.DashboardAssurancesType;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.AssuranceListMapper;
 import com.dsp.cga.mapper.AssuranceMapper;
@@ -1321,26 +1322,54 @@ public class AssuranceServiceImpl implements AssuranceService {
 	
 //	******************* MGMT Dashboard assurance count ***************************************
 	 @Override
-	    public DashboardAssurancesCountResponseDTO getMgmtDashboardAssurancesCount(Long lokSabhaNoId, Long sessionNoId)
+	    public DashboardAssurancesCountResponseDTO getMgmtDashboardAssurancesCount(String abbr,Long lokSabhaNoId, Long sessionNoId,
+	    		Long ministryId,Long memberId,Long statusId, Long categoryId)
 	    {
+		 List<Object[]> results=new ArrayList<>();
 	    	Long houseId=getHouseId();
 	    	
-	    		List<Object[]> results = assuranceRepository.getSessionWiseAssurancesCount(houseId,lokSabhaNoId,sessionNoId);
+	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Session_Wise.getValue())) 
+	    	{    
+	    	
+	    		results = assuranceRepository.getSessionWiseAssurancesCount(houseId,lokSabhaNoId,sessionNoId);
+	    	}
+	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Ministry_Wise.getValue())) 
+	    	{    
+	    	
+	    		results = assuranceRepository.getMinistryWiseAssurancesCount(houseId,ministryId);
+	    	}
+	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Member_Wise.getValue())) 
+	    	{    
+	    	
+	    		results = assuranceRepository.getMemberWiseAssurancesCount(houseId,memberId);
+	    	}
+	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Status_Wise.getValue())) 
+	    	{    
+	    	
+	    		results = assuranceRepository.getStatusWiseAssurancesCount(houseId,statusId);
+	    	}
+	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Category_Wise.getValue())) 
+	    	{    
+	    	
+	    		results = assuranceRepository.getCategoryWiseAssurancesCount(houseId,categoryId);
+	    	}
+	    	
 	    		String totalAssurancesCountByHouse=assuranceRepository.getTotalAssurancesCountByHouseId(houseId);
 	    		
 	    		return DashboardAssurancesCountResponseDTO.builder()
+	    				.abbr(abbr)
 	    	            .totalAssurances(!(totalAssurancesCountByHouse.isBlank() || totalAssurancesCountByHouse.equalsIgnoreCase("null")) ? totalAssurancesCountByHouse : null)
-	    	            .sessionWiseCountList(mapResponseToDto(results))
+	    	            .assurancesWiseCountList(mapResponseToDto(results))
 	    	            .build();
 	    }
 	 
-	    public List<DashboardAssurancesSessionWiseCountsResponseDTO> mapResponseToDto(List<Object[]> results)
+	    public List<DashboardAssurancesWiseCountsResponseDTO> mapResponseToDto(List<Object[]> results)
 	    {
 
 			return results.isEmpty() ? Collections.emptyList() : results.stream().map(row ->
-				DashboardAssurancesSessionWiseCountsResponseDTO.builder()
-						.sessionNo(row[0] != null ? row[0].toString() : null)
-						.lokSabhaNo(row[1] != null ? row[1].toString() : null)
+			DashboardAssurancesWiseCountsResponseDTO.builder()
+						.valueId(row[0] != null ? row[0].toString() : null)
+						.valueName(row[1] != null ? row[1].toString() : null)
 						.assuranceCounts(row[2] != null ? row[2].toString() : null)
 						.build()
 			).toList();

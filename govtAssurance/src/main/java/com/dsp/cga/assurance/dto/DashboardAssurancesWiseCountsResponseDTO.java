@@ -10,9 +10,9 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class DashboardAssurancesSessionWiseCountsResponseDTO {
+public class DashboardAssurancesWiseCountsResponseDTO {
 
-	String sessionNo;
-	String lokSabhaNo;
+	String valueId;
+	String valueName;
 	String assuranceCounts;
 }
