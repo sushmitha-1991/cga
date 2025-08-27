@@ -41,12 +41,12 @@ public class ReportServiceImpl implements ReportService {
 	public List<ImplementationReportResponseDto> getImplementationReport(LocalDate fromDate,LocalDate toDate) {
 		Long houseId=getHouseId();
 		List<Object[]> results=new ArrayList<Object[]>(); 
-		if(toDate == null) {
-			 results = reportRepo.fetchImplementationReports(houseId,fromDate, toDate);
-		}
-		else {
-		 results = reportRepo.fetchImplementationReports(houseId,fromDate, DateFormatterUtil.addDatePlusOne(toDate));
-		}
+//		if(toDate == null) {
+//			 results = reportRepo.fetchImplementationReports(houseId,fromDate, toDate);
+//		}
+//		else {
+		 results = reportRepo.fetchImplementationReports(houseId,fromDate,(toDate == null)? null : DateFormatterUtil.addDatePlusOne(toDate));
+//		}
 		 return results.isEmpty() ? Collections.emptyList() : results.stream()
                 .map(row -> new ImplementationReportResponseDto(
                 				row[0] != null ? row[0].toString() : null, // assuranceNo

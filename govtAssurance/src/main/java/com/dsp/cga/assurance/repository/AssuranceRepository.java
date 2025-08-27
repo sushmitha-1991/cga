@@ -139,11 +139,11 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 			where ca.house_id=:houseId
 			and(
 			(:houseId =2 and ca.lok_sabha_session_no is not null
-			and (cast(:lokSabhaNo as varchar) is null or lsm.lok_sabha_number=cast(:lokSabhaNo as varchar))
-			and (cast(:sessionNo as varchar) is null or ls.session_number=cast(:sessionNo as varchar)))
+			and (:lokSabhaNoId is null or ca.lok_sabha_no=:lokSabhaNoId)
+			and (:sessionNoId is null or ca.lok_sabha_session_no=:sessionNoId))
 			or
 			(:houseId =1 and ca.rajya_sabha_session_no is not null
-			and (cast(:sessionNo as varchar) is null or rs.session_number=cast(:sessionNo as varchar)))
+			and (:sessionNoId is null or ca.rajya_sabha_session_no=:sessionNoId))
 			)
 			group by
 			case
@@ -151,7 +151,8 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 				when ca.house_id = 2 then ls.session_number
 			end,lokSabhaNo
 			""", nativeQuery = true)
-	List<Object[]> getSessionWiseAssurancesCount(@Param("houseId") Long houseId,@Param("lokSabhaNo") String lokSabhaNo, @Param("sessionNo") String sessionNo);
+	List<Object[]> getSessionWiseAssurancesCount(@Param("houseId") Long houseId,@Param("lokSabhaNoId") Long lokSabhaNoId, 
+			@Param("sessionNoId") Long sessionNoId);
 
 	@Query(value = """
 						select
@@ -186,14 +187,25 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 			where ca.house_id=:houseId
 			and(
 			(:houseId =2 and ca.lok_sabha_session_no is not null
-			and (cast(:lokSabhaNo as varchar) is null or lsm.lok_sabha_number=cast(:lokSabhaNo as varchar))
-			and (cast(:sessionNo as varchar) is null or ls.session_number=cast(:sessionNo as varchar)))
+			and (:lokSabhaNoId is null or ca.lok_sabha_no=:lokSabhaNoId)
+			and (:sessionNoId is null or ca.lok_sabha_session_no=:sessionNoId))
 			or
 			(:houseId =1 and ca.rajya_sabha_session_no is not null
-			and (cast(:sessionNo as varchar) is null or rs.session_number=cast(:sessionNo as varchar)))
+			and (:sessionNoId is null or ca.rajya_sabha_session_no=:sessionNoId))
 			)
+			and (cast(:fromDate as DATE) is null or ca.assurance_date >=cast(:fromDate as DATE))
+			and (cast(:toDate as DATE) is null or ca.assurance_date <cast(:toDate as DATE))
+			and (:categoryId is null or ca.category_id=:categoryId)
+			and (:memberId is null or ca.member_id=:memberId)
+			and (:ministryId is null or ca.ministry_id=:ministryId)
+			and (:departmentId is null or ca.department_id=:departmentId)
+			and (:questionTypeId is null or ca.assurance_type_id=:questionTypeId)
+			and (:statusId is null or ca.status_id=:statusId)
 			""", nativeQuery = true)
-	List<Object[]> getSessionWiseAssurancesDetails(@Param("houseId") Long houseId,@Param("lokSabhaNo") String lokSabhaNo, @Param("sessionNo") String sessionNo);
+	List<Object[]> getSessionWiseAssurancesDetails(@Param("houseId") Long houseId,@Param("lokSabhaNoId") Long lokSabhaNoId, 
+			@Param("sessionNoId") Long sessionNoId,@Param("fromDate") LocalDate fromDate,@Param("toDate") LocalDate toDate,
+			@Param("categoryId") Long categoryId,@Param("memberId") Long memberId,@Param("ministryId") Long ministryId,
+			@Param("departmentId") Long departmentId,@Param("questionTypeId") Long questionTypeId,@Param("statusId") Long statusId);
 	
 	@Query(value = """
 						select

@@ -29,6 +29,7 @@ import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.entity.RequestHistory;
 import com.dsp.cga.report.service.ReportService;
 import com.dsp.cga.response.GenericResponse;
+import com.dsp.cga.util.DateFormatterUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -420,10 +421,10 @@ public class AssuranceController {
 	
 	@GetMapping("/management-dashboard-assurances-count")
 	public ResponseEntity<GenericResponse<DashboardAssurancesCountResponseDTO>> getMgmtDashboardAssurancesCount (
-			@RequestParam(required = false) String lokSabhaNo,
-    		@RequestParam(required = false) String sessionNo) {
+			@RequestParam(required = false) Long lokSabhaNoId,
+    		@RequestParam(required = false) Long sessionNoId) {
 		System.out.println("inside dashboard assurance count service in assurance");
-		DashboardAssurancesCountResponseDTO result = assuranceService.getMgmtDashboardAssurancesCount(lokSabhaNo,sessionNo);
+		DashboardAssurancesCountResponseDTO result = assuranceService.getMgmtDashboardAssurancesCount(lokSabhaNoId,sessionNoId);
 
 		if (result==null) {
 			GenericResponse<DashboardAssurancesCountResponseDTO> response = new GenericResponse<>(false, "No records found",
@@ -438,10 +439,21 @@ public class AssuranceController {
 	
 	@GetMapping("/management-dashboard-assurances-details")
 	public ResponseEntity<GenericResponse<List<DashboardAssurancesDetailsResponseDTO>>> getMgmtDashboardAssurancesDetails (
-			@RequestParam(required = false) String lokSabhaNo,
-    		@RequestParam(required = false) String sessionNo) {
+			@RequestParam(required = false) Long lokSabhaNoId,
+    		@RequestParam(required = false) Long sessionNoId,
+    		@RequestParam(required = false) LocalDate fromDate,
+    		@RequestParam(required = false) LocalDate toDate,
+    		@RequestParam(required = false) Long categoryId,
+    		@RequestParam(required = false) Long memberId,
+    		@RequestParam(required = false) Long ministryId,
+    		@RequestParam(required = false) Long departmentId,
+    		@RequestParam(required = false) Long questionTypeId,
+    		@RequestParam(required = false) Long statusId) {
 		System.out.println("inside dashboard assurance details service in assurance");
-		List<DashboardAssurancesDetailsResponseDTO> result = assuranceService.getMgmtDashboardAssurancesDetails(lokSabhaNo,sessionNo);
+		List<DashboardAssurancesDetailsResponseDTO> result = assuranceService.getMgmtDashboardAssurancesDetails(lokSabhaNoId, 
+				  sessionNoId, fromDate, toDate,
+				  categoryId,  memberId,  ministryId,
+				  departmentId,  questionTypeId,  statusId);
 
 		if (result.isEmpty()) {
 			GenericResponse<List<DashboardAssurancesDetailsResponseDTO>> response = new GenericResponse<>(false, "No records found",
