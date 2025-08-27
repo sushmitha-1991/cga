@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class DashboardAssurancesCountResponseDTO {
 
+	String abbr;
 	String totalAssurances;
-	List<DashboardAssurancesSessionWiseCountsResponseDTO> sessionWiseCountList;
+	List<DashboardAssurancesWiseCountsResponseDTO> assurancesWiseCountList;
 }

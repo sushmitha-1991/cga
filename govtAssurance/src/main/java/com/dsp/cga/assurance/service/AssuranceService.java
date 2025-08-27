@@ -45,7 +45,8 @@ public interface AssuranceService {
 
 	public List<RequestHistory> getInputHistoryByRequestId(Long requestId);
 	public List<DocumentMetadataDTO> getDocuments(Long requestId);
-	public DashboardAssurancesCountResponseDTO getMgmtDashboardAssurancesCount(Long lokSabhaNoId, Long sessionNoId);
+	public DashboardAssurancesCountResponseDTO getMgmtDashboardAssurancesCount(String abbr,Long lokSabhaNoId, Long sessionNoId,
+    		Long ministryId,Long memberId,Long statusId, Long categoryId);
 	 public List<DashboardAssurancesDetailsResponseDTO> getMgmtDashboardAssurancesDetails(Long lokSabhaNoId, 
 			 Long sessionNoId, LocalDate fromDate, LocalDate toDate,
 			 Long categoryId, Long memberId, Long ministryId,
