@@ -130,12 +130,21 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 				when ca.house_id = 1 then rs.session_number
 				when ca.house_id = 2 then ls.session_number
 			end as sessionNo,
+			case
+				when ca.house_id = 1 then rs.id
+				when ca.house_id = 2 then ls.id
+			end as sessionNoId,
 			lsm.lok_sabha_number as lokSabhaNo,
+			lsm.id as lokSabhaNoId,
 			count(ca.id) as count
 			from cga.assurance ca
 			left join master.rajya_sabha_session_master rs on ca.rajya_sabha_session_no = rs.id and ca.house_id = 1
 			left join master.lok_sabha_session_masters ls on ca.lok_sabha_session_no = ls.id and ca.house_id = 2
 			left join master.lok_sabha_masters lsm on ca.lok_sabha_no =lsm.id and ca.house_id = 2
+			left join master.ministries mm on mm.id=ca.ministry_id
+			left join members.personal_details mpd on mpd.id=ca.member_id
+			left join master.codes mc on mc.id=ca.status_id
+			left join master.codes mc1 on mc1.id=ca.category_id
 			where ca.house_id=:houseId
 			and(
 			(:houseId =2 and ca.lok_sabha_session_no is not null
@@ -145,14 +154,24 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 			(:houseId =1 and ca.rajya_sabha_session_no is not null
 			and (:sessionNoId is null or ca.rajya_sabha_session_no=:sessionNoId))
 			)
+			and (:ministryId is null or ca.ministry_id=:ministryId)
+			and (:memberId is null or ca.member_id=:memberId)
+			and (:statusId is null or ca.status_id=:statusId)
+			and (:categoryId is null or ca.category_id=:categoryId)
 			group by
 			case
 				when ca.house_id = 1 then rs.session_number
 				when ca.house_id = 2 then ls.session_number
-			end,lokSabhaNo
+			end,
+			case
+				when ca.house_id = 1 then rs.id
+				when ca.house_id = 2 then ls.id
+			end,
+			lokSabhaNo,lokSabhaNoId
 			""", nativeQuery = true)
 	List<Object[]> getSessionWiseAssurancesCount(@Param("houseId") Long houseId,@Param("lokSabhaNoId") Long lokSabhaNoId, 
-			@Param("sessionNoId") Long sessionNoId);
+			@Param("sessionNoId") Long sessionNoId,@Param("ministryId") Long ministryId,@Param("memberId") Long memberId,
+			@Param("statusId") Long statusId,@Param("categoryId") Long categoryId);
 
 	@Query(value = """
 			select

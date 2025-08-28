@@ -421,7 +421,7 @@ public class AssuranceController {
 	
 	@GetMapping("/management-dashboard-assurances-count")
 	public ResponseEntity<GenericResponse<DashboardAssurancesCountResponseDTO>> getMgmtDashboardAssurancesCount (
-			@RequestParam(required = true) String abbr,
+//			@RequestParam(required = true) String abbr,
 			@RequestParam(required = false) Long lokSabhaNoId,
     		@RequestParam(required = false) Long sessionNoId,
     		@RequestParam(required = false) Long ministryId,
@@ -429,7 +429,7 @@ public class AssuranceController {
     		@RequestParam(required = false) Long statusId,
     		@RequestParam(required = false) Long categoryId) {
 		System.out.println("inside dashboard assurance count service in assurance");
-		DashboardAssurancesCountResponseDTO result = assuranceService.getMgmtDashboardAssurancesCount(abbr,lokSabhaNoId,
+		DashboardAssurancesCountResponseDTO result = assuranceService.getMgmtDashboardAssurancesCount(lokSabhaNoId,
 				sessionNoId,ministryId,memberId,statusId,categoryId);
 
 		if (result==null) {

@@ -12,7 +12,11 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class DashboardAssurancesWiseCountsResponseDTO {
 
-	String valueId;
-	String valueName;
+//	String valueId;
+//	String valueName;
+	String lokSabhaNoId;
+	String lokSabhaNo;
+	String sessionNo;
+	String sessionNoId;
 	String assuranceCounts;
 }
