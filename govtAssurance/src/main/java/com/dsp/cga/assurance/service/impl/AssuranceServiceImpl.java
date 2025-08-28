@@ -1322,42 +1322,41 @@ public class AssuranceServiceImpl implements AssuranceService {
 	
 //	******************* MGMT Dashboard assurance count ***************************************
 	 @Override
-	    public DashboardAssurancesCountResponseDTO getMgmtDashboardAssurancesCount(String abbr,Long lokSabhaNoId, Long sessionNoId,
+	    public DashboardAssurancesCountResponseDTO getMgmtDashboardAssurancesCount(Long lokSabhaNoId, Long sessionNoId,
 	    		Long ministryId,Long memberId,Long statusId, Long categoryId)
 	    {
 		 List<Object[]> results=new ArrayList<>();
 	    	Long houseId=getHouseId();
 	    	
-	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Session_Wise.getValue())) 
-	    	{    
+//	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Session_Wise.getValue())) 
+//	    	{    
 	    	
-	    		results = assuranceRepository.getSessionWiseAssurancesCount(houseId,lokSabhaNoId,sessionNoId);
-	    	}
-	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Ministry_Wise.getValue())) 
-	    	{    
-	    	
-	    		results = assuranceRepository.getMinistryWiseAssurancesCount(houseId,ministryId);
-	    	}
-	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Member_Wise.getValue())) 
-	    	{    
-	    	
-	    		results = assuranceRepository.getMemberWiseAssurancesCount(houseId,memberId);
-	    	}
-	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Status_Wise.getValue())) 
-	    	{    
-	    	
-	    		results = assuranceRepository.getStatusWiseAssurancesCount(houseId,statusId);
-	    	}
-	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Category_Wise.getValue())) 
-	    	{    
-	    	
-	    		results = assuranceRepository.getCategoryWiseAssurancesCount(houseId,categoryId);
-	    	}
+	    		results = assuranceRepository.getSessionWiseAssurancesCount(houseId,lokSabhaNoId,sessionNoId,ministryId,memberId,statusId,categoryId);
+//	    	}
+//	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Ministry_Wise.getValue())) 
+//	    	{    
+//	    	
+//	    		results = assuranceRepository.getMinistryWiseAssurancesCount(houseId,ministryId);
+//	    	}
+//	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Member_Wise.getValue())) 
+//	    	{    
+//	    	
+//	    		results = assuranceRepository.getMemberWiseAssurancesCount(houseId,memberId);
+//	    	}
+//	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Status_Wise.getValue())) 
+//	    	{    
+//	    	
+//	    		results = assuranceRepository.getStatusWiseAssurancesCount(houseId,statusId);
+//	    	}
+//	    	if(abbr.equalsIgnoreCase(DashboardAssurancesType.Category_Wise.getValue())) 
+//	    	{    
+//	    	
+//	    		results = assuranceRepository.getCategoryWiseAssurancesCount(houseId,categoryId);
+//	    	}
 	    	
 	    		String totalAssurancesCountByHouse=assuranceRepository.getTotalAssurancesCountByHouseId(houseId);
 	    		
 	    		return DashboardAssurancesCountResponseDTO.builder()
-	    				.abbr(abbr)
 	    	            .totalAssurances(!(totalAssurancesCountByHouse.isBlank() || totalAssurancesCountByHouse.equalsIgnoreCase("null")) ? totalAssurancesCountByHouse : null)
 	    	            .assurancesWiseCountList(mapResponseToDto(results))
 	    	            .build();
@@ -1368,9 +1367,11 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 			return results.isEmpty() ? Collections.emptyList() : results.stream().map(row ->
 			DashboardAssurancesWiseCountsResponseDTO.builder()
-						.valueId(row[0] != null ? row[0].toString() : null)
-						.valueName(row[1] != null ? row[1].toString() : null)
-						.assuranceCounts(row[2] != null ? row[2].toString() : null)
+						.sessionNo(row[0] != null ? row[0].toString() : null)
+						.sessionNoId(row[1] != null ? row[1].toString() : null)
+						.lokSabhaNo(row[2] != null ? row[2].toString() : null)
+						.lokSabhaNoId(row[3] != null ? row[3].toString() : null)
+						.assuranceCounts(row[4] != null ? row[4].toString() : null)
 						.build()
 			).toList();
 	    }
