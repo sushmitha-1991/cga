@@ -1,5 +1,7 @@
 package com.dsp.cga.response;
 
+import com.dsp.cga.config.XSSConfig.NoEscape;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class GenericResponse<T> {
 	private int statusCode;
 	private boolean success;
+	@NoEscape
 	private String message;
 	private T data;
 	

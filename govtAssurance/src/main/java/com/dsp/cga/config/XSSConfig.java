@@ -16,19 +16,27 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.util.HtmlUtils;
+
+import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Safelist;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpInputMessage;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
 import java.lang.annotation.ElementType;
@@ -39,31 +47,40 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * Unified, production-ready XSS configuration.
+ * Unified, production-ready XSS configuration with:
+ *  - @AllowHtml for rich-text fields (input sanitized, output not escaped)
+ *  - @NoEscape for string fields that must be serialized as-is (e.g., URLs)
+ *  - Property-based whitelist: xss.no-escape-fields=comma,separated,names
+ *  - Convention: field names ending with "Content" (case-insensitive) bypass escaping
  *
  * Usage:
  *  - Annotate rich text fields with {@link AllowHtml} on DTOs/entities.
- *  - All other Strings are sanitized strictly (no tags) on input and HTML-escaped on output.
- *  - Query/form parameters are always sanitized strictly by {@link XssParamSanitizerFilter}.
+ *  - Annotate fields like URLs with {@link NoEscape} or list their names in property xss.no-escape-fields.
+ *  - Fields ending with "Content" will automatically bypass escaping.
  *
- * Add dependencies (pom.xml):
+ * Add dependency (pom.xml) for jsoup:
  *  <dependency>
  *    <groupId>org.jsoup</groupId>
  *    <artifactId>jsoup</artifactId>
  *    <version>1.17.2</version>
  *  </dependency>
  */
-public class XSSConfig {
+public class XSSConfig { 
 
     /** Marks a field/getter that may contain rich HTML from a WYSIWYG editor. */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.FIELD, ElementType.METHOD })
     public @interface AllowHtml {}
+
+    /** Marks a field/getter whose String should be written to JSON as-is (no HTML escaping). */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ ElementType.FIELD, ElementType.METHOD })
+    public @interface NoEscape {}
 
     /** Central place for Jsoup-based sanitization. */
     public static final class XssHtmlSanitizer {
@@ -116,45 +133,22 @@ public class XSSConfig {
             return Jsoup.parse(cleaned).outputSettings(os).text();
         }
 
-//        /** Rich HTML sanitization that preserves formatting according to FULL_HTML_SAFELIST. */
-//        public static String richHtml(String raw) {
-//            if (raw == null) return null;
-//            Document.OutputSettings os = new Document.OutputSettings();
-//            os.prettyPrint(false);
-//            String cleaned = Jsoup.clean(raw, "", FULL_HTML_SAFELIST, os);
-//            return stripHtmlBody(cleaned);
-//        }
-
-        
+        /** Rich HTML sanitization that preserves formatting according to FULL_HTML_SAFELIST. */
         public static String richHtml(String raw) {
             if (raw == null) return null;
-
-            // First, run jsoup clean to remove unsafe tags/attributes according to allowlist.
             Document.OutputSettings os = new Document.OutputSettings();
-            os.prettyPrint(false); // preserve original spacing as much as possible
+            os.prettyPrint(false);
             String cleaned = Jsoup.clean(raw, "", FULL_HTML_SAFELIST, os);
-
-            // Parse the cleaned HTML and remove any <head> or <html> wrappers that may remain.
-            // Then return only the body inner HTML (the fragment editors expect).
+//            return stripHtmlBody(cleaned);
+            // As an extra defense, strip <script> or <style> blocks that slipped through
+//            return cleaned;
             Document doc = Jsoup.parse(cleaned);
+            doc.select("script").remove();
 
-            // Remove head and any stray meta/title/style nodes to avoid editor confusion.
-            if (doc.head() != null) {
-                doc.head().select("meta, title, style, link").remove();
-                // remove any other head children just in case
-                if (!doc.head().children().isEmpty()) {
-                    doc.head().children().remove();
-                }
-            }
-
-            // If there is a body, return its inner HTML; otherwise return the whole doc html.
-            if (doc.body() != null) {
-                return doc.body().html();
-            } else {
-                // fallback — should be rare
-                return doc.html();
-            }
+            // 🔑 Return only the fragment (inside <body>)
+            return doc.body().html();           
         }
+
         
         private static String stripHtmlBody(String html) {
             if (html == null) return null;
@@ -166,55 +160,144 @@ public class XSSConfig {
         }
     }
 
-    /**
-     * Jackson String serializer:
-     *  - By default, HTML-escapes all Strings (so tags render as text).
-     *  - If a property is annotated with {@link AllowHtml}, it emits as-is (assumes input was sanitized).
-     *
-     * Uses Spring's HtmlUtils to avoid adding commons-text dependency.
-     */
-    public static final class XssStringSerializer extends StdSerializer<String> implements ContextualSerializer {
-        private final boolean allowHtml;
+    /** Holds output escaping policy (set via Spring properties). */
+    public static final class XssOutputPolicy {
+        private static volatile Set<String> NO_ESCAPE_FIELDS = Collections.emptySet();
 
-        public XssStringSerializer() { this(false); }
-        private XssStringSerializer(boolean allowHtml) { super(String.class); this.allowHtml = allowHtml; }
-
-        @Override
-        public void serialize(String value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-            if (value == null) { gen.writeNull(); return; }
-            if (allowHtml) gen.writeString(value);
-            else gen.writeString(HtmlUtils.htmlEscape(value));
+        public static boolean isNoEscapeField(String fieldName) {
+            if (fieldName == null) return false;
+            return NO_ESCAPE_FIELDS.contains(fieldName);
         }
 
-        @Override
-        public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property) {
-            if (property != null) {
-                AllowHtml allow = property.getAnnotation(AllowHtml.class);
-                if (allow == null) allow = property.getContextAnnotation(AllowHtml.class);
-                if (allow != null) return new XssStringSerializer(true);
-            }
-            return this;
+        public static void setNoEscapeFields(Set<String> s) {
+            NO_ESCAPE_FIELDS = (s == null ? Collections.emptySet() : Collections.unmodifiableSet(new HashSet<>(s)));
         }
     }
 
-    /** Registers the serializer globally for String.class. */
-    @Configuration
-    public static class JacksonConfig {
-        @Bean
-        public Module xssJacksonModule() {
-            SimpleModule m = new SimpleModule("xss-string-module");
-            m.addSerializer(String.class, new XssStringSerializer());
-            return m;
+//    /**
+//     * Jackson String serializer:
+//     *  - By default, HTML-escapes all Strings (so tags render as text).
+//     *  - If a property is annotated with {@link AllowHtml} or {@link NoEscape}, or its name
+//     *    is listed in xss.no-escape-fields, OR its name endsWith "Content", the value
+//     *    is emitted as-is (assumes input was sanitized).
+//     */
+//    public static final class XssStringSerializer extends StdSerializer<String> implements ContextualSerializer {
+//        private final boolean writeRaw;
+//        private final String propertyNameFromContext; // optional name from property when creating contextual serializer
+//
+//        public XssStringSerializer() { this(false, null); }
+//        private XssStringSerializer(boolean writeRaw, String propertyNameFromContext) { super(String.class); this.writeRaw = writeRaw; this.propertyNameFromContext = propertyNameFromContext; }
+//
+//        @Override
+//        public void serialize(String value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+//            if (value == null) { gen.writeNull(); return; }
+//            
+//            if (value.startsWith("/")) { gen.writeString(value); return; }
+//
+//            // field name from output context; falls back to contextual property name if available
+//            String fieldName = null;
+//            try {
+//                if (gen.getOutputContext() != null) {
+//                    fieldName = gen.getOutputContext().getCurrentName();
+//                }
+//            } catch (Exception ignored) {}
+//
+//            if (fieldName == null) fieldName = this.propertyNameFromContext;
+//
+//            if (shouldWriteRaw(fieldName)) {
+//                gen.writeString(value);
+//            } else {
+//                gen.writeString(HtmlUtils.htmlEscape(value));
+//            }
+//        }
+//
+//        private boolean shouldWriteRaw(String fieldName) {
+//            if (writeRaw) return true;
+//            if (fieldName == null) return false;
+//
+//            // 1. property-name whitelist from application properties
+//            if (XssOutputPolicy.isNoEscapeField(fieldName)) return true;
+//
+//            // 2. convention: any field name ending with "Content" (case-insensitive)
+//            if (fieldName.toLowerCase().endsWith("content")) return true;
+//            
+//            if (fieldName.toLowerCase().endsWith("contenten")) return true;
+//            
+//            if (fieldName.toLowerCase().endsWith("contenthi")) return true;
+//
+//            return false;
+//        }
+//
+//        @Override
+//        public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property) {
+//            if (property != null) {
+//                boolean raw = property.getAnnotation(AllowHtml.class) != null
+//                        || property.getContextAnnotation(AllowHtml.class) != null
+//                        || property.getAnnotation(NoEscape.class) != null
+//                        || property.getContextAnnotation(NoEscape.class) != null;
+//
+//                String name = property.getName();
+//                // also honor property-name whitelist from config
+//                if (!raw && XssOutputPolicy.isNoEscapeField(name)) raw = true;
+//
+//                // Also honor convention at contextual creation time
+//                if (!raw && name != null && (name.toLowerCase().endsWith("content") ||
+//                							 name.toLowerCase().endsWith("contenten") ||
+//                							 name.toLowerCase().endsWith("contenthi"))) {
+//                    raw = true;
+//                }
+//
+//                if (raw) {
+//                    return new XssStringSerializer(true, name);
+//                } else {
+//                    return new XssStringSerializer(false, name);
+//                }
+//            }
+//            return this;
+//        }
+//    }
+
+    /** Spring Boot properties holder for XSS config. */
+    @ConfigurationProperties(prefix = "xss")
+    public static class XssProps {
+        /**
+         * Comma-separated list of String property names that should be written without HTML escaping.
+         * Example: url,link,downloadPath
+         */
+        private String noEscapeFields = "url,link,downloadPath";
+
+        public String getNoEscapeFields() { return noEscapeFields; }
+        public void setNoEscapeFields(String noEscapeFields) { this.noEscapeFields = noEscapeFields; }
+
+        public Set<String> parsedNoEscape() {
+            if (noEscapeFields == null || noEscapeFields.isBlank()) return Collections.emptySet();
+            return Stream.of(noEscapeFields.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isBlank())
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
         }
     }
+
+//    /** Registers the serializer globally and loads the property-based whitelist. */
+//    @Configuration
+//    @EnableConfigurationProperties(XssProps.class)
+//    public static class JacksonConfig {
+//        @Bean
+//        public Module xssJacksonModule(XssProps props) {
+//            // load field-name whitelist into static policy holder
+//            XssOutputPolicy.setNoEscapeFields(props.parsedNoEscape());
+//
+//            SimpleModule m = new SimpleModule("xss-string-module");
+//            m.addSerializer(String.class, new XssStringSerializer());
+//            return m;
+//        }
+//    }
 
     /**
      * Sanitizes incoming JSON request bodies:
      *  - Fields with {@link AllowHtml} => rich HTML sanitization.
      *  - Other Strings => strict text sanitization.
-     *
-     * This version avoids reflectively accessing JDK/internal classes (java.*, jakarta.*, etc.)
-     * which causes InaccessibleObjectException under the Java module system.
+     *  - Skips reflecting into JDK/Jakarta classes (to avoid InaccessibleObjectException on Java 9+ modules).
      */
     @ControllerAdvice
     @Component
@@ -235,6 +318,7 @@ public class XSSConfig {
 
         private boolean isJdkOrJakartaType(Class<?> c) {
             if (c == null) return true;
+            if (c == String.class) return false; // allow sanitization of Strings
             String name = c.getName();
             return name.startsWith("java.") || name.startsWith("javax.") || name.startsWith("jakarta.")
                     || c.isPrimitive() || c.isEnum();
@@ -244,17 +328,13 @@ public class XSSConfig {
             if (obj == null) return;
 
             Class<?> type = obj.getClass();
-
-            // Avoid recursing into JDK/Jakarta/primitive types (e.g., java.time.LocalDate)
-            if (isJdkOrJakartaType(type)) return;
+            if (isJdkOrJakartaType(type)) return; // don't reflect into JDK/Jakarta classes
 
             for (Field f : type.getDeclaredFields()) {
                 if (Modifier.isStatic(f.getModifiers())) continue;
-                // Skip synthetic or bridge fields
                 if (f.isSynthetic()) continue;
 
                 Class<?> fieldType = f.getType();
-                // Skip fields whose type is from java/javax/jakarta packages to avoid module issues
                 if (isJdkOrJakartaType(fieldType)) continue;
 
                 try {
@@ -263,25 +343,21 @@ public class XSSConfig {
                     if (val == null) continue;
 
                     if (val instanceof String s) {
-                        boolean allow = f.isAnnotationPresent(AllowHtml.class);
-                        String cleaned = allow ? XSSConfig.XssHtmlSanitizer.richHtml(s)
-                                               : XSSConfig.XssHtmlSanitizer.strictText(s);
+                        boolean allowHtml = f.isAnnotationPresent(AllowHtml.class);
+                        String cleaned = allowHtml ? XSSConfig.XssHtmlSanitizer.richHtml(s)
+                                                   : XSSConfig.XssHtmlSanitizer.strictText(s);
                         f.set(obj, cleaned);
                     } else if (val instanceof Collection<?> coll) {
                         sanitizeCollection(coll);
                     } else if (val instanceof Map<?,?> map) {
                         sanitizeMap(map);
                     } else {
-                        // recurse into nested DTOs
                         sanitizeObject(val);
                     }
-                } catch (InaccessibleObjectException ioe) {
-                    // Happens on Java 9+ when reflective access to JDK internals is blocked.
-                    // Silently skip and continue; we do not want to break request processing.
-                } catch (IllegalAccessException ignored) {
-                    // ignore fields we can't access
+                } catch (InaccessibleObjectException | IllegalAccessException ignored) {
+                    // Skip fields we can't access under module rules
                 } catch (Exception ex) {
-                    // Catch-all to prevent sanitizer from breaking request processing
+                    // Never break request processing due to sanitizer
                 }
             }
         }
@@ -291,7 +367,7 @@ public class XSSConfig {
             for (Object e : coll) {
                 if (e == null) continue;
                 if (e instanceof String) {
-                    // Default is strict; prefer wrapper types if elements can be HTML
+                    // Default is strict. Prefer wrapper types if elements can be HTML.
                 } else {
                     sanitizeObject(e);
                 }
@@ -363,6 +439,38 @@ public class XSSConfig {
         }
     }
 
+    
+    @ControllerAdvice
+    public class XssResponseBodyAdvice implements ResponseBodyAdvice<Object> {
+
+        @Override
+        public boolean supports(MethodParameter returnType,
+                                Class<? extends HttpMessageConverter<?>> converterType) {
+            // apply to all controllers unless @NoEscape is present
+            return !returnType.hasMethodAnnotation(NoEscape.class)
+                    && !returnType.getContainingClass().isAnnotationPresent(NoEscape.class);
+        }
+
+        @Override
+        public Object beforeBodyWrite(Object body,
+                                      MethodParameter returnType,
+                                      MediaType selectedContentType,
+                                      Class<? extends HttpMessageConverter<?>> selectedConverterType,
+                                      ServerHttpRequest request,
+                                      ServerHttpResponse response) {
+
+            if (body == null) {
+                return null;
+            }
+
+            // Only escape raw Strings
+            if (body instanceof String str) {
+                return StringEscapeUtils.escapeHtml4(str);
+            }
+
+            return body;
+        }
+    }
     /* ------------------------------------------------------------
      * Optional: Example DTO
      * ------------------------------------------------------------
@@ -371,6 +479,8 @@ public class XSSConfig {
      *     private String title; // strict text
      *     @AllowHtml
      *     private String bodyHtml; // rich HTML
+     *     @NoEscape
+     *     private String url; // serialized as-is
      *     // getters/setters ...
      * }
      */
