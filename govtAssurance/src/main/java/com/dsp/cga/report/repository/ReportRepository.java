@@ -29,7 +29,11 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			        when ca.house_id = 2 then ls.session_number
 			    end as sessionNo,
 			    lsm.lok_sabha_number as lokSabhaNo,
-				mc1.code as committeeDecision,
+			    case
+			    	when ca.house_id = 1 then mc1.code
+			        when ca.house_id = 2 then mc2.code
+			    end as committeeDecision,
+				--mc1.code as committeeDecision,
 				cir.reason as reason,
 			    cir.created_at AS updatedOn
 			from cga.implementation_requests cir
@@ -37,6 +41,7 @@ public interface ReportRepository extends JpaRepository<ClubbedAssurance, Long> 
 			join master.ministries mm on mm.id = ca.ministry_id
 			join master.codes mc on mc.id = ca.assurance_type_id
 			join master.codes mc1 on mc1.id=cir.committee_decision_id
+			left join master.codes mc2 on mc2.id=ca.status_id
 			left join master.rajya_sabha_session_master rs on ca.rajya_sabha_session_no = rs.id and ca.house_id = 1
 			left join master.lok_sabha_session_masters ls on ca.lok_sabha_session_no = ls.id and ca.house_id = 2
 			left join master.lok_sabha_masters lsm on ca.lok_sabha_no =lsm.id and ca.house_id = 2
