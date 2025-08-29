@@ -173,61 +173,61 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 			@Param("sessionNoId") Long sessionNoId,@Param("ministryId") Long ministryId,@Param("memberId") Long memberId,
 			@Param("statusId") Long statusId,@Param("categoryId") Long categoryId);
 
-	@Query(value = """
-			select
-			mm.id as ministryId,
-			mm.ministry_name as ministry,
-			count(ca.id) as count
-			from cga.assurance ca
-			left join master.ministries mm on mm.id=ca.ministry_id
-			where ca.house_id=:houseId
-			and (:ministryId is null or ca.ministry_id=:ministryId)
-			group by
-			ministry,ministryId
-			""", nativeQuery = true)
-	List<Object[]> getMinistryWiseAssurancesCount(@Param("houseId") Long houseId,@Param("ministryId") Long ministryId);
-	
-	@Query(value = """
-			select
-			mpd.id as memberId,
-			mpd.full_name as memberName,
-			count(ca.id) as count
-			from cga.assurance ca
-			left join members.personal_details mpd on mpd.id=ca.member_id
-			where ca.house_id=:houseId
-			and (:memberId is null or ca.member_id=:memberId)
-			group by
-			memberName,memberId
-			""", nativeQuery = true)
-	List<Object[]> getMemberWiseAssurancesCount(@Param("houseId") Long houseId,@Param("memberId") Long memberId);
-	
-	@Query(value = """
-			select
-			mc.id as statusId,
-			mc.code as statusName,
-			count(ca.id) as count
-			from cga.assurance ca
-			left join master.codes mc on mc.id=ca.status_id
-			where ca.house_id=:houseId
-			and (:statusId is null or ca.status_id=:statusId)
-			group by
-			statusName,statusId
-			""", nativeQuery = true)
-	List<Object[]> getStatusWiseAssurancesCount(@Param("houseId") Long houseId,@Param("statusId") Long statusId);
-	
-	@Query(value = """
-			select
-			mc.id as categoryId,
-			mc.code as categoryName,
-			count(ca.id) as count
-			from cga.assurance ca
-			left join master.codes mc on mc.id=ca.category_id
-			where ca.house_id=:houseId
-			and (:categoryId is null or ca.category_id=:categoryId)
-			group by
-			categoryName,categoryId
-			""", nativeQuery = true)
-	List<Object[]> getCategoryWiseAssurancesCount(@Param("houseId") Long houseId,@Param("categoryId") Long categoryId);
+//	@Query(value = """
+//			select
+//			mm.id as ministryId,
+//			mm.ministry_name as ministry,
+//			count(ca.id) as count
+//			from cga.assurance ca
+//			left join master.ministries mm on mm.id=ca.ministry_id
+//			where ca.house_id=:houseId
+//			and (:ministryId is null or ca.ministry_id=:ministryId)
+//			group by
+//			ministry,ministryId
+//			""", nativeQuery = true)
+//	List<Object[]> getMinistryWiseAssurancesCount(@Param("houseId") Long houseId,@Param("ministryId") Long ministryId);
+//	
+//	@Query(value = """
+//			select
+//			mpd.id as memberId,
+//			mpd.full_name as memberName,
+//			count(ca.id) as count
+//			from cga.assurance ca
+//			left join members.personal_details mpd on mpd.id=ca.member_id
+//			where ca.house_id=:houseId
+//			and (:memberId is null or ca.member_id=:memberId)
+//			group by
+//			memberName,memberId
+//			""", nativeQuery = true)
+//	List<Object[]> getMemberWiseAssurancesCount(@Param("houseId") Long houseId,@Param("memberId") Long memberId);
+//	
+//	@Query(value = """
+//			select
+//			mc.id as statusId,
+//			mc.code as statusName,
+//			count(ca.id) as count
+//			from cga.assurance ca
+//			left join master.codes mc on mc.id=ca.status_id
+//			where ca.house_id=:houseId
+//			and (:statusId is null or ca.status_id=:statusId)
+//			group by
+//			statusName,statusId
+//			""", nativeQuery = true)
+//	List<Object[]> getStatusWiseAssurancesCount(@Param("houseId") Long houseId,@Param("statusId") Long statusId);
+//	
+//	@Query(value = """
+//			select
+//			mc.id as categoryId,
+//			mc.code as categoryName,
+//			count(ca.id) as count
+//			from cga.assurance ca
+//			left join master.codes mc on mc.id=ca.category_id
+//			where ca.house_id=:houseId
+//			and (:categoryId is null or ca.category_id=:categoryId)
+//			group by
+//			categoryName,categoryId
+//			""", nativeQuery = true)
+//	List<Object[]> getCategoryWiseAssurancesCount(@Param("houseId") Long houseId,@Param("categoryId") Long categoryId);
 	
 	@Query(value = """
 						select
@@ -287,7 +287,11 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 			count(ca.id) as totalAssurances
 			from cga.assurance ca
 			where ca.house_id=:houseId
+			and(
+			(:houseId =2 and ca.lok_sabha_session_no is not null and ca.lok_sabha_no is not null)
+			OR(:houseId =1 and ca.rajya_sabha_session_no is not null))
+			and (:lokSabhaNoId is null or ca.lok_sabha_no=:lokSabhaNoId)
 			""", nativeQuery = true)
-	String getTotalAssurancesCountByHouseId(@Param("houseId") Long houseId);
+	String getTotalAssurancesCountByHouseId(@Param("houseId") Long houseId,@Param("lokSabhaNoId") Long lokSabhaNoId);
 }
 
