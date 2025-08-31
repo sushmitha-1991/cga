@@ -85,9 +85,9 @@ public class XSSConfig {
     /** Central place for Jsoup-based sanitization. */
     public static final class XssHtmlSanitizer {
 
-        private static final Safelist FULL_HTML_SAFELIST = Safelist.relaxed()
+        private static final Safelist FULL_HTML_SAFELIST = Safelist.relaxed()  
                 // structural
-                .addTags("html","head","body","title","meta","link","section","article","nav","aside","header","footer","main","figure","figcaption")
+                .addTags("html","head","body","title","meta","style","link","section","article","nav","aside","header","footer","main","figure","figcaption")
                 // layout/semantic
                 .addTags("div","span","p","blockquote","pre","code","kbd","samp","var","abbr","dfn","small","sub","sup","mark","hr","br")
                 .addTags("h1","h2","h3","h4","h5","h6")

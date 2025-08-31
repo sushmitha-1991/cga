@@ -38,6 +38,7 @@ import com.dsp.cga.assurance.dto.ImplementationTypeDTO;
 import com.dsp.cga.assurance.dto.MemberDTO;
 import com.dsp.cga.assurance.dto.SerialNumberRequest;
 import com.dsp.cga.assurance.dto.SerialNumberResponse;
+import com.dsp.cga.assurance.dto.SessionDTO;
 import com.dsp.cga.assurance.dto.UserDetailsDTO;
 import com.dsp.cga.assurance.entity.Assurance;
 import com.dsp.cga.assurance.entity.Departments;
@@ -526,11 +527,11 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	    Long houseId = getHouseId(); 
 	    if (sessionNo == null) {
-	        sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
+//	        sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
 	    
-//	    	SessionDTO session = util.getCurrentSession();
-//	    	sessionNo = session.getLokSabhaSessionNoId() != null 
-//	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();
+	    	SessionDTO session = util.getCurrentSession();
+	    	sessionNo = session.getLokSabhaSessionNoId() != null 
+	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();
 	    }
 
 	    final Long finalSessionNo = sessionNo;
