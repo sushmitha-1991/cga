@@ -71,7 +71,7 @@ public class RestTemplateConfig {
 //    }
     
     @Bean
-	public RestTemplate restTemplate() {
+	public RestTemplate restTemplate() { 
 		return new RestTemplate();
 	}
 }

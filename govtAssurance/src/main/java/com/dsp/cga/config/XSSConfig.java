@@ -56,7 +56,7 @@ import java.util.stream.Stream;
  *  - @AllowHtml for rich-text fields (input sanitized, output not escaped)
  *  - @NoEscape for string fields that must be serialized as-is (e.g., URLs)
  *  - Property-based whitelist: xss.no-escape-fields=comma,separated,names
- *  - Convention: field names ending with "Content" (case-insensitive) bypass escaping
+ *  - Convention: field names ending with "Content" (case-insensitive) bypass escaping 
  *
  * Usage:
  *  - Annotate rich text fields with {@link AllowHtml} on DTOs/entities.

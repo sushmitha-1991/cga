@@ -525,7 +525,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 	        ministryId = null;
 	    }
 
-	    Long houseId = getHouseId(); 
+	    Long houseId = getHouseId();  
 	    if (sessionNo == null) {
 //	        sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
 	    
