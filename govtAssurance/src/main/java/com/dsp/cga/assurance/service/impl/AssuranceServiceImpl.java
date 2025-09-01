@@ -1354,7 +1354,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 //	    		results = assuranceRepository.getCategoryWiseAssurancesCount(houseId,categoryId);
 //	    	}
 	    	
-	    		String totalAssurancesCountByHouse=assuranceRepository.getTotalAssurancesCountByHouseId(houseId,lokSabhaNoId);
+	    		String totalAssurancesCountByHouse=assuranceRepository.getTotalAssurancesCountByHouseId(houseId,lokSabhaNoId,sessionNoId,ministryId,memberId,statusId,categoryId);
 	    		
 	    		return DashboardAssurancesCountResponseDTO.builder()
 	    	            .totalAssurances(!(totalAssurancesCountByHouse.isBlank() || totalAssurancesCountByHouse.equalsIgnoreCase("null")) ? totalAssurancesCountByHouse : null)

@@ -288,10 +288,20 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 			from cga.assurance ca
 			where ca.house_id=:houseId
 			and(
-			(:houseId =2 and ca.lok_sabha_session_no is not null and ca.lok_sabha_no is not null)
-			OR(:houseId =1 and ca.rajya_sabha_session_no is not null))
+			(:houseId =2 and ca.lok_sabha_session_no is not null
 			and (:lokSabhaNoId is null or ca.lok_sabha_no=:lokSabhaNoId)
+			and (:sessionNoId is null or ca.lok_sabha_session_no=:sessionNoId))
+			or
+			(:houseId =1 and ca.rajya_sabha_session_no is not null
+			and (:sessionNoId is null or ca.rajya_sabha_session_no=:sessionNoId))
+			)
+			and (:ministryId is null or ca.ministry_id=:ministryId)
+			and (:memberId is null or ca.member_id=:memberId)
+			and (:statusId is null or ca.status_id=:statusId)
+			and (:categoryId is null or ca.category_id=:categoryId)
 			""", nativeQuery = true)
-	String getTotalAssurancesCountByHouseId(@Param("houseId") Long houseId,@Param("lokSabhaNoId") Long lokSabhaNoId);
+	String getTotalAssurancesCountByHouseId(@Param("houseId") Long houseId,@Param("lokSabhaNoId") Long lokSabhaNoId,
+			@Param("sessionNoId") Long sessionNoId,@Param("ministryId") Long ministryId,@Param("memberId") Long memberId,
+			@Param("statusId") Long statusId,@Param("categoryId") Long categoryId);
 }
 
