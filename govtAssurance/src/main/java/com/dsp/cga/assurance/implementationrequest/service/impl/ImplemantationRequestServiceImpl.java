@@ -527,8 +527,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 
 	    Long houseId = getHouseId();  
 	    if (sessionNo == null) {
-//	        sessionNo = (houseId == 1) ? rssRepo.findLatestByCreatedAt() : lssRepo.findLatestByCreatedAt();
-	    
+
 	    	SessionDTO session = util.getCurrentSession();
 	    	sessionNo = session.getLokSabhaSessionNoId() != null 
 	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();

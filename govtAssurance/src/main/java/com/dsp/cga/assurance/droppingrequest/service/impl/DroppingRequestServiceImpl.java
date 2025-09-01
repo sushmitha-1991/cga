@@ -290,18 +290,18 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 	    }
 
 	    // 🔹 Determine houseId
-	    Long houseId = getHouseId(); // Implement this method
+//	    Long houseId = getHouseId(); // Implement this method
 	    String houseAbbr = util.getHouseAbbr();
 	    
 	    // 🔹 Get latest session if sessionNo is null
 	    if (sessionNo == null) {
-	        sessionNo = (houseId == 1)
-	                ? rssRepo.findLatestByCreatedAt()
-	                : lssRepo.findLatestByCreatedAt();
+//	        sessionNo = (houseId == 1)
+//	                ? rssRepo.findLatestByCreatedAt()
+//	                : lssRepo.findLatestByCreatedAt();
 	       
-//	    	SessionDTO session = util.getCurrentSession();
-//	    	sessionNo = session.getLokSabhaSessionNoId() != null 
-//	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();
+	    	SessionDTO session = util.getCurrentSession();
+	    	sessionNo = session.getLokSabhaSessionNoId() != null 
+	    					? session.getLokSabhaSessionNoId() : session.getRajyaSabhaSessionNoId();
 	    }
 
 	    Long finalSessionNo = sessionNo;
