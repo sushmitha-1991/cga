@@ -2,6 +2,7 @@ package com.dsp.cga.util;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ public class PdfExportUtil {
 	private final static Map<String, String> tMap = new HashMap();
 	static {
 		tMap.put("CGA_PA_REF", "paRefLetter");
+		tMap.put("ROSTER_SCH_MEET_DETAILS", "meetingScheduleTemplate");
 	}
 	
 	@Autowired
@@ -31,7 +33,7 @@ public class PdfExportUtil {
 
 	}
 	
-	public byte[] generatePdf(String abbr, Map<String, String> reportParams) throws Exception {
+	public byte[] generatePdf(String abbr, Map<String, Object> reportParams) throws Exception {
 
 		String templateFile = tMap.get(abbr);
 		System.out.println("templateFile: " + templateFile);
@@ -39,11 +41,24 @@ public class PdfExportUtil {
 			throw new FileNotFoundException("Template for report not found");
 		}
 
+//		Context ctx = new Context();
+//		reportParams.forEach((key, value) -> {
+//			System.out.println(key + "/ " + value);
+//		});
+//		reportParams.forEach((key, value) -> ctx.setVariable(key, value));
 		Context ctx = new Context();
+
 		reportParams.forEach((key, value) -> {
-			System.out.println(key + "/ " + value);
+			System.out.println(key + " / " + value);
+			// Handle lists, maps, and simple values
+			if (value instanceof List) {
+				ctx.setVariable(key, (List<?>) value);
+			} else if (value instanceof Map) {
+				ctx.setVariable(key, (Map<?, ?>) value);
+			} else {
+				ctx.setVariable(key, value);
+			}
 		});
-		reportParams.forEach((key, value) -> ctx.setVariable(key, value));
 		return generatePdf(ctx, templateFile);
 
 	}
