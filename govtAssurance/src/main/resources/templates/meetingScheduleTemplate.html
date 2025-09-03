@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Meeting Schedule</title>
+  <style>
+    body {
+      font-family: "Times New Roman", serif;
+      font-size: 13px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 5px;
+    }
+
+    h3 {
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+
+    table {
+      width: 95%;
+      margin: auto;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid black;
+      padding: 6px 10px;
+      text-align: center;
+    }
+
+    th {
+      font-weight: bold;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 20mm;
+      @bottom-right {
+        content: "Page " counter(page) " of " counter(pages);
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Title -->
+  <h2>Meeting Schedule</h2>
+  <h3 th:text="${from_date} + ' to ' + ${to_date}"></h3>
+
+  <!-- Meeting table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Day</th>
+        <th>Time</th>
+        <th>Meeting</th>
+        <th>Venue</th>
+        <th>In Charge</th>
+        <th>Info</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+		<tr th:each="meeting : ${meetings}">
+		        <td th:text="${meeting.day}"></td>
+		        <td th:text="${meeting.time}"></td>
+		        <td th:text="${meeting.meeting}"></td>
+		        <td th:text="${meeting.venue}"></td>
+		        <td th:text="${meeting.inCharge}"></td>
+		        <td th:text="${meeting.info}"></td>
+		        <td th:text="${meeting.email}"></td>
+		  </tr>
+    </tbody>
+  </table>
+
+</div>
+</body>
+</html>

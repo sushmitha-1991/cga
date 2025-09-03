@@ -25,5 +25,5 @@ public class GenericReportInputDTO {
     
      String abbr;
      String docType;
-     HashMap<String, String> reportParams;
+     HashMap<String, Object> reportParams;
 }
