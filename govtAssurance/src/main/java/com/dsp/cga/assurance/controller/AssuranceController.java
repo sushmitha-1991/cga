@@ -8,6 +8,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +33,6 @@ import com.dsp.cga.assurance.service.AssuranceService;
 import com.dsp.cga.entity.RequestHistory;
 import com.dsp.cga.report.service.ReportService;
 import com.dsp.cga.response.GenericResponse;
-import com.dsp.cga.util.DateFormatterUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -80,15 +83,23 @@ public class AssuranceController {
 	    @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
 	    @ApiResponse(responseCode = "500", description = "Internal server error")
 	})
-	public ResponseEntity<Map<String, Object>> getAllAssurance() {
-	    List<AssuranceDTO> assuranceList = assuranceService.getAllAssurance();
+	public ResponseEntity<Map<String, Object>> getAllAssurance(
+			@RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+		Page<AssuranceDTO> assurancePage = assuranceService.getAllAssurance(pageable);
+//	    List<AssuranceDTO> assuranceList = assuranceService.getAllAssurance();
 
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("statusCode", HttpStatus.OK.value());
 	    response.put("success", true);
 	    response.put("message", "assurance fetched successfully");
-	    response.put("count", assuranceList.size()); // ✅ new count field
-	    response.put("data", assuranceList);         // ✅ keep data as-is
+//	    response.put("count", assuranceList.size()); // ✅ new count field
+//	    response.put("data", assuranceList);         // ✅ keep data as-is
+	    response.put("count", assurancePage.getTotalElements()); // total count
+	    response.put("currentPage", assurancePage.getNumber());
+	    response.put("totalPages", assurancePage.getTotalPages());
+	    response.put("data", assurancePage.getContent());
 
 	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
@@ -159,15 +170,23 @@ public class AssuranceController {
 	    @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
 	    @ApiResponse(responseCode = "500", description = "Internal server error")
 	})
-	public ResponseEntity<Map<String, Object>> getAllLokSabhaAssurance() {
-	    List<AssuranceDTO> assuranceList = assuranceService.getAllLokSabhaAssurance();
+	public ResponseEntity<Map<String, Object>> getAllLokSabhaAssurance(
+			@RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+	    Page<AssuranceDTO> assurancePage = assuranceService.getAllLokSabhaAssurance(pageable);
+//	    List<AssuranceDTO> assuranceList = assuranceService.getAllLokSabhaAssurance();
 
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("statusCode", HttpStatus.OK.value());
 	    response.put("success", true);
 	    response.put("message", "assurance fetched successfully");
-	    response.put("count", assuranceList.size()); // ✅ new count field
-	    response.put("data", assuranceList);         // ✅ keep data as-is
+//	    response.put("count", assuranceList.size()); // ✅ new count field
+//	    response.put("data", assuranceList);         // ✅ keep data as-is
+	    response.put("count", assurancePage.getTotalElements()); // total count
+	    response.put("currentPage", assurancePage.getNumber());
+	    response.put("totalPages", assurancePage.getTotalPages());
+	    response.put("data", assurancePage.getContent());
 
 	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}

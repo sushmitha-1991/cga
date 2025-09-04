@@ -3,6 +3,9 @@ package com.dsp.cga.assurance.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.dsp.cga.assurance.dto.AssuranceDTO;
 import com.dsp.cga.assurance.dto.AssuranceListDTO;
 import com.dsp.cga.assurance.dto.DashboardAssurancesCountResponseDTO;
@@ -15,7 +18,9 @@ public interface AssuranceService {
 
 	AssuranceDTO createAssurance(AssuranceDTO assuranceDTO);
 
-	List<AssuranceDTO> getAllAssurance();
+//	List<AssuranceDTO> getAllAssurance();
+//	****** added pagination to the above service ****************
+	Page<AssuranceDTO> getAllAssurance(Pageable pageable);
 
 	AssuranceDTO getAssuranceById(Long id);
 
@@ -29,7 +34,9 @@ public interface AssuranceService {
 
 	List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId, Long rajyaSabhaSessionNo, Long memberId);
 
-	List<AssuranceDTO> getAllLokSabhaAssurance();
+//	List<AssuranceDTO> getAllLokSabhaAssurance();
+//	****** added pagination to the above service ****************
+	Page<AssuranceDTO> getAllLokSabhaAssurance(Pageable pageable);
 
 	List<AssuranceDTO> getFilteredAssurancesLs(LocalDate fromDate, LocalDate toDate, Long ministryId,Long lokSabhaNo, Long lokSabhaSessionNo, Long memberId);
 

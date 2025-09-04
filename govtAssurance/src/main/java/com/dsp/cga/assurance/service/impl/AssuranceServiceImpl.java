@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -75,7 +78,6 @@ import com.dsp.cga.assurance.supplementry.entity.ClubbedMemberInfo;
 import com.dsp.cga.assurance.supplementry.entity.Supplementary;
 import com.dsp.cga.assurance.supplementry.repository.SupplementaryRepository;
 import com.dsp.cga.entity.RequestHistory;
-import com.dsp.cga.eunms.DashboardAssurancesType;
 import com.dsp.cga.exception.ResourceNotFoundException;
 import com.dsp.cga.mapper.AssuranceListMapper;
 import com.dsp.cga.mapper.AssuranceMapper;
@@ -370,19 +372,27 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	@Override
 	@Transactional
-	public List<AssuranceDTO> getAllAssurance() {
-		log.debug("Entering getAllAssurance");
+//	public List<AssuranceDTO> getAllAssurance() {
+	public Page<AssuranceDTO> getAllAssurance(Pageable pageable) {
+		log.debug("Entering getAllAssurance with pagination: {}", pageable);
 
 		// Fetch only assurances where rajyaSabhaSessionNo is not null
-		List<Assurance> assurances = assuranceRepository
-				.findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull();
+//		List<Assurance> assurances = assuranceRepository
+//				.findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull();
+		Page<Assurance> assurances = assuranceRepository
+				.findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull(pageable);
 		log.debug("Fetched Assurances with non-null rajyaSabhaSessionNo: {}", assurances);
 
-		List<AssuranceDTO> assuranceDTOs = new ArrayList<>();
-		for (Assurance assurance : assurances) {
-			log.debug("Processing Assurance: {}", assurance);
+		List<AssuranceDTO> assuranceDTOs=assurances.stream().map(assurance -> {
 			AssuranceDTO dto = assuranceMapper.toDTO(assurance);
+			
+//		List<AssuranceDTO> assuranceDTOs = new ArrayList<>();
+//		for (Assurance assurance : assurances) {
+//			log.debug("Processing Assurance: {}", assurance);
+//			AssuranceDTO dto = assuranceMapper.toDTO(assurance);
 
+			log.debug("Processing Assurance: {}", assurance);
+			
 			// Populate additional data
 			if (assurance.getMemberId() != null) {
 			dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
@@ -413,13 +423,20 @@ public class AssuranceServiceImpl implements AssuranceService {
 				dto.setStatusDTO(fetchStatusData(assurance.getStatusId()));
 			}
 			
+			if (assurance.getClubbedMembers() != null) {
 			List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
 			dto.setClubbedMembersData(clubbedMembersData);
-			assuranceDTOs.add(dto);
-		}
+			}
+//			assuranceDTOs.add(dto);
+//		}
 
-		log.debug("Returning list of AssuranceDTOs: {}", assuranceDTOs);
-		return assuranceDTOs;
+//		log.debug("Returning list of AssuranceDTOs: {}", assuranceDTOs);
+//		return assuranceDTOs;
+			log.debug("Returning list of AssuranceDTOs: {}", dto);
+			return dto;
+		}).toList();
+
+	    return new PageImpl<>(assuranceDTOs, pageable, assurances.getTotalElements());
 	}
 
 	private MemberDTO fetchMemberData(Long memberId) {
@@ -1047,19 +1064,24 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 
 	@Override
-	public List<AssuranceDTO> getAllLokSabhaAssurance() {
-		log.debug("Entering getAllAssurance");
+//	public List<AssuranceDTO> getAllLokSabhaAssurance() {
+	public Page<AssuranceDTO> getAllLokSabhaAssurance(Pageable pageable) {
+//		log.debug("Entering getAllAssurance");
+		log.debug("Entering getAllAssurance with pagination: {}", pageable);
+		// Fetch only assurances where rajyaSabhaSessionNo is null
+//		List<Assurance> assurances = assuranceRepository
+//				.findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNull();
+		Page<Assurance> assurances = assuranceRepository
+				.findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNull(pageable);
+		log.debug("Fetched Assurances with null rajyaSabhaSessionNo: {}", assurances);
 
-		// Fetch only assurances where rajyaSabhaSessionNo is not null
-		List<Assurance> assurances = assuranceRepository
-				.findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNull();
-		log.debug("Fetched Assurances with non-null rajyaSabhaSessionNo: {}", assurances);
-
-		List<AssuranceDTO> assuranceDTOs = new ArrayList<>();
-		for (Assurance assurance : assurances) {
-			log.debug("Processing Assurance: {}", assurance);
-			AssuranceDTO dto = assuranceMapper.toDTO(assurance);
-
+		 List<AssuranceDTO> assuranceDTOs = assurances.stream().map(assurance -> {
+		        AssuranceDTO dto = assuranceMapper.toDTO(assurance);
+//		List<AssuranceDTO> assuranceDTOs = new ArrayList<>();
+//		for (Assurance assurance : assurances) {
+//			log.debug("Processing Assurance: {}", assurance);
+//			AssuranceDTO dto = assuranceMapper.toDTO(assurance);
+		        log.debug("Processing Assurance: {}", assurance);
 			// Populate additional data
 			if (assurance.getMemberId() != null) {
 			dto.setMemberDTO(fetchMemberData(assurance.getMemberId()));
@@ -1100,11 +1122,16 @@ public class AssuranceServiceImpl implements AssuranceService {
 			List<MemberDTO> clubbedMembersData = fetchClubbedMembersData(assurance.getClubbedMembers());
 			dto.setClubbedMembersData(clubbedMembersData);
 			}
-			assuranceDTOs.add(dto);
-		}
+//			assuranceDTOs.add(dto);
+//		}
 
-		log.debug("Returning list of AssuranceDTOs: {}", assuranceDTOs);
-		return assuranceDTOs;
+//		log.debug("Returning list of AssuranceDTOs: {}", assuranceDTOs);
+//		return assuranceDTOs;
+			log.debug("Returning list of AssuranceDTOs: {}", dto);
+			 return dto;
+		    }).toList();
+
+		    return new PageImpl<>(assuranceDTOs, pageable, assurances.getTotalElements());
 	}
 
 	@Override
