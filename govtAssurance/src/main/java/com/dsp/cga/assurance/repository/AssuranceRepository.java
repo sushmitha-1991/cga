@@ -23,16 +23,16 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 //		       "ORDER BY a.createdAt DESC")
 //		List<Assurance> findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull();
 	
-//	@Query("SELECT a FROM Assurance a " +
-//		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL AND a.lokSabhaSessionNo IS NULL " +
-//		       "ORDER BY a.createdAt DESC")
-//		List<Assurance> findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull();
+	@Query("SELECT a FROM Assurance a " +
+		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL AND a.lokSabhaSessionNo IS NULL " +
+		       "ORDER BY a.createdAt DESC")
+		List<Assurance> findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull();
 	
 //  *************************  adding pagination to the above query *******************************
 	@Query("SELECT a FROM Assurance a " +
 		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL AND a.lokSabhaSessionNo IS NULL " +
 		       "ORDER BY a.createdAt DESC")
-	Page<Assurance> findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNull(Pageable pageable);
+	Page<Assurance> findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNullV2(Pageable pageable);
 
 //	@Query("SELECT a FROM Assurance a " +
 //		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL " +
@@ -57,16 +57,16 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 	List<Assurance> findFilteredAssurances(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
 			@Param("ministryId") Long ministryId, @Param("memberId") Long memberId);
 
-//	@Query("SELECT a FROM Assurance a " +
-//		       "WHERE a.rajyaSabhaSessionNo IS NULL AND a.lokSabhaSessionNo IS NOT NULL " +
-//		       "ORDER BY a.createdAt DESC")
-//		List<Assurance> findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNull();
+	@Query("SELECT a FROM Assurance a " +
+		       "WHERE a.rajyaSabhaSessionNo IS NULL AND a.lokSabhaSessionNo IS NOT NULL " +
+		       "ORDER BY a.createdAt DESC")
+		List<Assurance> findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNull();
 	
 //  *************************  adding pagination to the above query *******************************
 	@Query("SELECT a FROM Assurance a " +
 		       "WHERE a.rajyaSabhaSessionNo IS NULL AND a.lokSabhaSessionNo IS NOT NULL " +
 		       "ORDER BY a.createdAt DESC")
-	Page<Assurance> findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNull(Pageable pageable);
+	Page<Assurance> findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNullV2(Pageable pageable);
 
 	@Query("SELECT a FROM Assurance a WHERE a.rajyaSabhaSessionNo IS NULL "
 			+ "AND (a.lokSabhaSessionNo IS NOT NULL) " + "AND (a.assuranceDate >= :fromDate or :fromDate is null)"

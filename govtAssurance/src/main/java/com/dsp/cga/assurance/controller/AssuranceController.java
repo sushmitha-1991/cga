@@ -83,19 +83,36 @@ public class AssuranceController {
 	    @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
 	    @ApiResponse(responseCode = "500", description = "Internal server error")
 	})
-	public ResponseEntity<Map<String, Object>> getAllAssurance(
-			@RequestParam(defaultValue = "0") int page,
-	        @RequestParam(defaultValue = "10") int size) {
-		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-		Page<AssuranceDTO> assurancePage = assuranceService.getAllAssurance(pageable);
-//	    List<AssuranceDTO> assuranceList = assuranceService.getAllAssurance();
+	public ResponseEntity<Map<String, Object>> getAllAssurance() {
+	    List<AssuranceDTO> assuranceList = assuranceService.getAllAssurance();
 
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("statusCode", HttpStatus.OK.value());
 	    response.put("success", true);
 	    response.put("message", "assurance fetched successfully");
-//	    response.put("count", assuranceList.size()); // ✅ new count field
-//	    response.put("data", assuranceList);         // ✅ keep data as-is
+	    response.put("count", assuranceList.size()); // ✅ new count field
+	    response.put("data", assuranceList);         // ✅ keep data as-is
+
+	    return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+//	*********** pagination added *************************
+	@GetMapping("/v2/getAll")
+	@Operation(summary = "Get all Assurance")
+	@ApiResponses(value = {
+	    @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
+	    @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<Map<String, Object>> getAllAssuranceV2(
+			@RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+		Page<AssuranceDTO> assurancePage = assuranceService.getAllAssuranceV2(pageable);
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("statusCode", HttpStatus.OK.value());
+	    response.put("success", true);
+	    response.put("message", "assurance fetched successfully");
 	    response.put("count", assurancePage.getTotalElements()); // total count
 	    response.put("currentPage", assurancePage.getNumber());
 	    response.put("totalPages", assurancePage.getTotalPages());
@@ -103,7 +120,6 @@ public class AssuranceController {
 
 	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-
 
 //	@GetMapping("/getAll")
 //	@Operation(summary = "Get all Assurance")
@@ -170,19 +186,36 @@ public class AssuranceController {
 	    @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
 	    @ApiResponse(responseCode = "500", description = "Internal server error")
 	})
-	public ResponseEntity<Map<String, Object>> getAllLokSabhaAssurance(
-			@RequestParam(defaultValue = "0") int page,
-	        @RequestParam(defaultValue = "10") int size) {
-		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-	    Page<AssuranceDTO> assurancePage = assuranceService.getAllLokSabhaAssurance(pageable);
-//	    List<AssuranceDTO> assuranceList = assuranceService.getAllLokSabhaAssurance();
+	public ResponseEntity<Map<String, Object>> getAllLokSabhaAssurance() {
+	    List<AssuranceDTO> assuranceList = assuranceService.getAllLokSabhaAssurance();
 
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("statusCode", HttpStatus.OK.value());
 	    response.put("success", true);
 	    response.put("message", "assurance fetched successfully");
-//	    response.put("count", assuranceList.size()); // ✅ new count field
-//	    response.put("data", assuranceList);         // ✅ keep data as-is
+	    response.put("count", assuranceList.size()); // ✅ new count field
+	    response.put("data", assuranceList);         // ✅ keep data as-is
+
+	    return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+//  ************  pagination added   *****************
+	@GetMapping("/v2/getAllLokSabha")
+	@Operation(summary = "Get all Assurance")
+	@ApiResponses(value = {
+	    @ApiResponse(responseCode = "200", description = "Assurance fetched successfully"),
+	    @ApiResponse(responseCode = "500", description = "Internal server error")
+	})
+	public ResponseEntity<Map<String, Object>> getAllLokSabhaAssuranceV2(
+			@RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+	    Page<AssuranceDTO> assurancePage = assuranceService.getAllLokSabhaAssuranceV2(pageable);
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("statusCode", HttpStatus.OK.value());
+	    response.put("success", true);
+	    response.put("message", "assurance fetched successfully");
 	    response.put("count", assurancePage.getTotalElements()); // total count
 	    response.put("currentPage", assurancePage.getNumber());
 	    response.put("totalPages", assurancePage.getTotalPages());
@@ -190,7 +223,6 @@ public class AssuranceController {
 
 	    return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-
 
 
 	@GetMapping("/{id}")

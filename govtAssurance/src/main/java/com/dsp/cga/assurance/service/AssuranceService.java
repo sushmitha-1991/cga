@@ -18,9 +18,9 @@ public interface AssuranceService {
 
 	AssuranceDTO createAssurance(AssuranceDTO assuranceDTO);
 
-//	List<AssuranceDTO> getAllAssurance();
+	List<AssuranceDTO> getAllAssurance();
 //	****** added pagination to the above service ****************
-	Page<AssuranceDTO> getAllAssurance(Pageable pageable);
+	Page<AssuranceDTO> getAllAssuranceV2(Pageable pageable);
 
 	AssuranceDTO getAssuranceById(Long id);
 
@@ -34,9 +34,9 @@ public interface AssuranceService {
 
 	List<AssuranceDTO> getFilteredAssurances(LocalDate fromDate, LocalDate toDate, Long ministryId, Long rajyaSabhaSessionNo, Long memberId);
 
-//	List<AssuranceDTO> getAllLokSabhaAssurance();
+	List<AssuranceDTO> getAllLokSabhaAssurance();
 //	****** added pagination to the above service ****************
-	Page<AssuranceDTO> getAllLokSabhaAssurance(Pageable pageable);
+	Page<AssuranceDTO> getAllLokSabhaAssuranceV2(Pageable pageable);
 
 	List<AssuranceDTO> getFilteredAssurancesLs(LocalDate fromDate, LocalDate toDate, Long ministryId,Long lokSabhaNo, Long lokSabhaSessionNo, Long memberId);
 
