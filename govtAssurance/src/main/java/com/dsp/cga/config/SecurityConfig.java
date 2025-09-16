@@ -74,9 +74,11 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		log.debug("Configuring SecurityFilterChain");
 
-		http.authorizeHttpRequests(
-				(authz) -> authz.requestMatchers("/cga/v3/api-docs/**", "/cga/swagger-ui/**", "/cga/swagger-ui.html/**","/cga/dsp1/govtAssuranceList","/cga/reports/generate-excel")
-						.permitAll().requestMatchers("/**").hasRole("ADMIN").anyRequest().authenticated())
+		http.authorizeHttpRequests((authz) -> authz
+				.requestMatchers("/cga/v3/api-docs/**", "/cga/swagger-ui/**", "/cga/swagger-ui.html/**",
+						"/cga/dsp1/govtAssuranceList", "/cga/reports/generate-excel")
+				.permitAll().requestMatchers("/**").hasRole("ADMIN").requestMatchers("/cga/reports/**")
+				.hasAnyRole("ADMIN", "VR", "VRADMIN").anyRequest().authenticated())
 				.csrf(AbstractHttpConfigurer::disable).authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
