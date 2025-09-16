@@ -77,7 +77,8 @@ public class SecurityConfig {
 		http.authorizeHttpRequests((authz) -> authz
 				.requestMatchers("/cga/v3/api-docs/**", "/cga/swagger-ui/**", "/cga/swagger-ui.html/**",
 						"/cga/dsp1/govtAssuranceList", "/cga/reports/generate-excel")
-				.permitAll().requestMatchers("/**").hasRole("ADMIN").requestMatchers("/cga/reports/**")
+				.permitAll().requestMatchers("/**").hasRole("ADMIN")
+				.requestMatchers("/cga/reports/generate-excel/**", "/cga/reports/generate-generic-report/**")
 				.hasAnyRole("ADMIN", "VR", "VRADMIN").anyRequest().authenticated())
 				.csrf(AbstractHttpConfigurer::disable).authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
