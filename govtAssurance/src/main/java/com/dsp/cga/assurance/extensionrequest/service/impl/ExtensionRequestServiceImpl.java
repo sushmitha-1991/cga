@@ -325,7 +325,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 		ResponseEntity<GenericResponse<StatusDTO>> response = restTemplate.exchange(statusServiceUrl, HttpMethod.GET,
 				null, new ParameterizedTypeReference<GenericResponse<StatusDTO>>() {
 				});
-		System.out.println(response);
+		//System.out.println(response);
 
 		if (!response.getStatusCode().is2xxSuccessful()) {
 			log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(),
@@ -1223,7 +1223,7 @@ public class ExtensionRequestServiceImpl implements ExtensionRequestService {
 
 		clubbedAssuranceRepository.findAll(spec).forEach(req -> {
 
-			System.out.println(req);
+			// System.out.println(req);
 			
 			response.add(buildDTO(req.getAssurance(), req));
 

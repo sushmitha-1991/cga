@@ -156,7 +156,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		ResponseEntity<GenericResponse<StatusDTO>> response = restTemplate.exchange(statusServiceUrl, HttpMethod.GET,
 				null, new ParameterizedTypeReference<GenericResponse<StatusDTO>>() {
 				});
-		System.out.println(response);
+		//System.out.println(response);
 
 		if (!response.getStatusCode().is2xxSuccessful()) {
 			log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(),
@@ -202,7 +202,7 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 		ResponseEntity<GenericResponse<AcceptedDTO>> response = restTemplate.exchange(statusServiceUrl, HttpMethod.GET,
 				null, new ParameterizedTypeReference<GenericResponse<AcceptedDTO>>() {
 				});
-		System.out.println(response);
+		//System.out.println(response);
 
 		if (!response.getStatusCode().is2xxSuccessful()) {
 			log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(),
@@ -441,14 +441,14 @@ public class DroppingRequestServiceImpl implements DroppingRequestService {
 			
 			// New to be created. Validate if dropping exists for the assurance
 			Long count = droppingRequestRepository.countByAssuranceId(droppingRequestDTO.getAssuranceId());
-			System.out.println("Droppings Existing for assurance ID: " + count);
+			// System.out.println("Droppings Existing for assurance ID: " + count);
 			if (count > 0) {
 				return null;  
 			}
 			
-			System.out.println(droppingRequestDTO);
+			// System.out.println(droppingRequestDTO);
 			DroppingRequest entity = DroppingRequestMapper.toEntity(droppingRequestDTO);
-			System.out.println(entity);
+			// System.out.println(entity);
 			DroppingRequest saved = droppingRequestRepository.save(entity);
 	        return DroppingRequestMapper.toDTO(saved);
 		}

@@ -597,7 +597,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 		ResponseEntity<GenericResponse<StatusDTO>> response = restTemplate.exchange(statusServiceUrl, HttpMethod.GET,
 				null, new ParameterizedTypeReference<GenericResponse<StatusDTO>>() {
 				});
-		System.out.println(response);
+		//System.out.println(response);
 
 		if (!response.getStatusCode().is2xxSuccessful()) {
 			log.error("Failed to fetch data from master service for Status: {} - {}", response.getStatusCode(),
@@ -621,7 +621,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 		ResponseEntity<GenericResponse<SourceDTO>> response = restTemplate.exchange(sourceServiceUrl, HttpMethod.GET,
 				null, new ParameterizedTypeReference<GenericResponse<SourceDTO>>() {
 				});
-		System.out.println(response);
+		//System.out.println(response);
 		if (!response.getStatusCode().is2xxSuccessful()) {
 			log.error("Failed to fetch data from master service: {} - {}", response.getStatusCode(),
 					response.getBody());
@@ -642,7 +642,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 		ResponseEntity<GenericResponse<SupplementDTO>> response = restTemplate.exchange(supplemantServiceUrl, HttpMethod.GET,
 				null, new ParameterizedTypeReference<GenericResponse<SupplementDTO>>() {
 				});
-		System.out.println(response);
+		// System.out.println(response);
 		if (!response.getStatusCode().is2xxSuccessful()) {
 			log.error("Failed to fetch data from master service: {} - {}", response.getStatusCode(),
 					response.getBody());
@@ -662,7 +662,7 @@ public class AssuranceServiceImpl implements AssuranceService {
 		ResponseEntity<GenericResponse<AssuranceTypeDTO>> response = restTemplate.exchange(assuranceTypeServiceUrl,
 				HttpMethod.GET, null, new ParameterizedTypeReference<GenericResponse<AssuranceTypeDTO>>() {
 				});
-		System.out.println(response);
+		// System.out.println(response);
 
 		if (!response.getStatusCode().is2xxSuccessful()) {
 			log.error("Failed to fetch data from master service for Assurance Type: {} - {}", response.getStatusCode(),

@@ -308,7 +308,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 					GenericResponse.class);
 
 			System.out.println("@@@");
-			System.out.println(response);
+			//System.out.println(response);
 			if (response.getBody() != null && response.getBody().isSuccess()) {
 				return response.getBody().getMessage(); // Return success message
 			} else {
@@ -396,7 +396,7 @@ public class ImplemantationRequestServiceImpl implements ImplementationRequestSe
 //	    savedDTO.setCommitteeDecisionDTO(implementationRequestDTO.getCommitteeDecisionDTO());
 
 	    // Return response
-		System.out.println("Response returned");
+		//System.out.println("Response returned");
 		
 	    return new GenericResponse<>(HttpStatus.CREATED.value(), true, 
 	    		generateResponseMsg(implementationRequestDTO, savedDTO.getAssuranceNo()), savedDTO);
