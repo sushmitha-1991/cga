@@ -76,7 +76,15 @@ public class JwtFilter extends OncePerRequestFilter {
 				log.debug("No username found or authentication already set in context");
 			}
 			chain.doFilter(request, response);
-		} catch (JwtException e) {
+		}
+		// changes for expired token
+
+		catch (io.jsonwebtoken.ExpiredJwtException e) {
+			log.error("Expired JWT token: {}", e.getMessage());
+			sendErrorResponse(response, 498, false, "JWT token has expired");
+		}
+		// changes for expired token
+		catch (JwtException e) {
 			log.error("Invalid JWT token: {}", e.getMessage(), e); // Log the exception stack trace
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.getWriter().write("Invalid JWT token");
@@ -86,4 +94,23 @@ public class JwtFilter extends OncePerRequestFilter {
 			response.getWriter().write("An error occurred while processing the authentication request");
 		}
 	}
+	// changes for expired token
+
+	private void sendErrorResponse(HttpServletResponse response, int status, boolean success, String message)
+
+			throws IOException {
+		response.setStatus(status);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+
+		GenericResponse<Object> genericResponse = new GenericResponse<>(status, success, message, null);
+
+		// Convert object to JSON
+		ObjectMapper mapper = new ObjectMapper();
+		String json = mapper.writeValueAsString(genericResponse);
+
+		response.getWriter().write(json);
+	}
+
+	// changes for expired token
 }
