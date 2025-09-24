@@ -18,7 +18,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.dsp.cga.assurance.service.impl.CustomUserDetailsService;
+import com.dsp.cga.response.GenericResponse;
 import com.dsp.cga.util.JwtUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
