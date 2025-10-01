@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
 		GenericResponse<Void> response = new GenericResponse<>(HttpStatus.OK.value(), false, ex.getMessage(), null);
 
 		// Return the response with HTTP 400 status
-		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	@ExceptionHandler(IllegalStateException.class)
