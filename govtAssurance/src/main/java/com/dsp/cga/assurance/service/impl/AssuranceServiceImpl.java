@@ -432,12 +432,12 @@ public class AssuranceServiceImpl implements AssuranceService {
 //	************************ pagination added ************************
 	@Override
 	@Transactional
-	public Page<AssuranceDTO> getAllAssuranceV2(Pageable pageable) {
+	public Page<AssuranceDTO> getAllAssuranceV2(Pageable pageable,Long sessionNo,LocalDate fromDate,LocalDate toDate,Long memberId,Long ministryId) {
 		log.debug("Entering getAllAssurance with pagination: {}", pageable);
 
 		// Fetch only assurances where rajyaSabhaSessionNo is not null
 		Page<Assurance> assurances = assuranceRepository
-				.findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNullV2(pageable);
+				.findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNullV2(pageable,fromDate,toDate,ministryId,memberId,sessionNo);
 		log.debug("Fetched Assurances with non-null rajyaSabhaSessionNo: {}", assurances);
 
 		List<AssuranceDTO> assuranceDTOs=assurances.stream().map(assurance -> {
@@ -1174,11 +1174,13 @@ public class AssuranceServiceImpl implements AssuranceService {
 
 	
 	@Override
-	public Page<AssuranceDTO> getAllLokSabhaAssuranceV2(Pageable pageable) {
+	public Page<AssuranceDTO> getAllLokSabhaAssuranceV2(Pageable pageable,Long lokSabhaNo,Long sessionNo,LocalDate fromDate,LocalDate toDate,Long memberId,Long ministryId) {
 		log.debug("Entering getAllAssurance with pagination: {}", pageable);
+		log.debug("Filters => fromDate: {}, toDate: {}, memberId: {}, ministryId: {}, sessionNo: {}, lokSabhaNo: {}",
+		          fromDate, toDate, memberId, ministryId, sessionNo, lokSabhaNo);
 		// Fetch only assurances where rajyaSabhaSessionNo is null
 		Page<Assurance> assurances = assuranceRepository
-				.findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNullV2(pageable);
+				.findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNullV2(pageable,fromDate,toDate,ministryId,memberId,lokSabhaNo,sessionNo);
 		log.debug("Fetched Assurances with null rajyaSabhaSessionNo: {}", assurances);
 
 		 List<AssuranceDTO> assuranceDTOs = assurances.stream().map(assurance -> {

@@ -30,9 +30,15 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 	
 //  *************************  adding pagination to the above query *******************************
 	@Query("SELECT a FROM Assurance a " +
-		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL AND a.lokSabhaSessionNo IS NULL " +
-		       "ORDER BY a.createdAt DESC")
-	Page<Assurance> findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNullV2(Pageable pageable);
+		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL AND a.lokSabhaSessionNo IS NULL " 
+		       +"AND (:sessionNo IS NULL or a.rajyaSabhaSessionNo =:sessionNo)"
+				+"AND (:ministryId is null or a.ministryId = :ministryId)"
+			    +"AND (:memberId is null or a.memberId = :memberId)"
+			    +"AND (CAST(:fromDate AS date) is null or a.assuranceDate >= :fromDate)"
+			    +"AND (CAST(:toDate AS date) is null or a.assuranceDate <= :toDate)"
+		       +"ORDER BY a.createdAt DESC")
+	Page<Assurance> findAssuranceWithRajyaSabhaSessionNotNullAndLokSabhaSessionNullV2(Pageable pageable,@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
+			@Param("ministryId") Long ministryId, @Param("memberId") Long memberId,@Param("sessionNo") Long sessionNo);
 
 //	@Query("SELECT a FROM Assurance a " +
 //		       "WHERE a.rajyaSabhaSessionNo IS NOT NULL " +
@@ -64,9 +70,16 @@ public interface AssuranceRepository extends JpaRepository<Assurance, Long>, Ass
 	
 //  *************************  adding pagination to the above query *******************************
 	@Query("SELECT a FROM Assurance a " +
-		       "WHERE a.rajyaSabhaSessionNo IS NULL AND a.lokSabhaSessionNo IS NOT NULL " +
-		       "ORDER BY a.createdAt DESC")
-	Page<Assurance> findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNullV2(Pageable pageable);
+		       "WHERE a.rajyaSabhaSessionNo IS NULL AND a.lokSabhaSessionNo IS NOT NULL " 
+			+"AND (:lokSabhaNo IS NULL or a.lokSabhaNo =:lokSabhaNo)"
+		    +"AND (:sessionNo IS NULL or a.lokSabhaSessionNo =:sessionNo)"
+			+"AND (:ministryId is null or a.ministryId = :ministryId)"
+		    +"AND (:memberId is null or a.memberId = :memberId)"
+		    +"AND (CAST(:fromDate AS date) is null or a.assuranceDate >= :fromDate)"
+		    +"AND (CAST(:toDate AS date) is null or a.assuranceDate <= :toDate)"
+		    +"ORDER BY a.createdAt DESC")
+	Page<Assurance> findAssuranceWithRajyaSabhaSessionNullAndLokSabhaSessionNotNullV2(Pageable pageable,@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate,
+			@Param("ministryId") Long ministryId, @Param("memberId") Long memberId,@Param("lokSabhaNo") Long lokSabhaNo,@Param("sessionNo") Long sessionNo);
 
 	@Query("SELECT a FROM Assurance a WHERE a.rajyaSabhaSessionNo IS NULL "
 			+ "AND (a.lokSabhaSessionNo IS NOT NULL) " + "AND (a.assuranceDate >= :fromDate or :fromDate is null)"
