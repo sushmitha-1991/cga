@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new GenericResponse<>(
 				HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "An unexpected error occurred.", null));
 	}
- 	
+
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<GenericResponse<Void>> handleResourceNotFoundException(ResourceNotFoundException ex) {
 		GenericResponse<Void> response = new GenericResponse<>(HttpStatus.NOT_FOUND.value(), false, ex.getMessage(),
@@ -31,16 +31,15 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<GenericResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
 		// Create a GenericResponse with a failure status
-		GenericResponse<Void> response = new GenericResponse<>(HttpStatus.BAD_REQUEST.value(), false, ex.getMessage(),
-				null);
+		GenericResponse<Void> response = new GenericResponse<>(HttpStatus.OK.value(), false, ex.getMessage(), null);
 
 		// Return the response with HTTP 400 status
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
-	
+
 	@ExceptionHandler(IllegalStateException.class)
 	public ResponseEntity<String> handleIllegalState(IllegalStateException ex) {
-	    return ResponseEntity.badRequest().body(ex.getMessage());
+		return ResponseEntity.badRequest().body(ex.getMessage());
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
@@ -54,7 +53,7 @@ public class GlobalExceptionHandler {
 		GenericResponse<Map<String, String>> response = new GenericResponse<>(HttpStatus.BAD_REQUEST.value(), false,
 				"Validation failed", errors);
 
-		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); 
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(UserNotFoundException.class)
@@ -62,13 +61,12 @@ public class GlobalExceptionHandler {
 		GenericResponse<String> response = new GenericResponse<>(HttpStatus.UNAUTHORIZED.value(), false,
 				ex.getMessage(), null);
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-	}	
+	}
 
-	//	@ExceptionHandler(IllegalArgumentException.class)
+	// @ExceptionHandler(IllegalArgumentException.class)
 //	public ResponseEntity<GenericResponse<Object>> handleIllegalArgument(IllegalArgumentException ex) {
 //	    GenericResponse<Object> response = new GenericResponse<>(HttpStatus.BAD_REQUEST.value(), false, ex.getMessage(), null);
 //	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 //	}
-
 
 }
