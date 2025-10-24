@@ -16,6 +16,12 @@ public class DroppingRequestMapper {
 	        if (dto == null) {
 	            return null;
 	        }
+	        
+	        boolean fromMinistry = dto.getFromMinistry();
+	        String statusForMinistry = dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : 
+										(fromMinistry ? MinistryStatus.SUBMITTED.getValue() 
+											          : MinistryStatus.ACCEPTED.getValue());
+
 
 	        return DroppingRequest.builder()
 				.id(dto.getId())
@@ -37,9 +43,10 @@ public class DroppingRequestMapper {
 				.type(dto.getType())
 				.issueLetterMinistry(dto.getIssueLetterMinistry())
 				.communicationDate(dto.getCommunicationDate())
-				.fromMinistry(true)
-				.statusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue())
-				.statusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
+//				.fromMinistry(true)
+				.fromMinistry(dto.getFromMinistry())
+				.statusForMinistry(statusForMinistry)
+				.statusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(statusForMinistry))
 				.session(dto.getSession())
 				.build();
 	    }
@@ -73,6 +80,7 @@ public class DroppingRequestMapper {
 	                .session(entity.getSession())
 	                .statusForMinistry(entity.getStatusForMinistry())
 	                .statusForCga(entity.getStatusForCga())
+	                .fromMinistry(entity.getFromMinistry())
 	                .build();
 	    }
 

@@ -46,6 +46,7 @@ public class DroppingRequestDTO {
 
 	private String remarks;
 
+	@Builder.Default
 	private Boolean draftStatus = Boolean.FALSE;
 
 	// private StatusDTO statusDTO;
@@ -73,5 +74,8 @@ public class DroppingRequestDTO {
 	private String statusForMinistry;
 	
 	private String statusForCga;
+	
+	@Builder.Default
+	private Boolean fromMinistry = true;
 
 }
