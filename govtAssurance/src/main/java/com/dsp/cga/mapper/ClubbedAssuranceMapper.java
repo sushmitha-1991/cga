@@ -27,14 +27,21 @@ public class ClubbedAssuranceMapper {
 	    public static ClubbedAssurance toEntity(ClubbedAssuranceDTO dto) {
 	        if (dto == null) return null;
 
+	        boolean fromMinistry = dto.getFromMinistry();
+	        String statusForMinistry = dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : 
+										(fromMinistry ? MinistryStatus.SUBMITTED.getValue() 
+											          : MinistryStatus.ACCEPTED.getValue());
 	        return ClubbedAssurance.builder()
 	                .id(dto.getId())
 	                .assuranceId(dto.getAssuranceId())
 	                .clubbedAssuranceIds(dto.getClubbedAssuranceIds())
 	                .date(dto.getDate())
-					.fromMinistry(true)
-					.statusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue())
-					.statusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
+//					.fromMinistry(true)
+//					.statusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue())
+//					.statusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()))
+					.fromMinistry(dto.getFromMinistry())
+					.statusForMinistry(statusForMinistry)
+					.statusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(statusForMinistry))
 	                .build();
 	    }
 	    

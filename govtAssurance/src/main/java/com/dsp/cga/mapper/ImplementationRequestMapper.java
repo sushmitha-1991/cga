@@ -49,6 +49,14 @@ public class ImplementationRequestMapper {
             return null;
         }
         
+        if (dto.getFromMinistry()) {
+            dto.setStatusForMinistry(dto.getDraftStatus() ? MinistryStatus.DRAFT.getValue() : MinistryStatus.SUBMITTED.getValue());
+			dto.setStatusForCga(dto.getDraftStatus() ? null : Utils.getStatusForCga(MinistryStatus.SUBMITTED.getValue()));
+        } else {
+            dto.setStatusForMinistry(MinistryStatus.ACCEPTED.getValue());
+			dto.setStatusForCga(CgaStatus.ACCEPTED.getValue());  
+        }
+        
         return ImplementationRequest.builder()
                 //.id(dto.getId())
                 .assuranceId(dto.getAssuranceId())

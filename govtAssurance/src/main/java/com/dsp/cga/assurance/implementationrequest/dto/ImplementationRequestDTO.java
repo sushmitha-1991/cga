@@ -49,5 +49,8 @@ public class ImplementationRequestDTO {
 	private Boolean draftStatus = Boolean.FALSE; // Make sure this is handled correctly in your application logic
 	private String statusForCga;
 	private String statusForMopa;
+	
+	@Builder.Default
+	private Boolean fromMinistry = true;
 
 }
