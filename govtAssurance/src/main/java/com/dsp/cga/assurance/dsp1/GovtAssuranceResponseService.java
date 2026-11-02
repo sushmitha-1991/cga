@@ -6,13 +6,18 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import com.dsp.cga.assurance.repository.BaseUserRepository;
+
 @Service
 public class GovtAssuranceResponseService {
 
+    @Autowired
+    private BaseUserRepository userRepository;
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -33,6 +38,7 @@ public class GovtAssuranceResponseService {
             Long sessionTo,
             String house
     ) {
+
     	
         StringBuilder sql = new StringBuilder("""
             SELECT
@@ -72,12 +78,12 @@ public class GovtAssuranceResponseService {
 
         Map<String, Object> paramMap = new HashMap<>();
        //paramMap.put("mpCode", mpCode);
-        if(house!=null && house.equalsIgnoreCase("LS")) {
-        	paramMap.put("house", 2);
-        	
-        } else {
-        	paramMap.put("house", 1);
-        }
+        if(house!=null) {
+        Integer houseId=getHouseIdByAbbr(house);
+
+        	paramMap.put("house", houseId);
+        } 
+        
        if (mpCode != null) {
            sql.append(" AND pd.mp_code = :mpCode");
            paramMap.put("mpCode", mpCode);
@@ -173,5 +179,19 @@ public class GovtAssuranceResponseService {
         dto.set_metadata(metadata);
 
         return dto;
+    }
+
+    private Integer getHouseIdByAbbr(String house) {
+    if (StringUtils.isBlank(house)) {
+        throw new IllegalArgumentException("House abbreviation cannot be empty");
+    }
+
+    Integer houseId = userRepository.fetchHouseIdByAbbr(house);
+
+    if (houseId == null) {
+        throw new IllegalArgumentException("Invalid house abbreviation: " + house);
+    }
+
+    return houseId;
     }
 }

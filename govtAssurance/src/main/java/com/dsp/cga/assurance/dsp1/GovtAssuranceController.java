@@ -31,7 +31,7 @@ public class GovtAssuranceController {
         @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    public ResponseEntity<GenericResponse<GovtAssuranceResponseDTO>> getAssuranceList(
+    public GovtAssuranceResponseDTO getAssuranceList(
             @RequestParam (required = false)String mpCode,
             @RequestParam(required = false) String loksabha,
             @RequestParam(required = false) String session,
@@ -49,31 +49,33 @@ public class GovtAssuranceController {
             @RequestParam(required = true) String house
 
     ) {
-    GovtAssuranceResponseDTO dto = govtAssuranceResponseService.getGovtAssuranceList(
-            mpCode,
-            loksabha,
-            session,
-            subject,
-            member,
-            ministry,
-            qType,
-            status,
-            catg,
-            dateFrom,
-            dateTo,
-            rsSession,
-            sessionFrom,
-            sessionTo,
-            house
-    );
-
-    GenericResponse<GovtAssuranceResponseDTO> response = new GenericResponse<>(
-            HttpStatus.OK.value(),
-            true,
-            "Assurance list fetched successfully",
-            dto
-    );
-
-    return ResponseEntity.ok(response);
+        GovtAssuranceResponseDTO dto = govtAssuranceResponseService.getGovtAssuranceList(
+                mpCode,
+                loksabha,
+                session,
+                subject,
+                member,
+                ministry,
+                qType,
+                status,
+                catg,
+                dateFrom,
+                dateTo,
+                rsSession,
+                sessionFrom,
+                sessionTo,
+                house
+        );
+        return dto;
+        
+        // GenericResponse<GovtAssuranceResponseDTO> response = new GenericResponse<>(
+        //         HttpStatus.OK.value(),
+        //         true,
+        //         "Assurance list fetched successfully",
+        //         dto
+        // );
+        // return ResponseEntity.ok(response);
+        // retutn dto;
+        
 }
 }
